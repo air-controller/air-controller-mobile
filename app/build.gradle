@@ -1,8 +1,11 @@
+import io.gitlab.arturbosch.detekt.Detekt
+
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'com.yanzhenjie.andserver'
     id 'kotlin-kapt'
+    id "io.gitlab.arturbosch.detekt"
 }
 
 android {
@@ -31,6 +34,34 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    detekt {
+        toolVersion = "1.19.0-RC1"
+
+        failFast = true
+        buildUponDefaultConfig = false
+        allRules = true
+        autoCorrect = false
+        config = files("${project.rootDir.absolutePath}/config/detekt.yml")
+        debug = true
+
+        source = files(
+                "src/main/java"
+        )
+
+        reports {
+            html.enabled = true
+        }
+    }
+}
+
+tasks.withType(Detekt).configureEach {
+    jvmTarget = "1.8"
+}
+
+project.afterEvaluate {
+    def detekt = tasks.getByName("detekt")
+    tasks.getByName("preBuild").dependsOn(detekt)
 }
 
 dependencies {
