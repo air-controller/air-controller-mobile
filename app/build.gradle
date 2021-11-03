@@ -38,7 +38,6 @@ android {
     detekt {
         toolVersion = "1.19.0-RC1"
 
-        failFast = true
         buildUponDefaultConfig = false
         allRules = true
         autoCorrect = false
@@ -50,7 +49,10 @@ android {
         )
 
         reports {
-            html.enabled = true
+            html {
+                enabled = true
+                destination  = file("build/reports/detekt/detekt.html")
+            }
         }
     }
 }

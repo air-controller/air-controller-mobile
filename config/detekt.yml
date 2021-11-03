@@ -231,40 +231,40 @@ formatting:
   android: true
   autoCorrect: true
   AnnotationOnSeparateLine:
-    active: false
+    active: true
     autoCorrect: true
   AnnotationSpacing:
-    active: false
+    active: true
     autoCorrect: true
   ArgumentListWrapping:
-    active: false
+    active: true
     autoCorrect: true
   ChainWrapping:
-    active: false
+    active: true
     autoCorrect: true
   CommentSpacing:
     active: true
     autoCorrect: true
   EnumEntryNameCase:
-    active: false
+    active: true
     autoCorrect: true
   Filename:
     active: true
   FinalNewline:
-    active: false
+    active: true
     autoCorrect: true
     insertFinalNewLine: true
   ImportOrdering:
-    active: false
+    active: true
     autoCorrect: true
     layout: 'idea'
   Indentation:
-    active: false
+    active: true
     autoCorrect: true
     indentSize: 4
     continuationIndentSize: 4
   MaximumLineLength:
-    active: false
+    active: true
     maxLineLength: 120
   ModifierOrdering:
     active: true
@@ -282,7 +282,7 @@ formatting:
     active: true
     autoCorrect: true
   NoEmptyFirstLineInMethodBlock:
-    active: false
+    active: true
     autoCorrect: true
   NoLineBreakAfterElse:
     active: true
@@ -327,7 +327,7 @@ formatting:
     active: true
     autoCorrect: true
   SpacingAroundDoubleColon:
-    active: false
+    active: true
     autoCorrect: true
   SpacingAroundKeyword:
     active: true
@@ -342,10 +342,10 @@ formatting:
     active: true
     autoCorrect: true
   SpacingBetweenDeclarationsWithAnnotations:
-    active: false
+    active: true
     autoCorrect: true
   SpacingBetweenDeclarationsWithComments:
-    active: false
+    active: true
     autoCorrect: true
   StringTemplate:
     active: true
