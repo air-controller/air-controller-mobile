@@ -5,7 +5,6 @@ import android.os.Environment
 import com.yanzhenjie.andserver.annotation.Config
 import com.yanzhenjie.andserver.framework.config.WebConfig
 import com.yanzhenjie.andserver.framework.website.FileBrowser
-import com.yanzhenjie.andserver.framework.website.StorageWebsite
 
 @Config
 class AppConfig : WebConfig {

@@ -1,6 +1,12 @@
 package com.youngfeng.android.assistant.web.controller
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Environment
+import android.text.TextUtils
+import androidx.core.content.ContextCompat
 import com.yanzhenjie.andserver.annotation.*
+import com.youngfeng.android.assistant.app.MobileAssistantApplication
 import com.youngfeng.android.assistant.web.HttpError
 import com.youngfeng.android.assistant.web.HttpModule
 import com.youngfeng.android.assistant.web.entity.FileEntity
@@ -11,18 +17,27 @@ import java.io.File
 
 @RestController
 @RequestMapping("/file")
-class FileController {
+open class FileController {
 
-    /**
-     * 以下代码仅为举例，逻辑仍需完善
-     */
     @PostMapping("/list")
     @ResponseBody
     fun getFileList(@RequestBody requestBody: GetFileListRequest): HttpResponseEntity<List<FileEntity>> {
-        val dir = File(requestBody.path)
+        // 先判断是否存在读取外部存储权限
+        if (ContextCompat.checkSelfPermission(MobileAssistantApplication.getInstance(),
+                Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.NoReadExternalStoragePerm).build();
+        }
+
+        var path = requestBody.path
+        if (TextUtils.isEmpty(path)) {
+            path = Environment.getExternalStorageDirectory().absolutePath;
+        }
+
+        val dir = File(path)
 
         if (!dir.isDirectory) {
-            return ErrorBuilder().mode(HttpModule.FileModule).error(HttpError.FileIsNotADir).build()
+            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.FileIsNotADir).build()
         }
 
         val files = dir.listFiles()
@@ -40,5 +55,4 @@ class FileController {
 
         return HttpResponseEntity.success(data)
     }
-
 }

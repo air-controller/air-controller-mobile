@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">AndroidMobileAssistant</string>
+    <string name="no_read_external_storage_perm">无访问内部存储权限，请前往设置中开启</string>
+    <string name="this_file_is_not_a_dir">该文件不是一个目录</string>
 </resources>

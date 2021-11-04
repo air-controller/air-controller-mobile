@@ -6,7 +6,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:7.0.2"
+        classpath "com.android.tools.build:gradle:7.0.3"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.30"
         classpath 'com.yanzhenjie.andserver:plugin:2.1.9'
         classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.19.0-RC1"

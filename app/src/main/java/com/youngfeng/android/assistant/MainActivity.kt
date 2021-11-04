@@ -6,7 +6,7 @@ import com.yanzhenjie.andserver.AndServer
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
-    private val mServer by lazy {
+    private val mServer by lazy(mode = LazyThreadSafetyMode.NONE) {
         AndServer.webServer(this)
             .port(8080)
             .timeout(10, TimeUnit.SECONDS)

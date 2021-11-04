@@ -8,7 +8,7 @@ class ErrorBuilder {
     var mode: HttpModule? = null
     var error: HttpError? = null
 
-    fun mode(module: HttpModule): ErrorBuilder {
+    fun module(module: HttpModule): ErrorBuilder {
         this.mode = module
         return this
     }
