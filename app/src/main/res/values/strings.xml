@@ -1,5 +1,10 @@
 <resources>
     <string name="app_name">AndroidMobileAssistant</string>
-    <string name="no_read_external_storage_perm">无访问内部存储权限，请前往设置中开启</string>
+    <string name="no_read_external_storage_perm">无访问存储卡权限，请前往设置中开启</string>
     <string name="this_file_is_not_a_dir">该文件不是一个目录</string>
+    <string name="no_write_external_storage_perm">无操作存储卡权限，请前往设置中开启</string>
+    <string name="invalid_file_name">无效文件名，请重新输入</string>
+    <string name="file_name_cant_empty">文件名不能为空</string>
+    <string name="folder_cant_empty">文件名不能为空</string>
+    <string name="file_create_fail">文件创建失败</string>
 </resources>
