@@ -3,6 +3,7 @@ package com.youngfeng.android.assistant.web.controller
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Environment
+import android.os.FileUtils
 import android.text.TextUtils
 import androidx.core.content.ContextCompat
 import com.yanzhenjie.andserver.annotation.*
@@ -12,12 +13,9 @@ import com.youngfeng.android.assistant.web.HttpError
 import com.youngfeng.android.assistant.web.HttpModule
 import com.youngfeng.android.assistant.web.entity.FileEntity
 import com.youngfeng.android.assistant.web.entity.HttpResponseEntity
-import com.youngfeng.android.assistant.web.request.CreateFileRequest
-import com.youngfeng.android.assistant.web.request.DeleteFileRequest
-import com.youngfeng.android.assistant.web.request.GetFileListRequest
-import com.youngfeng.android.assistant.web.request.RenameFileRequest
+import com.youngfeng.android.assistant.web.request.*
 import com.youngfeng.android.assistant.web.util.ErrorBuilder
-import java.io.File
+import java.io.*
 import java.lang.Exception
 
 @RestController
@@ -204,6 +202,48 @@ open class FileController {
         } catch (e: Exception) {
             e.printStackTrace()
             val response = ErrorBuilder().module(HttpModule.FileModule).error(HttpError.RenameFileFail).build<Map<String, String>>()
+            response.msg = e.message
+            return response
+        }
+    }
+
+    @PostMapping("/move")
+    @ResponseBody
+    fun move(@RequestBody request: MoveFileRequest): HttpResponseEntity<Map<String, String>> {
+        // 先判断是否存在写入外部存储权限
+        if (ContextCompat.checkSelfPermission(MobileAssistantApplication.getInstance(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.NoWriteExternalStoragePerm).build();
+        }
+
+        val fileName = request.fileName
+
+        if (TextUtils.isEmpty(fileName)) {
+            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.FileNameEmpty).build();
+        }
+
+        val oldFolder = request.oldFolder
+
+        val file = File("$oldFolder/$fileName")
+
+        val newFolder = request.newFolder
+        val newFile = File("$newFolder/$$fileName")
+
+        try {
+            //  FIXME: 这样处理存在问题
+            val isSuccess = file.renameTo(newFile)
+            return if (isSuccess) {
+                HttpResponseEntity.success(mapOf(
+                    "newFolder" to newFolder,
+                    "name" to fileName
+                ))
+            } else {
+                ErrorBuilder().module(HttpModule.FileModule).error(HttpError.MoveFileFail).build()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            val response = ErrorBuilder().module(HttpModule.FileModule).error(HttpError.MoveFileFail).build<Map<String, String>>()
             response.msg = e.message
             return response
         }
