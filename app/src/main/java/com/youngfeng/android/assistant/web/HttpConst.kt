@@ -23,7 +23,9 @@ enum class HttpError(var code: String, var value: String) {
     FolderCantEmpty("06", MobileAssistantApplication.getInstance().getString(R.string.folder_cant_empty)),
     CreateFileFail("06", MobileAssistantApplication.getInstance().getString(R.string.file_create_fail)),
     FilePathCantEmpty("07", MobileAssistantApplication.getInstance().getString(R.string.file_path_cant_empty)),
-    DeleteFileFail("08", MobileAssistantApplication.getInstance().getString(R.string.delete_file_fail));
+    DeleteFileFail("08", MobileAssistantApplication.getInstance().getString(R.string.delete_file_fail)),
+    RenameFileFail("09", MobileAssistantApplication.getInstance().getString(R.string.rename_file_fail));
+
 
     fun getString(strRes: Int): String {
         return MobileAssistantApplication.getInstance().getString(strRes)

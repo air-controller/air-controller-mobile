@@ -9,4 +9,5 @@
     <string name="file_create_fail">文件创建失败</string>
     <string name="file_path_cant_empty">文件路径不能为空</string>
     <string name="delete_file_fail">删除文件失败</string>
+    <string name="rename_file_fail">文件重命名失败</string>
 </resources>

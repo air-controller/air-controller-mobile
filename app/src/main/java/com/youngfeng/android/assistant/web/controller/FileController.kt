@@ -15,6 +15,7 @@ import com.youngfeng.android.assistant.web.entity.HttpResponseEntity
 import com.youngfeng.android.assistant.web.request.CreateFileRequest
 import com.youngfeng.android.assistant.web.request.DeleteFileRequest
 import com.youngfeng.android.assistant.web.request.GetFileListRequest
+import com.youngfeng.android.assistant.web.request.RenameFileRequest
 import com.youngfeng.android.assistant.web.util.ErrorBuilder
 import java.io.File
 import java.lang.Exception
@@ -159,6 +160,50 @@ open class FileController {
         } catch (e: Exception) {
             e.printStackTrace()
             val response = ErrorBuilder().module(HttpModule.FileModule).error(HttpError.DeleteFileFail).build<Map<String, Any>>()
+            response.msg = e.message
+            return response
+        }
+    }
+
+    /**
+     * 重命名文件
+     */
+    @PostMapping("/rename")
+    @ResponseBody
+    fun rename(@RequestBody request: RenameFileRequest): HttpResponseEntity<Map<String, String>> {
+        // 先判断是否存在写入外部存储权限
+        if (ContextCompat.checkSelfPermission(MobileAssistantApplication.getInstance(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.NoWriteExternalStoragePerm).build();
+        }
+
+        val fileName = request.file
+
+        if (TextUtils.isEmpty(fileName)) {
+            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.FileNameEmpty).build();
+        }
+
+        val folder = request.folder
+
+        val file = File("$folder/$fileName")
+
+        val newName = request.newName
+        val newFile = File("$folder/$newName")
+
+        try {
+            val isSuccess = file.renameTo(newFile)
+            return if (isSuccess) {
+                HttpResponseEntity.success(mapOf(
+                    "folder" to folder,
+                    "newName" to newName
+                ))
+            } else {
+                ErrorBuilder().module(HttpModule.FileModule).error(HttpError.RenameFileFail).build();
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            val response = ErrorBuilder().module(HttpModule.FileModule).error(HttpError.RenameFileFail).build<Map<String, String>>()
             response.msg = e.message
             return response
         }
