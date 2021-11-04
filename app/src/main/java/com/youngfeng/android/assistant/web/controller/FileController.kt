@@ -13,6 +13,7 @@ import com.youngfeng.android.assistant.web.HttpModule
 import com.youngfeng.android.assistant.web.entity.FileEntity
 import com.youngfeng.android.assistant.web.entity.HttpResponseEntity
 import com.youngfeng.android.assistant.web.request.CreateFileRequest
+import com.youngfeng.android.assistant.web.request.DeleteFileRequest
 import com.youngfeng.android.assistant.web.request.GetFileListRequest
 import com.youngfeng.android.assistant.web.util.ErrorBuilder
 import java.io.File
@@ -120,6 +121,44 @@ open class FileController {
         } catch (e: Exception) {
             e.printStackTrace()
             val response = ErrorBuilder().module(HttpModule.FileModule).error(HttpError.CreateFileFail).build<Map<String, Any>>()
+            response.msg = e.message
+            return response
+        }
+    }
+
+    /**
+     * 删除文件
+     */
+    @PostMapping("/delete")
+    @ResponseBody
+    fun delete(@RequestBody request: DeleteFileRequest): HttpResponseEntity<Map<String, Any>> {
+        // 先判断是否存在写入外部存储权限
+        if (ContextCompat.checkSelfPermission(MobileAssistantApplication.getInstance(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.NoWriteExternalStoragePerm).build();
+        }
+
+        val path = request.file
+
+        if (TextUtils.isEmpty(path)) {
+            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.FilePathCantEmpty).build();
+        }
+
+        val file = File(path)
+        try {
+            val isSuccess = file.deleteRecursively()
+            return if (isSuccess) {
+                HttpResponseEntity.success(mapOf(
+                    "path" to path,
+                    "isDir" to request.isDir
+                ))
+            } else {
+                ErrorBuilder().module(HttpModule.FileModule).error(HttpError.DeleteFileFail).build()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            val response = ErrorBuilder().module(HttpModule.FileModule).error(HttpError.DeleteFileFail).build<Map<String, Any>>()
             response.msg = e.message
             return response
         }
