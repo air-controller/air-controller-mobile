@@ -49,9 +49,11 @@ open class FileController {
         files?.forEach {
             val fileEntity = FileEntity(
                 it.name,
-                it.absolutePath,
-                if (it.isFile) it.totalSpace else 0, it.isDirectory,
-                it.listFiles()?.isEmpty()
+                it.parentFile?.absolutePath ?:"",
+                if (it.isFile) it.length() else 0,
+                it.isDirectory,
+                it.lastModified(),
+                it.listFiles()?.isEmpty() ?: false
             )
             data.add(fileEntity)
         }
