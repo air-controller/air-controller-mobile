@@ -1,9 +1,8 @@
 package com.youngfeng.android.assistant.web.entity
 
 data class AlbumEntity(
-    var id: Int,
+    var id: String,
     var name: String,
-    var photoNum: Int,
+    var photoNum: Long = 0,
     var cover: String
-) {
-}
+)
