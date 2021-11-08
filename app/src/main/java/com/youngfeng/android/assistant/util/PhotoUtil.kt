@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
 import com.youngfeng.android.assistant.web.entity.AlbumEntity
+import com.youngfeng.android.assistant.web.entity.ImageEntity
 
 object PhotoUtil {
 
@@ -52,5 +53,48 @@ object PhotoUtil {
         }
 
         return map.values.toList()
+    }
+
+    @JvmStatic
+    fun getAllImages(context: Context): List<ImageEntity> {
+        val contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+
+        val projections = arrayOf(
+            MediaStore.Images.ImageColumns._ID,
+            MediaStore.Images.Thumbnails.DATA,
+            MediaStore.Images.ImageColumns.DATA
+        )
+
+        val orderBy = "${MediaStore.Images.ImageColumns.DATE_TAKEN} DESC"
+
+        val images = mutableListOf<ImageEntity>()
+        context.contentResolver.query(contentUri, projections, null, null, orderBy, null)?.use {
+            if (it.moveToFirst()) {
+                val idIndex = it.getColumnIndex(MediaStore.Images.ImageColumns._ID)
+                val thumbnailDataIndex = it.getColumnIndex(MediaStore.Images.Thumbnails.DATA)
+                val imageDataIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
+
+                do {
+                    val id = it.getString(idIndex)
+                    val thumbnailData = it.getString(thumbnailDataIndex)
+                    val imageData = it.getString(imageDataIndex)
+
+                    images.add(ImageEntity(id, thumbnailData, imageData))
+                } while (it.moveToNext())
+            }
+        }
+
+        images.forEach { image ->
+            MediaStore.Images.Thumbnails.queryMiniThumbnail(context.contentResolver, image.id.toLong(), MediaStore.Images.Thumbnails.MINI_KIND, null)?.use { cursor ->
+                if (cursor.count > 0) {
+                    cursor.moveToFirst()
+                    val url = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Thumbnails.DATA));
+                    image.thumbnail = url
+                    println("Thumbnail, url: $url")
+                }
+            }
+        }
+
+        return images
     }
 }

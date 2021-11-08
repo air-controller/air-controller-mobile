@@ -21,8 +21,10 @@ class ImageController {
     }
 
     @PostMapping("/all")
+    @ResponseBody
     fun getAllImages(): HttpResponseEntity<List<ImageEntity>> {
-        throw NotImplementedError()
+        val images = PhotoUtil.getAllImages(mContext)
+        return HttpResponseEntity.success(images)
     }
 
     @PostMapping("/daily")
