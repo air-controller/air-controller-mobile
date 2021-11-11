@@ -1,9 +1,11 @@
 package com.youngfeng.android.assistant.web.converter
 
+import android.graphics.Bitmap
 import com.google.gson.Gson
 import com.yanzhenjie.andserver.annotation.Converter
 import com.yanzhenjie.andserver.framework.MessageConverter
 import com.yanzhenjie.andserver.framework.body.FileBody
+import com.yanzhenjie.andserver.framework.body.StreamBody
 import com.yanzhenjie.andserver.framework.body.StringBody
 import com.yanzhenjie.andserver.http.ResponseBody
 import com.yanzhenjie.andserver.util.IOUtils
@@ -11,6 +13,8 @@ import com.yanzhenjie.andserver.util.MediaType
 import com.youngfeng.android.assistant.web.entity.HttpResponseEntity
 import com.youngfeng.android.assistant.web.response.HttpResponseEntityBody
 import com.youngfeng.android.assistant.web.util.JsonUtils
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.lang.reflect.Type
 import java.nio.charset.Charset
@@ -24,7 +28,18 @@ class AppMessageConverter : MessageConverter {
             val json = mGson.toJson(output)
             return HttpResponseEntityBody(json)
         } else {
-            throw NotImplementedError()
+            if (output is Bitmap) {
+                val bos = ByteArrayOutputStream()
+                output.compress(Bitmap.CompressFormat.JPEG, 100, bos)
+
+                val inputStream = ByteArrayInputStream(bos.toByteArray())
+                bos.flush()
+                bos.close()
+
+                return StreamBody(inputStream, bos.size().toLong(), MediaType.IMAGE_JPEG)
+            }
+
+            throw NotImplementedError("AppMessageConverter: convert method not implemented completed")
         }
     }
 

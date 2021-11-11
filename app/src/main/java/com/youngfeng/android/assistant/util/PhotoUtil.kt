@@ -61,8 +61,14 @@ object PhotoUtil {
 
         val projections = arrayOf(
             MediaStore.Images.ImageColumns._ID,
-            MediaStore.Images.Thumbnails.DATA,
-            MediaStore.Images.ImageColumns.DATA
+            MediaStore.Images.ImageColumns.DATA,
+            MediaStore.Images.ImageColumns.DATE_MODIFIED,
+            MediaStore.Images.ImageColumns.MINI_THUMB_MAGIC,
+            MediaStore.Images.ImageColumns.MIME_TYPE,
+            MediaStore.Images.ImageColumns.WIDTH,
+            MediaStore.Images.ImageColumns.HEIGHT,
+            MediaStore.Images.ImageColumns.DATE_TAKEN,
+            MediaStore.Images.ImageColumns.DISPLAY_NAME
         )
 
         val orderBy = "${MediaStore.Images.ImageColumns.DATE_TAKEN} DESC"
@@ -71,21 +77,43 @@ object PhotoUtil {
         context.contentResolver.query(contentUri, projections, null, null, orderBy, null)?.use {
             if (it.moveToFirst()) {
                 val idIndex = it.getColumnIndex(MediaStore.Images.ImageColumns._ID)
-                val thumbnailDataIndex = it.getColumnIndex(MediaStore.Images.Thumbnails.DATA)
                 val imageDataIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
+                val dateModifiedIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.DATE_MODIFIED)
+                val miniThumbMagicIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.MINI_THUMB_MAGIC)
+                val mimeTypeIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.MIME_TYPE)
+                val widthIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.WIDTH)
+                val heightIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.HEIGHT)
+                val dateTakenIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.DATE_TAKEN)
+                val displayNameIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME)
 
                 do {
                     val id = it.getString(idIndex)
-                    val thumbnailData = it.getString(thumbnailDataIndex)
                     val imageData = it.getString(imageDataIndex)
+                    val modifyDate = it.getLong(dateModifiedIndex)
+                    val thumbnail = it.getString(miniThumbMagicIndex);
+                    val mimeType = it.getString(mimeTypeIndex)
+                    val width = it.getInt(widthIndex);
+                    val height = it.getInt(heightIndex)
+                    val dateTaken = it.getLong(dateTakenIndex)
+                    val displayName = it.getString(displayNameIndex)
 
-                    images.add(ImageEntity(id, thumbnailData, imageData))
+                    images.add(ImageEntity(id, mimeType, thumbnail, imageData, width, height, modifyDate, dateTaken, displayName))
                 } while (it.moveToNext())
             }
         }
 
         images.forEach { image ->
-            MediaStore.Images.Thumbnails.queryMiniThumbnail(context.contentResolver, image.id.toLong(), MediaStore.Images.Thumbnails.MINI_KIND, null)?.use { cursor ->
+            context.contentResolver.query(
+                MediaStore.Images.Thumbnails.EXTERNAL_CONTENT_URI,
+                arrayOf(
+                    MediaStore.Images.Thumbnails.DATA
+                ),
+                "${MediaStore.Images.Thumbnails.IMAGE_ID} = ?",
+                arrayOf(
+                    image.id
+                ),
+                null
+            )?.use { cursor ->
                 if (cursor.count > 0) {
                     cursor.moveToFirst()
                     val url = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Thumbnails.DATA));
