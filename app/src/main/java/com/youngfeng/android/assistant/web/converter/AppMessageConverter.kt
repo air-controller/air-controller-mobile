@@ -15,6 +15,8 @@ import com.youngfeng.android.assistant.web.response.HttpResponseEntityBody
 import com.youngfeng.android.assistant.web.util.JsonUtils
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileInputStream
 import java.io.InputStream
 import java.lang.reflect.Type
 import java.nio.charset.Charset
@@ -37,6 +39,18 @@ class AppMessageConverter : MessageConverter {
                 bos.close()
 
                 return StreamBody(inputStream, bos.size().toLong(), MediaType.IMAGE_JPEG)
+            }
+
+            if (output is File) {
+                val inputStream = FileInputStream(output)
+                var mediaType = MediaType.ALL
+
+                if (output.extension.lowercase().endsWith(".jpg")
+                    || output.extension.lowercase().endsWith(".jpeg")) {
+                    mediaType = MediaType.IMAGE_JPEG
+                }
+
+                return StreamBody(inputStream, inputStream.available().toLong(), mediaType)
             }
 
             throw NotImplementedError("AppMessageConverter: convert method not implemented completed")

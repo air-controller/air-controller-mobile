@@ -6,9 +6,11 @@ import android.provider.MediaStore
 import android.util.Size
 import com.yanzhenjie.andserver.annotation.GetMapping
 import com.yanzhenjie.andserver.annotation.PathVariable
+import com.yanzhenjie.andserver.annotation.QueryParam
 import com.yanzhenjie.andserver.annotation.RequestMapping
 import com.yanzhenjie.andserver.annotation.RestController
 import com.youngfeng.android.assistant.app.MobileAssistantApplication
+import java.io.File
 
 @RestController
 @RequestMapping("/stream")
@@ -24,5 +26,10 @@ class StreamController {
     ): Bitmap {
         val uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
         return mContext.contentResolver.loadThumbnail(uri, Size(width, height), null)
+    }
+
+    @GetMapping("/file")
+    fun file(@QueryParam("path") path: String): File {
+        return File(path)
     }
 }
