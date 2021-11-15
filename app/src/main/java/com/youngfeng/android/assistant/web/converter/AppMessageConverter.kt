@@ -42,15 +42,7 @@ class AppMessageConverter : MessageConverter {
             }
 
             if (output is File) {
-                val inputStream = FileInputStream(output)
-                var mediaType = MediaType.ALL
-
-                if (output.extension.lowercase().endsWith(".jpg")
-                    || output.extension.lowercase().endsWith(".jpeg")) {
-                    mediaType = MediaType.IMAGE_JPEG
-                }
-
-                return StreamBody(inputStream, inputStream.available().toLong(), mediaType)
+                return FileBody(output)
             }
 
             throw NotImplementedError("AppMessageConverter: convert method not implemented completed")
