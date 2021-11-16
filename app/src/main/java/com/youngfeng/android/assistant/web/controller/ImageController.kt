@@ -36,4 +36,11 @@ class ImageController {
     fun getMonthlyImages(): HttpResponseEntity<List<MonthlyImageEntity>> {
         throw NotImplementedError()
     }
+
+    @PostMapping("/albumImages")
+    @ResponseBody
+    fun getAlbumImages(): HttpResponseEntity<List<ImageEntity>> {
+        val images = PhotoUtil.getAlbumImages(mContext)
+        return HttpResponseEntity.success(images)
+    }
 }

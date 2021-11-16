@@ -2,6 +2,7 @@ package com.youngfeng.android.assistant.util
 
 import android.content.Context
 import android.net.Uri
+import android.os.Environment
 import android.provider.MediaStore
 import com.youngfeng.android.assistant.web.entity.AlbumEntity
 import com.youngfeng.android.assistant.web.entity.ImageEntity
@@ -102,24 +103,56 @@ object PhotoUtil {
             }
         }
 
-        images.forEach { image ->
-            context.contentResolver.query(
-                MediaStore.Images.Thumbnails.EXTERNAL_CONTENT_URI,
-                arrayOf(
-                    MediaStore.Images.Thumbnails.DATA
-                ),
-                "${MediaStore.Images.Thumbnails.IMAGE_ID} = ?",
-                arrayOf(
-                    image.id
-                ),
-                null
-            )?.use { cursor ->
-                if (cursor.count > 0) {
-                    cursor.moveToFirst()
-                    val url = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Thumbnails.DATA));
-                    image.thumbnail = url
-                    println("Thumbnail, url: $url")
-                }
+        return images
+    }
+
+    @JvmStatic
+    fun getAlbumImages(context: Context): List<ImageEntity> {
+        val contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+
+        val projections = arrayOf(
+            MediaStore.Images.ImageColumns._ID,
+            MediaStore.Images.ImageColumns.DATA,
+            MediaStore.Images.ImageColumns.DATE_MODIFIED,
+            MediaStore.Images.ImageColumns.MINI_THUMB_MAGIC,
+            MediaStore.Images.ImageColumns.MIME_TYPE,
+            MediaStore.Images.ImageColumns.WIDTH,
+            MediaStore.Images.ImageColumns.HEIGHT,
+            MediaStore.Images.ImageColumns.DATE_TAKEN,
+            MediaStore.Images.ImageColumns.DISPLAY_NAME
+        )
+
+        val orderBy = "${MediaStore.Images.ImageColumns.DATE_TAKEN} DESC"
+
+        val selection = "${MediaStore.Images.ImageColumns.DATA} like ?"
+        val selectionArgs = arrayOf("${Environment.getExternalStorageDirectory().absolutePath}/DCIM/Camera%")
+
+        val images = mutableListOf<ImageEntity>()
+        context.contentResolver.query(contentUri, projections, selection, selectionArgs, orderBy, null)?.use {
+            if (it.moveToFirst()) {
+                val idIndex = it.getColumnIndex(MediaStore.Images.ImageColumns._ID)
+                val imageDataIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
+                val dateModifiedIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.DATE_MODIFIED)
+                val miniThumbMagicIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.MINI_THUMB_MAGIC)
+                val mimeTypeIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.MIME_TYPE)
+                val widthIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.WIDTH)
+                val heightIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.HEIGHT)
+                val dateTakenIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.DATE_TAKEN)
+                val displayNameIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME)
+
+                do {
+                    val id = it.getString(idIndex)
+                    val imageData = it.getString(imageDataIndex)
+                    val modifyDate = it.getLong(dateModifiedIndex)
+                    val thumbnail = it.getString(miniThumbMagicIndex);
+                    val mimeType = it.getString(mimeTypeIndex)
+                    val width = it.getInt(widthIndex);
+                    val height = it.getInt(heightIndex)
+                    val dateTaken = it.getLong(dateTakenIndex)
+                    val displayName = it.getString(displayNameIndex)
+
+                    images.add(ImageEntity(id, mimeType, thumbnail, imageData, width, height, modifyDate, dateTaken, displayName))
+                } while (it.moveToNext())
             }
         }
 
