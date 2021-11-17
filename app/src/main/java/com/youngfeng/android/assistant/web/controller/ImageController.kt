@@ -11,6 +11,7 @@ import com.youngfeng.android.assistant.web.HttpError
 import com.youngfeng.android.assistant.web.HttpModule
 import com.youngfeng.android.assistant.web.entity.*
 import com.youngfeng.android.assistant.web.request.DeleteImageRequest
+import com.youngfeng.android.assistant.web.request.DeleteMultiImageRequest
 import com.youngfeng.android.assistant.web.util.ErrorBuilder
 
 @RestController
@@ -58,5 +59,16 @@ class ImageController {
         }
 
         return ErrorBuilder().module(HttpModule.ImageModule).error(HttpError.DeleteImageFail).build()
+    }
+
+    @PostMapping("/deleteMulti")
+    @ResponseBody
+    fun deleteMultiImage(@RequestBody request: DeleteMultiImageRequest): HttpResponseEntity<Any> {
+        val isSuccess = PhotoUtil.deleteMultiImage(mContext, request.ids)
+        if (isSuccess) {
+            return HttpResponseEntity.success()
+        }
+
+        return ErrorBuilder().module(HttpModule.ImageModule).error(HttpError.DeleteMultiImageFail).build()
     }
 }
