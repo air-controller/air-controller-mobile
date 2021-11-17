@@ -11,4 +11,5 @@
     <string name="delete_file_fail">删除文件失败</string>
     <string name="rename_file_fail">文件重命名失败</string>
     <string name="move_file_fail">文件移动失败</string>
+    <string name="delete_image_fail">删除图片失败</string>
 </resources>

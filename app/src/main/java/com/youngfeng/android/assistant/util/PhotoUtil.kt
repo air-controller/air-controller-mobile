@@ -158,4 +158,15 @@ object PhotoUtil {
 
         return images
     }
+
+    @JvmStatic
+    fun deleteImage(context: Context, id: String): Boolean {
+        val contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+
+        val where = "${MediaStore.Images.ImageColumns._ID} = ?"
+        val selectionArgs = arrayOf(id)
+
+        val rowsNumber = context.contentResolver.delete(contentUri, where, selectionArgs)
+        return rowsNumber > 0
+    }
 }
