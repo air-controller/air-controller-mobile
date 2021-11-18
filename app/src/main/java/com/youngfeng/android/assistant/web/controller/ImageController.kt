@@ -1,5 +1,7 @@
 package com.youngfeng.android.assistant.web.controller
 
+import android.media.MediaScannerConnection
+import android.net.Uri
 import com.yanzhenjie.andserver.annotation.PostMapping
 import com.yanzhenjie.andserver.annotation.RequestBody
 import com.yanzhenjie.andserver.annotation.RequestMapping
@@ -13,6 +15,7 @@ import com.youngfeng.android.assistant.web.entity.*
 import com.youngfeng.android.assistant.web.request.DeleteImageRequest
 import com.youngfeng.android.assistant.web.request.DeleteMultiImageRequest
 import com.youngfeng.android.assistant.web.util.ErrorBuilder
+import java.io.File
 
 @RestController
 @RequestMapping("/image")
@@ -53,12 +56,22 @@ class ImageController {
     @PostMapping("/delete")
     @ResponseBody
     fun deleteImage(@RequestBody request: DeleteImageRequest): HttpResponseEntity<Any> {
-        val isSuccess = PhotoUtil.deleteImage(mContext, request.id)
-        if (isSuccess) {
-            return HttpResponseEntity.success()
+        val imageFile = File(request.path)
+        if (!imageFile.exists()) {
+            return ErrorBuilder().module(HttpModule.ImageModule).error(HttpError.ImageFileNotExist).build()
+        } else {
+            val isSuccess = imageFile.delete()
+            if (!isSuccess) {
+                return ErrorBuilder().module(HttpModule.ImageModule).error(HttpError.DeleteImageFail).build()
+            }
         }
 
-        return ErrorBuilder().module(HttpModule.ImageModule).error(HttpError.DeleteImageFail).build()
+        MediaScannerConnection.scanFile(
+            mContext, arrayOf(imageFile.absolutePath), null) { path, uri ->
+                println("Path: $path, uri: ${uri.path}")
+        }
+
+        return HttpResponseEntity.success()
     }
 
     @PostMapping("/deleteMulti")

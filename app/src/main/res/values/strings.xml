@@ -12,4 +12,5 @@
     <string name="rename_file_fail">文件重命名失败</string>
     <string name="move_file_fail">文件移动失败</string>
     <string name="delete_image_fail">删除图片失败</string>
+    <string name="image_not_exist">图片不存在</string>
 </resources>
