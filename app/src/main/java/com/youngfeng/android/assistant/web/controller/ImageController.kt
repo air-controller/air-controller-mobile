@@ -93,15 +93,4 @@ class ImageController {
 
         return HttpResponseEntity.success()
     }
-
-    @PostMapping("/deleteMulti")
-    @ResponseBody
-    fun deleteMultiImage(@RequestBody request: DeleteMultiImageRequest): HttpResponseEntity<Any> {
-        val isSuccess = PhotoUtil.deleteMultiImage(mContext, request.ids)
-        if (isSuccess) {
-            return HttpResponseEntity.success()
-        }
-
-        return ErrorBuilder().module(HttpModule.ImageModule).error(HttpError.DeleteMultiImageFail).build()
-    }
 }
