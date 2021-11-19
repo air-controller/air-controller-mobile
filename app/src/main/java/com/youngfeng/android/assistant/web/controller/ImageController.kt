@@ -12,7 +12,6 @@ import com.youngfeng.android.assistant.web.HttpError
 import com.youngfeng.android.assistant.web.HttpModule
 import com.youngfeng.android.assistant.web.entity.*
 import com.youngfeng.android.assistant.web.request.DeleteImageRequest
-import com.youngfeng.android.assistant.web.request.DeleteMultiImageRequest
 import com.youngfeng.android.assistant.web.util.ErrorBuilder
 import java.io.File
 import java.lang.Exception
