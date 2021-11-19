@@ -6,5 +6,6 @@
     <buildUponDefaultConfig>true</buildUponDefaultConfig>
     <enableAllRules>true</enableAllRules>
     <treatAsError>true</treatAsError>
+    <configPaths>$PROJECT_DIR$/config/detekt.yml</configPaths>
   </component>
 </project>

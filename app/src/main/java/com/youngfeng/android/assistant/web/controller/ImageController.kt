@@ -74,7 +74,7 @@ class ImageController {
                     }
                 }
             }
-            if (imageFiles.size> 0) {
+            if (imageFiles.size > 0) {
                 MediaScannerConnection.scanFile(mContext, imageFiles.toTypedArray(), null) { path, uri ->
                     println("Path: $path, uri: ${uri.path}")
                 }
