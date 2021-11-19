@@ -3,7 +3,6 @@ package com.youngfeng.android.assistant.util
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
-import com.youngfeng.android.assistant.web.entity.AlbumEntity
 import com.youngfeng.android.assistant.web.entity.VideoEntity
 import com.youngfeng.android.assistant.web.entity.VideoFolder
 
@@ -24,8 +23,14 @@ object VideoUtil {
         val orderBy = "${MediaStore.Video.VideoColumns.DATE_TAKEN} DESC"
         val map = mutableMapOf<String, VideoFolder>()
 
-        context.contentResolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, projection,
-            null, null, orderBy, null)?.use { cursor ->
+        context.contentResolver.query(
+            MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+            projection,
+            null,
+            null,
+            orderBy,
+            null
+        )?.use { cursor ->
             if (cursor.moveToFirst()) {
                 val bucketIdIndex =
                     cursor.getColumnIndexOrThrow(MediaStore.Video.VideoColumns.BUCKET_ID)
@@ -50,7 +55,7 @@ object VideoUtil {
                         album
                     }
 
-                    album.videoCount ++
+                    album.videoCount++
                 } while (cursor.moveToNext())
             }
         }

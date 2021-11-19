@@ -4,5 +4,4 @@ data class VideoEntity(
     var id: Long,
     var name: String,
     var path: String
-) {
-}
+)

@@ -18,16 +18,14 @@ class VideoController {
     @ResponseBody
     fun videoFolders(): HttpResponseEntity<List<VideoFolder>> {
         val videoFolders = VideoUtil.getAllVideoFolders(mContext)
-        return HttpResponseEntity.success(videoFolders);
+        return HttpResponseEntity.success(videoFolders)
     }
 
     @PostMapping("/list")
     fun getVideos() {
-
     }
 
     @PostMapping("/delete")
     fun delete() {
-
     }
 }

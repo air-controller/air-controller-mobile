@@ -6,7 +6,6 @@ import com.yanzhenjie.andserver.annotation.Converter
 import com.yanzhenjie.andserver.framework.MessageConverter
 import com.yanzhenjie.andserver.framework.body.FileBody
 import com.yanzhenjie.andserver.framework.body.StreamBody
-import com.yanzhenjie.andserver.framework.body.StringBody
 import com.yanzhenjie.andserver.http.ResponseBody
 import com.yanzhenjie.andserver.util.IOUtils
 import com.yanzhenjie.andserver.util.MediaType
@@ -16,7 +15,6 @@ import com.youngfeng.android.assistant.web.util.JsonUtils
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileInputStream
 import java.io.InputStream
 import java.lang.reflect.Type
 import java.nio.charset.Charset

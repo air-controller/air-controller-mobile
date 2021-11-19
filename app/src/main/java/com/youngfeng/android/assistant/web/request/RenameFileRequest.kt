@@ -5,5 +5,4 @@ data class RenameFileRequest(
     var file: String,
     var newName: String,
     var isDir: Boolean
-) : BaseRequest() {
-}
+) : BaseRequest()

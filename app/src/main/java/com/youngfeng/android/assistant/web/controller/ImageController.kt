@@ -1,13 +1,11 @@
 package com.youngfeng.android.assistant.web.controller
 
 import android.media.MediaScannerConnection
-import android.net.Uri
 import com.yanzhenjie.andserver.annotation.PostMapping
 import com.yanzhenjie.andserver.annotation.RequestBody
 import com.yanzhenjie.andserver.annotation.RequestMapping
 import com.yanzhenjie.andserver.annotation.ResponseBody
 import com.yanzhenjie.andserver.annotation.RestController
-import com.youngfeng.android.assistant.R
 import com.youngfeng.android.assistant.app.MobileAssistantApplication
 import com.youngfeng.android.assistant.util.PhotoUtil
 import com.youngfeng.android.assistant.web.HttpError
@@ -76,12 +74,12 @@ class ImageController {
                     }
                 }
             }
-            if(imageFiles.size>0){
-                MediaScannerConnection.scanFile( mContext, imageFiles.toTypedArray(), null) { path, uri ->
+            if (imageFiles.size> 0) {
+                MediaScannerConnection.scanFile(mContext, imageFiles.toTypedArray(), null) { path, uri ->
                     println("Path: $path, uri: ${uri.path}")
                 }
             }
-            if(!isAllSuccess){
+            if (!isAllSuccess) {
                 val response = ErrorBuilder().module(HttpModule.ImageModule).error(HttpError.DeleteImageFail).build<Any>()
                 response.msg = resultMap.map { "${it.key}[${it.value}];" }.toString()
                 return response

@@ -4,5 +4,4 @@ data class DailyImageEntity(
     var start: Long,
     var end: Long,
     var images: List<ImageEntity>
-) {
-}
+)

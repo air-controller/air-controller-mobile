@@ -1,7 +1,5 @@
 package com.youngfeng.android.assistant.web.entity
 
-import android.util.Size
-
 data class ImageEntity(
     var id: String,
     var mimeType: String,

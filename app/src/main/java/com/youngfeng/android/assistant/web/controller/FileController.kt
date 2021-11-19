@@ -3,7 +3,6 @@ package com.youngfeng.android.assistant.web.controller
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Environment
-import android.os.FileUtils
 import android.text.TextUtils
 import androidx.core.content.ContextCompat
 import com.yanzhenjie.andserver.annotation.*
@@ -26,15 +25,17 @@ open class FileController {
     @ResponseBody
     fun getFileList(@RequestBody requestBody: GetFileListRequest): HttpResponseEntity<List<FileEntity>> {
         // 先判断是否存在读取外部存储权限
-        if (ContextCompat.checkSelfPermission(MobileAssistantApplication.getInstance(),
-                Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+        if (ContextCompat.checkSelfPermission(
+                MobileAssistantApplication.getInstance(),
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
         ) {
-            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.NoReadExternalStoragePerm).build();
+            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.NoReadExternalStoragePerm).build()
         }
 
         var path = requestBody.path
         if (TextUtils.isEmpty(path)) {
-            path = Environment.getExternalStorageDirectory().absolutePath;
+            path = Environment.getExternalStorageDirectory().absolutePath
         }
 
         val dir = File(path)
@@ -49,7 +50,7 @@ open class FileController {
         files?.forEach {
             val fileEntity = FileEntity(
                 it.name,
-                it.parentFile?.absolutePath ?:"",
+                it.parentFile?.absolutePath ?: "",
                 if (it.isFile) it.length() else 0,
                 it.isDirectory,
                 it.lastModified(),
@@ -65,10 +66,12 @@ open class FileController {
     @ResponseBody
     fun createFile(@RequestBody request: CreateFileRequest): HttpResponseEntity<Map<String, Any>> {
         // 先判断是否存在写入外部存储权限
-        if (ContextCompat.checkSelfPermission(MobileAssistantApplication.getInstance(),
-                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+        if (ContextCompat.checkSelfPermission(
+                MobileAssistantApplication.getInstance(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
         ) {
-            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.NoWriteExternalStoragePerm).build();
+            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.NoWriteExternalStoragePerm).build()
         }
 
         val fileName = request.name
@@ -87,8 +90,6 @@ open class FileController {
         }
 
         val file = File("$folder/$fileName")
-
-        // TODO: 这里应该先判断文件是否已存在
 
         val type = request.type
         try {
@@ -128,32 +129,36 @@ open class FileController {
     }
 
     /**
-     * 删除文件
+     * 删除文件.
      */
     @PostMapping("/delete")
     @ResponseBody
     fun delete(@RequestBody request: DeleteFileRequest): HttpResponseEntity<Map<String, Any>> {
         // 先判断是否存在写入外部存储权限
-        if (ContextCompat.checkSelfPermission(MobileAssistantApplication.getInstance(),
-                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+        if (ContextCompat.checkSelfPermission(
+                MobileAssistantApplication.getInstance(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
         ) {
-            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.NoWriteExternalStoragePerm).build();
+            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.NoWriteExternalStoragePerm).build()
         }
 
         val path = request.file
 
         if (TextUtils.isEmpty(path)) {
-            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.FilePathCantEmpty).build();
+            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.FilePathCantEmpty).build()
         }
 
         val file = File(path)
         try {
             val isSuccess = file.deleteRecursively()
             return if (isSuccess) {
-                HttpResponseEntity.success(mapOf(
-                    "path" to path,
-                    "isDir" to request.isDir
-                ))
+                HttpResponseEntity.success(
+                    mapOf(
+                        "path" to path,
+                        "isDir" to request.isDir
+                    )
+                )
             } else {
                 ErrorBuilder().module(HttpModule.FileModule).error(HttpError.DeleteFileFail).build()
             }
@@ -166,22 +171,24 @@ open class FileController {
     }
 
     /**
-     * 重命名文件
+     * 重命名文件.
      */
     @PostMapping("/rename")
     @ResponseBody
     fun rename(@RequestBody request: RenameFileRequest): HttpResponseEntity<Map<String, String>> {
         // 先判断是否存在写入外部存储权限
-        if (ContextCompat.checkSelfPermission(MobileAssistantApplication.getInstance(),
-                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+        if (ContextCompat.checkSelfPermission(
+                MobileAssistantApplication.getInstance(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
         ) {
-            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.NoWriteExternalStoragePerm).build();
+            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.NoWriteExternalStoragePerm).build()
         }
 
         val fileName = request.file
 
         if (TextUtils.isEmpty(fileName)) {
-            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.FileNameEmpty).build();
+            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.FileNameEmpty).build()
         }
 
         val folder = request.folder
@@ -194,12 +201,14 @@ open class FileController {
         try {
             val isSuccess = file.renameTo(newFile)
             return if (isSuccess) {
-                HttpResponseEntity.success(mapOf(
-                    "folder" to folder,
-                    "newName" to newName
-                ))
+                HttpResponseEntity.success(
+                    mapOf(
+                        "folder" to folder,
+                        "newName" to newName
+                    )
+                )
             } else {
-                ErrorBuilder().module(HttpModule.FileModule).error(HttpError.RenameFileFail).build();
+                ErrorBuilder().module(HttpModule.FileModule).error(HttpError.RenameFileFail).build()
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -213,16 +222,18 @@ open class FileController {
     @ResponseBody
     fun move(@RequestBody request: MoveFileRequest): HttpResponseEntity<Map<String, String>> {
         // 先判断是否存在写入外部存储权限
-        if (ContextCompat.checkSelfPermission(MobileAssistantApplication.getInstance(),
-                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+        if (ContextCompat.checkSelfPermission(
+                MobileAssistantApplication.getInstance(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
         ) {
-            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.NoWriteExternalStoragePerm).build();
+            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.NoWriteExternalStoragePerm).build()
         }
 
         val fileName = request.fileName
 
         if (TextUtils.isEmpty(fileName)) {
-            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.FileNameEmpty).build();
+            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.FileNameEmpty).build()
         }
 
         val oldFolder = request.oldFolder
@@ -233,13 +244,14 @@ open class FileController {
         val newFile = File("$newFolder/$$fileName")
 
         try {
-            //  FIXME: 这样处理存在问题
             val isSuccess = file.renameTo(newFile)
             return if (isSuccess) {
-                HttpResponseEntity.success(mapOf(
-                    "newFolder" to newFolder,
-                    "name" to fileName
-                ))
+                HttpResponseEntity.success(
+                    mapOf(
+                        "newFolder" to newFolder,
+                        "name" to fileName
+                    )
+                )
             } else {
                 ErrorBuilder().module(HttpModule.FileModule).error(HttpError.MoveFileFail).build()
             }

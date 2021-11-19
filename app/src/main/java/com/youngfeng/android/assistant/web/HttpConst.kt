@@ -15,9 +15,15 @@ enum class HttpModule(var value: Int) {
 
 enum class HttpError(var code: String, var value: String) {
     // 文件模块
-    NoReadExternalStoragePerm("01", MobileAssistantApplication.getInstance().getString(R.string.no_read_external_storage_perm)),
+    NoReadExternalStoragePerm(
+        "01",
+        MobileAssistantApplication.getInstance().getString(R.string.no_read_external_storage_perm)
+    ),
     FileIsNotADir("02", MobileAssistantApplication.getInstance().getString(R.string.this_file_is_not_a_dir)),
-    NoWriteExternalStoragePerm("03", MobileAssistantApplication.getInstance().getString(R.string.no_read_external_storage_perm)),
+    NoWriteExternalStoragePerm(
+        "03",
+        MobileAssistantApplication.getInstance().getString(R.string.no_read_external_storage_perm)
+    ),
     InvalidFileName("04", MobileAssistantApplication.getInstance().getString(R.string.invalid_file_name)),
     FileNameEmpty("05", MobileAssistantApplication.getInstance().getString(R.string.file_name_cant_empty)),
     FolderCantEmpty("06", MobileAssistantApplication.getInstance().getString(R.string.folder_cant_empty)),

@@ -8,5 +8,4 @@ class DeleteFileRequest(
      */
     val file: String,
     val isDir: Boolean
-) : BaseRequest() {
-}
+) : BaseRequest()

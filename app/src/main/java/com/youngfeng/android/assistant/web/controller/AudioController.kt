@@ -41,8 +41,11 @@ class AudioController {
 
                 val isSuccess = audioFile.delete()
                 if (!isSuccess) {
-                   val response =  ErrorBuilder().module(HttpModule.AudioModule).error(HttpError.DeleteAudioFail).build<Any>()
-                    response.msg = mContext.getString(R.string.delete_audio_file_fail).replace("%s", audioFile.absolutePath)
+                    val response = ErrorBuilder().module(HttpModule.AudioModule).error(HttpError.DeleteAudioFail).build<Any>()
+                    response.msg = mContext.getString(R.string.delete_audio_file_fail).replace(
+                        "%s",
+                        audioFile.absolutePath
+                    )
                     return response
                 } else {
                     MediaScannerConnection.scanFile(mContext, arrayOf(audioFile.absolutePath), null, null)
@@ -50,7 +53,7 @@ class AudioController {
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            val response =  ErrorBuilder().module(HttpModule.AudioModule).error(HttpError.DeleteAudioFail).build<Any>()
+            val response = ErrorBuilder().module(HttpModule.AudioModule).error(HttpError.DeleteAudioFail).build<Any>()
             response.msg = e.message
             return response
         }

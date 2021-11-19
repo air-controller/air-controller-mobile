@@ -40,7 +40,7 @@ android {
 
         buildUponDefaultConfig = false
         allRules = true
-        autoCorrect = false
+        autoCorrect = true
         config = files("${project.rootDir.absolutePath}/config/detekt.yml")
         debug = true
 
@@ -78,6 +78,7 @@ dependencies {
     implementation 'javax.activation:javax.activation-api:1.2.0'
 
     implementation 'com.google.code.gson:gson:2.8.9'
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.19.0-RC1")
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

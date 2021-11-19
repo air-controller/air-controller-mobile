@@ -4,5 +4,4 @@ class MoveFileRequest(
     var oldFolder: String,
     var fileName: String,
     var newFolder: String
-) : BaseRequest() {
-}
+) : BaseRequest()

@@ -17,7 +17,6 @@ import java.io.File
 class StreamController {
     private val mContext by lazy { MobileAssistantApplication.getInstance() }
 
-
     @GetMapping("/image/thumbnail/{id}/{width}/{height}")
     fun imageThumbnail(
         @PathVariable("id") id: Long,

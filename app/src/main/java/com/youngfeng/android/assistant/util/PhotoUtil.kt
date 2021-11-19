@@ -48,7 +48,7 @@ object PhotoUtil {
                         album
                     }
 
-                    album.photoNum ++
+                    album.photoNum++
                 } while (cursor.moveToNext())
             }
         }
@@ -91,14 +91,16 @@ object PhotoUtil {
                     val id = it.getString(idIndex)
                     val imageData = it.getString(imageDataIndex)
                     val modifyDate = it.getLong(dateModifiedIndex)
-                    val thumbnail = it.getString(miniThumbMagicIndex);
+                    val thumbnail = it.getString(miniThumbMagicIndex)
                     val mimeType = it.getString(mimeTypeIndex)
-                    val width = it.getInt(widthIndex);
+                    val width = it.getInt(widthIndex)
                     val height = it.getInt(heightIndex)
                     val dateTaken = it.getLong(dateTakenIndex)
                     val displayName = it.getString(displayNameIndex)
 
-                    images.add(ImageEntity(id, mimeType, thumbnail, imageData, width, height, modifyDate, dateTaken, displayName))
+                    images.add(
+                        ImageEntity(id, mimeType, thumbnail, imageData, width, height, modifyDate, dateTaken, displayName)
+                    )
                 } while (it.moveToNext())
             }
         }
@@ -144,14 +146,16 @@ object PhotoUtil {
                     val id = it.getString(idIndex)
                     val imageData = it.getString(imageDataIndex)
                     val modifyDate = it.getLong(dateModifiedIndex)
-                    val thumbnail = it.getString(miniThumbMagicIndex);
+                    val thumbnail = it.getString(miniThumbMagicIndex)
                     val mimeType = it.getString(mimeTypeIndex)
-                    val width = it.getInt(widthIndex);
+                    val width = it.getInt(widthIndex)
                     val height = it.getInt(heightIndex)
                     val dateTaken = it.getLong(dateTakenIndex)
                     val displayName = it.getString(displayNameIndex)
 
-                    images.add(ImageEntity(id, mimeType, thumbnail, imageData, width, height, modifyDate, dateTaken, displayName))
+                    images.add(
+                        ImageEntity(id, mimeType, thumbnail, imageData, width, height, modifyDate, dateTaken, displayName)
+                    )
                 } while (it.moveToNext())
             }
         }
