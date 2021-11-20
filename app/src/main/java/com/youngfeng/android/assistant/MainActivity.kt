@@ -3,6 +3,7 @@ package com.youngfeng.android.assistant
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.yanzhenjie.andserver.AndServer
+import com.youngfeng.android.assistant.manager.DeviceDiscoverManager
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
@@ -23,6 +24,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         mServer.startup()
+
+        DeviceDiscoverManager.getInstance().onDeviceDiscover {
+            print("Device: ip => ${it.ipAddress}, name => ${it.name}, platform => ${it.platform}")
+        }
+        DeviceDiscoverManager.getInstance().startDiscover()
     }
 
     override fun onDestroy() {

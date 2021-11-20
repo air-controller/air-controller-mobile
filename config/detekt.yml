@@ -296,7 +296,7 @@ formatting:
   Filename:
     active: true
   FinalNewline:
-    active: true
+    active: false
     autoCorrect: true
     insertFinalNewLine: true
   ImportOrdering:
@@ -325,7 +325,7 @@ formatting:
     active: true
     autoCorrect: true
   NoEmptyClassBody:
-    active: true
+    active: false
     autoCorrect: true
   NoEmptyFirstLineInMethodBlock:
     active: false
@@ -658,7 +658,7 @@ style:
     active: true
     maxJumpCount: 1
   MagicNumber:
-    active: true
+    active: false
     excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/jsTest/**', '**/iosTest/**']
     ignoreNumbers:
       - '-1'
