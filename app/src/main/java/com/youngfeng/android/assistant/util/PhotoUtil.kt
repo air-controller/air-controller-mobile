@@ -1,7 +1,6 @@
 package com.youngfeng.android.assistant.util
 
 import android.content.Context
-import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import com.youngfeng.android.assistant.web.entity.AlbumEntity
@@ -32,16 +31,19 @@ object PhotoUtil {
                 val imageUriIndex =
                     cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATA)
 
+                val idIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns._ID)
+
                 do {
                     val bucketId = cursor.getString(bucketIdIndex)
 
                     val album = map[bucketId] ?: let {
                         val bucketName = cursor.getString(bucketNameIndex)
-                        val lastImageUri = Uri.parse(cursor.getString(imageUriIndex))
+                        val coverImageId = cursor.getString(idIndex)
+
                         val album = AlbumEntity(
                             id = bucketId,
                             name = bucketName,
-                            cover = lastImageUri.toString()
+                            coverImageId = coverImageId
                         )
                         map[bucketId] = album
 
