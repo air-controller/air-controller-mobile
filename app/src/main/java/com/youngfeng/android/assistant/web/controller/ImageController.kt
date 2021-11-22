@@ -6,11 +6,13 @@ import com.yanzhenjie.andserver.annotation.RequestBody
 import com.yanzhenjie.andserver.annotation.RequestMapping
 import com.yanzhenjie.andserver.annotation.ResponseBody
 import com.yanzhenjie.andserver.annotation.RestController
+import com.youngfeng.android.assistant.R
 import com.youngfeng.android.assistant.app.MobileAssistantApplication
 import com.youngfeng.android.assistant.util.PhotoUtil
 import com.youngfeng.android.assistant.web.HttpError
 import com.youngfeng.android.assistant.web.HttpModule
 import com.youngfeng.android.assistant.web.entity.*
+import com.youngfeng.android.assistant.web.request.DeleteAlbumsRequest
 import com.youngfeng.android.assistant.web.request.DeleteImageRequest
 import com.youngfeng.android.assistant.web.util.ErrorBuilder
 import java.io.File
@@ -91,5 +93,50 @@ class ImageController {
         }
 
         return HttpResponseEntity.success()
+    }
+
+    @PostMapping("/deleteAlbums")
+    @ResponseBody
+    fun deleteAlbums(@RequestBody request: DeleteAlbumsRequest): HttpResponseEntity<Any> {
+        try {
+            val paths = request.paths
+
+            var deleteItemNum = 0
+            paths.forEach { path ->
+                val file = File(path)
+                if (!file.exists()) {
+                    val response = ErrorBuilder().module(HttpModule.ImageModule).error(HttpError.DeleteAlbumFail).build<Any>()
+                    response.msg = convertToDeleteAlbumError(paths.size, deleteItemNum)
+                    return response
+                } else {
+                    val isSuccess = file.deleteRecursively()
+                    if (!isSuccess) {
+                        val response = ErrorBuilder().module(HttpModule.ImageModule).error(HttpError.DeleteAlbumFail).build<Any>()
+                        response.msg = convertToDeleteAlbumError(paths.size, deleteItemNum)
+                        return response
+                    } else {
+                        MediaScannerConnection.scanFile(mContext, arrayOf(path), null, null)
+                    }
+                }
+
+                deleteItemNum ++
+            }
+
+            return HttpResponseEntity.success()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            val response = ErrorBuilder().module(HttpModule.ImageModule).error(HttpError.DeleteAlbumFail).build<Any>()
+            response.msg = e.message
+            return response
+        }
+    }
+
+    private fun convertToDeleteAlbumError(albumNum: Int, deletedItemNum: Int): String {
+        if (deletedItemNum > 0) {
+            return mContext.getString(R.string.place_holder_delete_part_of_success)
+                .format(albumNum, deletedItemNum)
+        }
+
+        return mContext.getString(R.string.delete_album_fail)
     }
 }

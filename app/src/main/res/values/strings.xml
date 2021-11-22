@@ -15,4 +15,7 @@
     <string name="image_not_exist">图片不存在</string>
     <string name="delete_audio_file_fail">删除音频文件失败</string>
     <string name="place_holder_delete_file_fail">删除文件%s失败</string>
+    <string name="the_dir_not_exist">文件夹不存在</string>
+    <string name="place_holder_delete_part_of_success">删除%d个项目成功，其中%d个项目失败</string>
+    <string name="delete_album_fail">删除相册失败</string>
 </resources>

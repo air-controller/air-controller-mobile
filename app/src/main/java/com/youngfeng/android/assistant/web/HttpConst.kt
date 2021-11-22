@@ -37,6 +37,7 @@ enum class HttpError(var code: String, var value: String) {
     DeleteImageFail("01", MobileAssistantApplication.getInstance().getString(R.string.delete_image_fail)),
     DeleteMultiImageFail("02", MobileAssistantApplication.getInstance().getString(R.string.delete_image_fail)),
     ImageFileNotExist("03", MobileAssistantApplication.getInstance().getString(R.string.image_not_exist)),
+    DeleteAlbumFail("04", "删除相册失败"),
 
     // 音频模块
     DeleteAudioFail("01", MobileAssistantApplication.getInstance().getString(R.string.delete_audio_file_fail));
