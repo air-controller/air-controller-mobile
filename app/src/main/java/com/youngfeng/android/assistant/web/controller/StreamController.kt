@@ -2,6 +2,7 @@ package com.youngfeng.android.assistant.web.controller
 
 import android.content.ContentUris
 import android.graphics.Bitmap
+import android.os.Build
 import android.provider.MediaStore
 import android.util.Size
 import com.yanzhenjie.andserver.annotation.GetMapping
@@ -24,7 +25,15 @@ class StreamController {
         @PathVariable("height") height: Int
     ): Bitmap {
         val uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
-        return mContext.contentResolver.loadThumbnail(uri, Size(width, height), null)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            mContext.contentResolver.loadThumbnail(uri, Size(width, height), null)
+        } else {
+            MediaStore.Images.Thumbnails.getThumbnail(
+                mContext.contentResolver,
+                id,
+                MediaStore.Images.Thumbnails.MINI_KIND, null
+            )
+        }
     }
 
     @GetMapping("/file")
