@@ -3,6 +3,7 @@ package com.youngfeng.android.assistant.util
 import android.content.Context
 import android.os.Environment
 import android.provider.MediaStore
+import android.text.TextUtils
 import com.youngfeng.android.assistant.web.entity.AlbumEntity
 import com.youngfeng.android.assistant.web.entity.ImageEntity
 
@@ -39,11 +40,22 @@ object PhotoUtil {
                     val album = map[bucketId] ?: let {
                         val bucketName = cursor.getString(bucketNameIndex)
                         val coverImageId = cursor.getString(idIndex)
+                        val imageUri = cursor.getString(imageUriIndex)
+
+                        var path = ""
+                        if (!TextUtils.isEmpty(imageUri)) {
+                            val index = imageUri.lastIndexOf("/")
+
+                            if (index != -1) {
+                                path = imageUri.substring(0, index)
+                            }
+                        }
 
                         val album = AlbumEntity(
                             id = bucketId,
                             name = bucketName,
-                            coverImageId = coverImageId
+                            coverImageId = coverImageId,
+                            path = path
                         )
                         map[bucketId] = album
 
