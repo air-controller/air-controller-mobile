@@ -14,6 +14,7 @@ import com.youngfeng.android.assistant.web.HttpModule
 import com.youngfeng.android.assistant.web.entity.*
 import com.youngfeng.android.assistant.web.request.DeleteAlbumsRequest
 import com.youngfeng.android.assistant.web.request.DeleteImageRequest
+import com.youngfeng.android.assistant.web.request.GetAlbumImagesRequest
 import com.youngfeng.android.assistant.web.util.ErrorBuilder
 import java.io.File
 import java.lang.Exception
@@ -138,5 +139,12 @@ class ImageController {
         }
 
         return mContext.getString(R.string.delete_album_fail)
+    }
+
+    @PostMapping("/imagesOfAlbum")
+    @ResponseBody
+    fun getImagesOfAlbum(@RequestBody request: GetAlbumImagesRequest): HttpResponseEntity<List<ImageEntity>> {
+        val images = PhotoUtil.getImagesOfAlbum(mContext, request.id)
+        return HttpResponseEntity.success(images)
     }
 }
