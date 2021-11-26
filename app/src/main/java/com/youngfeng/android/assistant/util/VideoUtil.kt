@@ -1,7 +1,6 @@
 package com.youngfeng.android.assistant.util
 
 import android.content.Context
-import android.net.Uri
 import android.provider.MediaStore
 import com.youngfeng.android.assistant.web.entity.VideoEntity
 import com.youngfeng.android.assistant.web.entity.VideoFolder
@@ -38,17 +37,19 @@ object VideoUtil {
                     cursor.getColumnIndexOrThrow(MediaStore.Video.VideoColumns.BUCKET_DISPLAY_NAME)
                 val videoUriIndex =
                     cursor.getColumnIndexOrThrow(MediaStore.Video.VideoColumns.DATA)
+                val idIndex = cursor.getColumnIndexOrThrow(MediaStore.Video.VideoColumns._ID)
 
                 do {
                     val bucketId = cursor.getString(bucketIdIndex)
 
                     val album = map[bucketId] ?: let {
                         val bucketName = cursor.getString(bucketNameIndex)
-                        val lastImageUri = Uri.parse(cursor.getString(videoUriIndex))
+                        val videoId = cursor.getLong(idIndex)
+
                         val album = VideoFolder(
                             id = bucketId,
                             name = bucketName,
-                            cover = lastImageUri.toString()
+                            coverVideoId = videoId
                         )
                         map[bucketId] = album
 

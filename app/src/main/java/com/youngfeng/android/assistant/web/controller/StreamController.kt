@@ -36,6 +36,24 @@ class StreamController {
         }
     }
 
+    @GetMapping("/video/thumbnail/{id}/{width}/{height}")
+    fun videoThumbnail(
+        @PathVariable("id") id: Long,
+        @PathVariable("width") width: Int,
+        @PathVariable("height") height: Int
+    ): Bitmap {
+        val uri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            mContext.contentResolver.loadThumbnail(uri, Size(width, height), null)
+        } else {
+            MediaStore.Images.Thumbnails.getThumbnail(
+                mContext.contentResolver,
+                id,
+                MediaStore.Images.Thumbnails.MINI_KIND, null
+            )
+        }
+    }
+
     @GetMapping("/file")
     fun file(@QueryParam("path") path: String): File {
         return File(path)
