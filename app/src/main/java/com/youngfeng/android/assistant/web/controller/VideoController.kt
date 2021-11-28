@@ -32,9 +32,15 @@ class VideoController {
         return HttpResponseEntity.success(videoFolders)
     }
 
-    @PostMapping("/list")
-    fun getVideos(@RequestBody request: GetVideosRequest): HttpResponseEntity<List<VideoEntity>> {
+    @PostMapping("/videosInFolder")
+    fun getVideosInFolder(@RequestBody request: GetVideosRequest): HttpResponseEntity<List<VideoEntity>> {
         val videos = VideoUtil.getVideosByFolderId(mContext, request.folderId)
+        return HttpResponseEntity.success(videos)
+    }
+
+    @PostMapping("/videos")
+    fun getAllVideos(): HttpResponseEntity<List<VideoEntity>> {
+        val videos = VideoUtil.getAllVideos(mContext)
         return HttpResponseEntity.success(videos)
     }
 

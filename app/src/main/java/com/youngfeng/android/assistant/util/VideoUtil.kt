@@ -7,10 +7,6 @@ import com.youngfeng.android.assistant.web.entity.VideoFolder
 
 object VideoUtil {
 
-    fun getAllVideos(context: Context): List<VideoEntity> {
-        throw NotImplementedError()
-    }
-
     fun getAllVideoFolders(context: Context): List<VideoFolder> {
         val projection = arrayOf(
             MediaStore.Video.VideoColumns._ID,
@@ -85,6 +81,62 @@ object VideoUtil {
             projection,
             selection,
             selectionArgs,
+            null
+        )?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val idIndex = cursor.getColumnIndex(MediaStore.Video.VideoColumns._ID)
+                val nameIndex = cursor.getColumnIndex(MediaStore.Video.VideoColumns.DISPLAY_NAME)
+                val dataIndex = cursor.getColumnIndex(MediaStore.Video.VideoColumns.DATA)
+                val durationIndex = cursor.getColumnIndex(MediaStore.Video.VideoColumns.DURATION)
+                val sizeIndex = cursor.getColumnIndex(MediaStore.Video.VideoColumns.SIZE)
+                val dateAddedIndex = cursor.getColumnIndex(MediaStore.Video.VideoColumns.DATE_ADDED)
+                val dateModified = cursor.getColumnIndex(MediaStore.Video.VideoColumns.DATE_MODIFIED)
+
+                do {
+                    val id = cursor.getLong(idIndex)
+                    val name = cursor.getString(nameIndex)
+                    val path = cursor.getString(dataIndex)
+                    val duration = cursor.getLong(durationIndex)
+                    val size = cursor.getLong(sizeIndex)
+                    val createTime = cursor.getLong(dateAddedIndex)
+                    val modifyTime = cursor.getLong(dateModified)
+
+                    videos.add(
+                        VideoEntity(
+                            id = id,
+                            name = name,
+                            path = path,
+                            duration = duration,
+                            size = size,
+                            createTime = createTime,
+                            lastModifyTime = modifyTime
+                        )
+                    )
+                } while (cursor.moveToNext())
+            }
+        }
+
+        return videos
+    }
+
+    fun getAllVideos(context: Context): List<VideoEntity> {
+        val projection = arrayOf(
+            MediaStore.Video.VideoColumns._ID,
+            MediaStore.Video.VideoColumns.DISPLAY_NAME,
+            MediaStore.Video.VideoColumns.DATA,
+            MediaStore.Video.VideoColumns.DURATION,
+            MediaStore.Video.VideoColumns.SIZE,
+            MediaStore.Video.VideoColumns.DATE_ADDED,
+            MediaStore.Video.VideoColumns.DATE_MODIFIED
+        )
+
+        val videos = mutableListOf<VideoEntity>()
+
+        context.contentResolver.query(
+            MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+            projection,
+            null,
+            null,
             null
         )?.use { cursor ->
             if (cursor.moveToFirst()) {
