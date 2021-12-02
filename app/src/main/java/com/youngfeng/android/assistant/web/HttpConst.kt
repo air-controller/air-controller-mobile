@@ -10,7 +10,8 @@ import com.youngfeng.android.assistant.app.MobileAssistantApplication
  */
 
 enum class HttpModule(var value: Int) {
-    FileModule(1), ImageModule(2), AudioModule(3), VideoModule(4)
+    FileModule(1), ImageModule(2), AudioModule(3), VideoModule(4),
+    Download(5)
 }
 
 enum class HttpError(var code: String, var value: String) {
@@ -43,7 +44,11 @@ enum class HttpError(var code: String, var value: String) {
     DeleteAudioFail("01", MobileAssistantApplication.getInstance().getString(R.string.delete_audio_file_fail)),
 
     // 视频模块
-    DeleteVideoFail("01", MobileAssistantApplication.getInstance().getString(R.string.delete_video_file_fail));
+    DeleteVideoFail("01", MobileAssistantApplication.getInstance().getString(R.string.delete_video_file_fail)),
+
+    // 下载模块
+    GetDownloadDirFail("01", MobileAssistantApplication.getInstance().getString(R.string.get_download_dir_fail)),
+    DownloadDirNotExist("02", MobileAssistantApplication.getInstance().getString(R.string.download_dir_not_exist));
 
     fun getString(strRes: Int): String {
         return MobileAssistantApplication.getInstance().getString(strRes)

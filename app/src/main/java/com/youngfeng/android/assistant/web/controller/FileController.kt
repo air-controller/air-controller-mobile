@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Environment
 import android.text.TextUtils
+import android.util.Log
 import androidx.core.content.ContextCompat
 import com.yanzhenjie.andserver.annotation.*
 import com.youngfeng.android.assistant.app.MobileAssistantApplication
@@ -20,6 +21,7 @@ import java.lang.Exception
 @RestController
 @RequestMapping("/file")
 open class FileController {
+    private val mContext by lazy { MobileAssistantApplication.getInstance() }
 
     @PostMapping("/list")
     @ResponseBody
@@ -46,7 +48,7 @@ open class FileController {
 
         val files = dir.listFiles()
 
-        val data = mutableListOf<FileEntity>()
+        var data = mutableListOf<FileEntity>()
         files?.forEach {
             val fileEntity = FileEntity(
                 it.name,
@@ -57,6 +59,24 @@ open class FileController {
                 it.listFiles()?.isEmpty() ?: false
             )
             data.add(fileEntity)
+        }
+
+        data = data.sortedWith(object : Comparator<FileEntity> {
+            override fun compare(a: FileEntity, b: FileEntity): Int {
+                if (a.isDir && !b.isDir) {
+                    return -1;
+                }
+
+                if (!a.isDir && b.isDir) {
+                    return 1;
+                }
+
+                return a.name.lowercase().compareTo(b.name.lowercase());
+            }
+        }).toMutableList()
+
+        for (entity in data) {
+            Log.e("排序", "${entity.name}")
         }
 
         return HttpResponseEntity.success(data)
@@ -261,5 +281,51 @@ open class FileController {
             response.msg = e.message
             return response
         }
+    }
+
+    @ResponseBody
+    @PostMapping("/downloadedFiles")
+    fun getDownloadFileList(): HttpResponseEntity<List<FileEntity>> {
+        val downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+
+        if (null == downloadDir) {
+            return ErrorBuilder().module(HttpModule.Download).error(HttpError.GetDownloadDirFail).build()
+        }
+
+        if (!downloadDir.exists()) {
+            return ErrorBuilder().module(HttpModule.Download).error(HttpError.DownloadDirNotExist).build()
+        }
+
+        var data = downloadDir.listFiles()?.map {
+            FileEntity(
+                isDir = it.isDirectory,
+                name = it.name,
+                folder = downloadDir.absolutePath,
+                size = if (it.isFile) it.length() else it.totalSpace,
+                changeDate = it.lastModified(),
+                isEmpty = if (it.isDirectory) it.listFiles()?.size ?: -1 <= 0 else true
+            )
+        }
+
+        data = data?.sortedWith(object : Comparator<FileEntity> {
+            override fun compare(a: FileEntity, b: FileEntity): Int {
+                if (a.isDir && !b.isDir) {
+                    return -1;
+                }
+
+                if (!a.isDir && b.isDir) {
+                    return 1;
+                }
+
+                return a.name.lowercase().compareTo(b.name.lowercase());
+            }
+        })
+
+        if (null != data) {
+            for (entity in data) {
+                Log.e("排序", "${entity.name}")
+            }
+        }
+        return HttpResponseEntity.success(data)
     }
 }

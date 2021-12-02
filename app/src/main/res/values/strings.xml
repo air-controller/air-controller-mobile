@@ -19,4 +19,6 @@
     <string name="place_holder_delete_part_of_success">删除%d个项目成功，其中%d个项目失败</string>
     <string name="delete_album_fail">删除相册失败</string>
     <string name="delete_video_file_fail">删除视频文件失败</string>
+    <string name="get_download_dir_fail">获取下载目录失败</string>
+    <string name="download_dir_not_exist">下载目录不存在</string>
 </resources>
