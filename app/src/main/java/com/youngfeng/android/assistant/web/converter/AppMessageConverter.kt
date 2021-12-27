@@ -1,6 +1,7 @@
 package com.youngfeng.android.assistant.web.converter
 
 import android.graphics.Bitmap
+import android.util.Log
 import com.google.gson.Gson
 import com.yanzhenjie.andserver.annotation.Converter
 import com.yanzhenjie.andserver.framework.MessageConverter
@@ -9,6 +10,8 @@ import com.yanzhenjie.andserver.framework.body.StreamBody
 import com.yanzhenjie.andserver.http.ResponseBody
 import com.yanzhenjie.andserver.util.IOUtils
 import com.yanzhenjie.andserver.util.MediaType
+import com.youngfeng.android.assistant.web.body.AudioItemBody
+import com.youngfeng.android.assistant.web.entity.AudioEntity
 import com.youngfeng.android.assistant.web.entity.HttpResponseEntity
 import com.youngfeng.android.assistant.web.response.HttpResponseEntityBody
 import com.youngfeng.android.assistant.web.util.JsonUtils
@@ -28,6 +31,7 @@ class AppMessageConverter : MessageConverter {
             val json = mGson.toJson(output)
             return HttpResponseEntityBody(json)
         } else {
+            Log.e("@@@", "${output?.javaClass?.canonicalName}")
             if (output is Bitmap) {
                 val bos = ByteArrayOutputStream()
                 output.compress(Bitmap.CompressFormat.JPEG, 100, bos)
@@ -41,6 +45,10 @@ class AppMessageConverter : MessageConverter {
 
             if (output is File) {
                 return FileBody(output)
+            }
+
+            if (output is AudioEntity) {
+                return AudioItemBody(output)
             }
 
             throw NotImplementedError("AppMessageConverter: convert method not implemented completed")

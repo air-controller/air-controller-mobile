@@ -1,6 +1,8 @@
 package com.youngfeng.android.assistant.web.controller
 
 import android.media.MediaScannerConnection
+import com.yanzhenjie.andserver.annotation.GetMapping
+import com.yanzhenjie.andserver.annotation.PathVariable
 import com.yanzhenjie.andserver.annotation.PostMapping
 import com.yanzhenjie.andserver.annotation.RequestBody
 import com.yanzhenjie.andserver.annotation.RequestMapping
@@ -16,7 +18,6 @@ import com.youngfeng.android.assistant.web.entity.HttpResponseEntity
 import com.youngfeng.android.assistant.web.request.DeleteAudioRequest
 import com.youngfeng.android.assistant.web.util.ErrorBuilder
 import java.io.File
-import java.lang.Exception
 
 @RestController
 @RequestMapping("/audio")
@@ -59,5 +60,16 @@ class AudioController {
         }
 
         return HttpResponseEntity.success()
+    }
+
+    @GetMapping("/item/{id}")
+    fun findById(@PathVariable("id") id: String): AudioEntity {
+        val audioEntity = AudioUtil.findById(mContext, id)
+
+        if (null != audioEntity) {
+            return audioEntity
+        } else {
+            throw IllegalArgumentException("Audio item is not exist, id: $id")
+        }
     }
 }
