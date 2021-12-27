@@ -11,8 +11,10 @@ import com.yanzhenjie.andserver.http.ResponseBody
 import com.yanzhenjie.andserver.util.IOUtils
 import com.yanzhenjie.andserver.util.MediaType
 import com.youngfeng.android.assistant.web.body.AudioItemBody
+import com.youngfeng.android.assistant.web.body.VideoItemBody
 import com.youngfeng.android.assistant.web.entity.AudioEntity
 import com.youngfeng.android.assistant.web.entity.HttpResponseEntity
+import com.youngfeng.android.assistant.web.entity.VideoEntity
 import com.youngfeng.android.assistant.web.response.HttpResponseEntityBody
 import com.youngfeng.android.assistant.web.util.JsonUtils
 import java.io.ByteArrayInputStream
@@ -49,6 +51,10 @@ class AppMessageConverter : MessageConverter {
 
             if (output is AudioEntity) {
                 return AudioItemBody(output)
+            }
+
+            if (output is VideoEntity) {
+                return VideoItemBody(output)
             }
 
             throw NotImplementedError("AppMessageConverter: convert method not implemented completed")

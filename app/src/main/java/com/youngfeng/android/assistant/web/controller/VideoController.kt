@@ -1,6 +1,8 @@
 package com.youngfeng.android.assistant.web.controller
 
 import android.media.MediaScannerConnection
+import com.yanzhenjie.andserver.annotation.GetMapping
+import com.yanzhenjie.andserver.annotation.PathVariable
 import com.yanzhenjie.andserver.annotation.PostMapping
 import com.yanzhenjie.andserver.annotation.RequestBody
 import com.yanzhenjie.andserver.annotation.RequestMapping
@@ -86,5 +88,16 @@ class VideoController {
         }
 
         return mContext.getString(R.string.delete_video_file_fail)
+    }
+
+    @GetMapping("/item/{id}")
+    fun findById(@PathVariable("id") id: String): VideoEntity {
+        val videoEntity = VideoUtil.findById(mContext, id)
+
+        if (null != videoEntity) {
+            return videoEntity
+        } else {
+            throw IllegalArgumentException("Video item is not exist, id: $id")
+        }
     }
 }
