@@ -8,5 +8,6 @@ data class AudioEntity(
     val duration: Long,
     val size: Long,
     val createTime: Long,
+    val modifyDate: Long,
     val isMusic: Boolean
 )

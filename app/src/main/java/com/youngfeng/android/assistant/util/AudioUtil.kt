@@ -16,7 +16,8 @@ object AudioUtil {
             MediaStore.Audio.AudioColumns.DURATION,
             MediaStore.Audio.AudioColumns.SIZE,
             MediaStore.Audio.AudioColumns.DATA,
-            MediaStore.Audio.AudioColumns.IS_MUSIC
+            MediaStore.Audio.AudioColumns.IS_MUSIC,
+            MediaStore.Audio.AudioColumns.DATE_MODIFIED
         )
 
         val audios = mutableListOf<AudioEntity>()
@@ -31,6 +32,7 @@ object AudioUtil {
                 val sizeIndex = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.SIZE)
                 val dataIndex = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DATA)
                 val isMusicIndex = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.IS_MUSIC)
+                val dateModifiedIndex = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DATE_MODIFIED)
 
                 do {
                     val path = cursor.getString(dataIndex)
@@ -52,7 +54,8 @@ object AudioUtil {
                             size = cursor.getLong(sizeIndex),
                             path = path,
                             isMusic = cursor.getInt(isMusicIndex) != 0,
-                            folder = folder
+                            folder = folder,
+                            modifyDate = cursor.getLong(dateModifiedIndex)
                         )
                     )
                 } while (cursor.moveToNext())
@@ -72,7 +75,8 @@ object AudioUtil {
             MediaStore.Audio.AudioColumns.DURATION,
             MediaStore.Audio.AudioColumns.SIZE,
             MediaStore.Audio.AudioColumns.DATA,
-            MediaStore.Audio.AudioColumns.IS_MUSIC
+            MediaStore.Audio.AudioColumns.IS_MUSIC,
+            MediaStore.Audio.AudioColumns.DATE_MODIFIED
         )
 
         val selection = "${MediaStore.Audio.AudioColumns._ID} = ?"
@@ -91,6 +95,7 @@ object AudioUtil {
                     val sizeIndex = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.SIZE)
                     val dataIndex = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DATA)
                     val isMusicIndex = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.IS_MUSIC)
+                    val dateModifiedIndex = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DATE_MODIFIED)
 
                     val path = cursor.getString(dataIndex)
 
@@ -109,7 +114,8 @@ object AudioUtil {
                         size = cursor.getLong(sizeIndex),
                         path = path,
                         isMusic = cursor.getInt(isMusicIndex) != 0,
-                        folder = folder
+                        folder = folder,
+                        modifyDate = cursor.getLong(dateModifiedIndex)
                     )
                 }
             }
