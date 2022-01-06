@@ -11,6 +11,7 @@ import android.util.Log
 import com.youngfeng.android.assistant.model.Command
 import com.youngfeng.android.assistant.model.MobileInfo
 import com.youngfeng.android.assistant.socket.CmdSocketServer
+import com.youngfeng.android.assistant.socket.HeartbeatServer
 import com.youngfeng.android.assistant.util.CommonUtil
 
 class MobileAssistantApplication : Application() {
@@ -46,10 +47,12 @@ class MobileAssistantApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        CmdSocketServer.getInstance().onConnected {
+        CmdSocketServer.getInstance().onOpen = {
             updateMobileInfo()
         }
         CmdSocketServer.getInstance().start()
+
+        HeartbeatServer.getInstance().start()
 
         val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         registerReceiver(mBatteryReceiver, filter)

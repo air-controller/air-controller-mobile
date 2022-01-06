@@ -7,24 +7,22 @@ import java.net.Socket
 import java.util.concurrent.Executors
 
 /**
- * 单客户端版本Socket Server，仅支持单一客户端连接，多个客户端连接将直接断开。
+ * 用于快速创建Socket Server，处理通用逻辑。
  *
  * @author Scott Smith 2021/12/29 16:13
  */
-class SingleClientSocketServer(private val port: Int) {
-    private val mExecutorService = Executors.newSingleThreadExecutor()
-    private var mClient: Socket? = null
+class SimpleSocketServer(private val port: Int) {
+    private val mExecutorService = Executors.newCachedThreadPool()
     private var mServerSocket: ServerSocket? = null
     private var isStarted = false
     private var onStartComplete: ((server: ServerSocket) -> Unit)? = null
     private var onStartFail: ((error: String) -> Unit)? = null
     private var onMessage: ((client: Socket, data: ByteArray) -> Unit)? = null
     private var onStopComplete: (() -> Unit)? = null
-    private var clientIsConnected = false
-    private var onConnected: ((client: Socket) -> Unit)? = null
+    private val mClients = mutableListOf<Socket>()
 
     companion object {
-        private val TAG = SingleClientSocketServer::class.simpleName
+        private val TAG = SimpleSocketServer::class.simpleName
     }
 
     fun start() {
@@ -35,26 +33,35 @@ class SingleClientSocketServer(private val port: Int) {
                 isStarted = true
 
                 while (isStarted) {
-                    if (null == mClient) {
-                        mClient = mServerSocket!!.accept()
-                        clientIsConnected = true
-                        mClient?.apply {
-                            onConnected?.invoke(this)
-                            val inputStream = this.getInputStream()
-                            val data = ByteArray(size = inputStream.available())
-                            inputStream.read(data)
-
-                            onMessage?.invoke(this, data)
-                        }
-                    } else {
-                        Log.e(TAG, "There is already a client connected, this connection will be discarded")
-                    }
+                    val client = mServerSocket!!.accept()
+                    mClients.add(client)
+                    handleMessage(client)
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
+                Log.e(TAG, "start, error: ${e.message}")
                 onStartFail?.invoke(e.message ?: "Unknown error")
             }
         }
+    }
+
+    private fun handleMessage(client: Socket) {
+        val inputStream = client.getInputStream()
+        do {
+            val data = mutableListOf<Byte>()
+
+            val buffer = ByteArray(1024)
+
+            val bytesRead = inputStream.read(buffer)
+            if (-1 != bytesRead) {
+                data.addAll(buffer.slice(0 until bytesRead))
+
+                onMessage?.invoke(client, data.toByteArray())
+            } else {
+                mClients.remove(client)
+                Log.d(TAG, "Remove this client [$client], bytesRead = -1")
+            }
+        } while (bytesRead != -1)
     }
 
     fun stop() {
@@ -69,25 +76,26 @@ class SingleClientSocketServer(private val port: Int) {
         onStopComplete?.invoke()
     }
 
-    fun sendToClient(data: ByteArray) {
-        if (!isStarted) {
-            throw IllegalAccessException("Call start() first please")
-        }
-
+    fun sendToClient(client: Socket, data: ByteArray) {
         mExecutorService.submit {
-            mClient?.apply {
-                this.getOutputStream().apply {
-                    write(data)
-                    flush()
-                }
+            try {
+                val outputStream = client.getOutputStream()
+                outputStream.write(data)
+                outputStream.flush()
+            } catch (e: IOException) {
+                e.printStackTrace()
+                mClients.remove(client)
+                Log.e(TAG, "send to client [$client] fail, reason: ${e.message}")
             }
         }
     }
 
-    fun markClientDisconnected() {
-        mClient?.close()
-        mClient = null
-        clientIsConnected = false
+    fun sendToAllClient(data: ByteArray) {
+        if (mClients.isNotEmpty()) {
+            mClients.forEach {
+                sendToClient(it, data)
+            }
+        }
     }
 
     fun onStartComplete(callback: (server: ServerSocket) -> Unit) {
@@ -106,11 +114,9 @@ class SingleClientSocketServer(private val port: Int) {
         this.onStopComplete = callback
     }
 
-    fun onConnected(callback: (client: Socket) -> Unit) {
-        this.onConnected = callback
-    }
-
     fun isStarted(): Boolean {
         return isStarted
     }
+
+    fun getHostname() = mServerSocket?.inetAddress?.hostName
 }

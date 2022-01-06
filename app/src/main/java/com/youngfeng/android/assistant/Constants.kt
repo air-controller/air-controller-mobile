@@ -11,6 +11,7 @@ object Constants {
         const val HTTP_SERVER = 8080
         const val UDP_DEVICE_DISCOVER = 20000
         const val CMD_SERVER = 20001
+        const val HEARTBEAT_SERVER = 20002
     }
 
     const val PLATFORM_ANDROID = 1
