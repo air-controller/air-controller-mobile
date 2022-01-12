@@ -262,7 +262,7 @@ exceptions:
       - 'Throwable'
     allowedExceptionNameRegex: '_|(ignore|expected).*'
   TooGenericExceptionThrown:
-    active: true
+    active: false
     exceptionNames:
       - 'Error'
       - 'Exception'
@@ -401,7 +401,7 @@ formatting:
     active: false
     autoCorrect: true
   StringTemplate:
-    active: true
+    active: false
     autoCorrect: true
 
 naming:

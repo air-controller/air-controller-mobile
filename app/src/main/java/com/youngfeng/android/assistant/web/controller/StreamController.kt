@@ -11,6 +11,7 @@ import com.yanzhenjie.andserver.annotation.QueryParam
 import com.yanzhenjie.andserver.annotation.RequestMapping
 import com.yanzhenjie.andserver.annotation.RestController
 import com.youngfeng.android.assistant.app.MobileAssistantApplication
+import net.lingala.zip4j.ZipFile
 import java.io.File
 
 @RestController
@@ -57,5 +58,29 @@ class StreamController {
     @GetMapping("/file")
     fun file(@QueryParam("path") path: String): File {
         return File(path)
+    }
+
+    @GetMapping("/dir")
+    fun dir(@QueryParam("path") path: String): File {
+        var name = path
+        val index = path.lastIndexOf("/")
+        if (-1 != index) {
+            name = path.substring(index + 1)
+        }
+
+        mContext.externalCacheDir?.apply {
+            val zipTempFolder = File("${this.absoluteFile}/.zip")
+            if (!zipTempFolder.exists()) {
+                zipTempFolder.mkdirs()
+            } else {
+                zipTempFolder.listFiles()?.forEach { it.delete() }
+            }
+
+            val zipFile = ZipFile("${zipTempFolder}/${name}.zip")
+            zipFile.addFolder(File(path))
+            return zipFile.file
+        }
+
+        throw RuntimeException("Unknown error, path: $path")
     }
 }

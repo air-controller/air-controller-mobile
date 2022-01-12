@@ -81,6 +81,7 @@ dependencies {
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.19.0-RC1")
 
     implementation 'org.java-websocket:Java-WebSocket:1.5.2'
+    implementation "net.lingala.zip4j:zip4j:2.9.1"
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
