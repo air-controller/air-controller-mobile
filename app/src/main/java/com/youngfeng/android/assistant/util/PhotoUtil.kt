@@ -231,6 +231,57 @@ object PhotoUtil {
         return images
     }
 
+    fun findImageByPath(context: Context, path: String): ImageEntity? {
+        val contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+
+        val projections = arrayOf(
+            MediaStore.Images.ImageColumns._ID,
+            MediaStore.Images.ImageColumns.DATA,
+            MediaStore.Images.ImageColumns.DATE_MODIFIED,
+            MediaStore.Images.ImageColumns.MINI_THUMB_MAGIC,
+            MediaStore.Images.ImageColumns.MIME_TYPE,
+            MediaStore.Images.ImageColumns.WIDTH,
+            MediaStore.Images.ImageColumns.HEIGHT,
+            MediaStore.Images.ImageColumns.DATE_TAKEN,
+            MediaStore.Images.ImageColumns.DISPLAY_NAME
+        )
+
+        val orderBy = "${MediaStore.Images.ImageColumns.DATE_TAKEN} DESC"
+
+        val selection = "${MediaStore.Images.ImageColumns.DATA} = ?"
+        val selectionArgs = arrayOf(path)
+
+        var result: ImageEntity? = null
+
+        context.contentResolver.query(contentUri, projections, selection, selectionArgs, orderBy, null)?.use {
+            if (it.moveToFirst()) {
+                val idIndex = it.getColumnIndex(MediaStore.Images.ImageColumns._ID)
+                val imageDataIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
+                val dateModifiedIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.DATE_MODIFIED)
+                val miniThumbMagicIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.MINI_THUMB_MAGIC)
+                val mimeTypeIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.MIME_TYPE)
+                val widthIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.WIDTH)
+                val heightIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.HEIGHT)
+                val dateTakenIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.DATE_TAKEN)
+                val displayNameIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME)
+
+                val id = it.getString(idIndex)
+                val imageData = it.getString(imageDataIndex)
+                val modifyDate = it.getLong(dateModifiedIndex)
+                val thumbnail = it.getString(miniThumbMagicIndex)
+                val mimeType = it.getString(mimeTypeIndex)
+                val width = it.getInt(widthIndex)
+                val height = it.getInt(heightIndex)
+                val dateTaken = it.getLong(dateTakenIndex)
+                val displayName = it.getString(displayNameIndex)
+
+                result = ImageEntity(id, mimeType, thumbnail, imageData, width, height, modifyDate, dateTaken, displayName)
+            }
+        }
+
+        return result
+    }
+
     @JvmStatic
     fun deleteImage(context: Context, id: String): Boolean {
         val contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI

@@ -11,6 +11,8 @@ import com.yanzhenjie.andserver.annotation.QueryParam
 import com.yanzhenjie.andserver.annotation.RequestMapping
 import com.yanzhenjie.andserver.annotation.RestController
 import com.youngfeng.android.assistant.app.MobileAssistantApplication
+import com.youngfeng.android.assistant.util.PhotoUtil
+import com.youngfeng.android.assistant.util.VideoUtil
 import net.lingala.zip4j.ZipFile
 import java.io.File
 
@@ -82,5 +84,51 @@ class StreamController {
         }
 
         throw RuntimeException("Unknown error, path: $path")
+    }
+
+    @GetMapping("/image/thumbnail2")
+    fun imageThumbnail2(
+        @QueryParam("path") path: String,
+        @QueryParam("width") width: Int,
+        @QueryParam("height") height: Int
+    ): Bitmap? {
+        val image = PhotoUtil.findImageByPath(mContext, path)
+        image?.apply {
+            val uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, this.id.toLong())
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                mContext.contentResolver.loadThumbnail(uri, Size(width, height), null)
+            } else {
+                MediaStore.Images.Thumbnails.getThumbnail(
+                    mContext.contentResolver,
+                    this.id.toLong(),
+                    MediaStore.Images.Thumbnails.MINI_KIND, null
+                )
+            }
+        }
+
+        return null
+    }
+
+    @GetMapping("/video/thumbnail2")
+    fun videoThumbnail2(
+        @QueryParam("path") path: String,
+        @QueryParam("width") width: Int,
+        @QueryParam("height") height: Int
+    ): Bitmap? {
+        val videoEntity = VideoUtil.findByPath(mContext, path)
+        videoEntity?.apply {
+            val uri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                mContext.contentResolver.loadThumbnail(uri, Size(width, height), null)
+            } else {
+                MediaStore.Images.Thumbnails.getThumbnail(
+                    mContext.contentResolver,
+                    id,
+                    MediaStore.Images.Thumbnails.MINI_KIND, null
+                )
+            }
+        }
+
+        return null
     }
 }
