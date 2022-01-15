@@ -2,6 +2,7 @@ package com.youngfeng.android.assistant.web.controller
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.media.MediaScannerConnection
 import android.os.Environment
 import android.text.TextUtils
 import android.util.Log
@@ -185,6 +186,59 @@ open class FileController {
         } catch (e: Exception) {
             e.printStackTrace()
             val response = ErrorBuilder().module(HttpModule.FileModule).error(HttpError.DeleteFileFail).build<Map<String, Any>>()
+            response.msg = e.message
+            return response
+        }
+    }
+
+    /**
+     * 删除多个文件
+     */
+    @PostMapping("/deleteMulti")
+    @ResponseBody
+    fun deleteMulti(@RequestBody request: DeleteMultiFileRequest): HttpResponseEntity<Any> {
+        // 先判断是否存在写入外部存储权限
+        if (ContextCompat.checkSelfPermission(
+                MobileAssistantApplication.getInstance(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.NoWriteExternalStoragePerm).build()
+        }
+
+        try {
+            val paths = request.paths
+
+            var deleteCount = 0
+
+            paths.forEachIndexed { index, path ->
+                val file = File(path)
+
+                if (file.exists()) {
+                    if (file.isDirectory) {
+                        if (file.deleteRecursively()) {
+                            deleteCount++
+                            MediaScannerConnection.scanFile(mContext, arrayOf(path), null, null)
+                        }
+                    } else {
+                        if (file.delete()) {
+                            deleteCount++
+                            MediaScannerConnection.scanFile(mContext, arrayOf(path), null, null)
+                        }
+                    }
+                }
+            }
+
+            if (deleteCount == paths.size) {
+                return HttpResponseEntity.success()
+            } else {
+                val response = ErrorBuilder().module(HttpModule.FileModule).error(HttpError.DeleteFileFail).build<Any>()
+                response.msg = "${deleteCount}删除成功，${paths.size - deleteCount}删除失败"
+                return response
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            val response = ErrorBuilder().module(HttpModule.FileModule).error(HttpError.DeleteFileFail).build<Any>()
             response.msg = e.message
             return response
         }
