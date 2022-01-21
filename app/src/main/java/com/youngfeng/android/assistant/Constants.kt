@@ -8,7 +8,7 @@ package com.youngfeng.android.assistant
 object Constants {
 
     object Port {
-        const val HTTP_SERVER = 8080
+        const val HTTP_SERVER = 9527
         const val UDP_DEVICE_DISCOVER = 20000
         const val CMD_SERVER = 20001
         const val HEARTBEAT_SERVER = 20002
