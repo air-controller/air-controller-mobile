@@ -41,11 +41,19 @@ object VideoUtil {
                     val album = map[bucketId] ?: let {
                         val bucketName = cursor.getString(bucketNameIndex)
                         val videoId = cursor.getLong(idIndex)
+                        val videoPath = cursor.getString(videoUriIndex);
+
+                        var folder = videoPath
+                        val index = folder.lastIndexOf("/")
+                        if (index != -1) {
+                            folder = folder.substring(0, index)
+                        }
 
                         val album = VideoFolder(
                             id = bucketId,
                             name = bucketName,
-                            coverVideoId = videoId
+                            coverVideoId = videoId,
+                            path = folder
                         )
                         map[bucketId] = album
 
