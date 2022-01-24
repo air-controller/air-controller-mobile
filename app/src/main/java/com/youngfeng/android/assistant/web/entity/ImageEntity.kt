@@ -9,5 +9,6 @@ data class ImageEntity(
     var height: Int? = null,
     var modifyTime: Long? = null,
     var createTime: Long? = null,
-    var displayName: String? = null
+    var displayName: String? = null,
+    var size: Long? = null
 )

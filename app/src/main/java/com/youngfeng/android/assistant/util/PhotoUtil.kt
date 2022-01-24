@@ -83,7 +83,8 @@ object PhotoUtil {
             MediaStore.Images.ImageColumns.WIDTH,
             MediaStore.Images.ImageColumns.HEIGHT,
             MediaStore.Images.ImageColumns.DATE_TAKEN,
-            MediaStore.Images.ImageColumns.DISPLAY_NAME
+            MediaStore.Images.ImageColumns.DISPLAY_NAME,
+            MediaStore.Images.ImageColumns.SIZE
         )
 
         val orderBy = "${MediaStore.Images.ImageColumns.DATE_TAKEN} DESC"
@@ -100,6 +101,7 @@ object PhotoUtil {
                 val heightIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.HEIGHT)
                 val dateTakenIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.DATE_TAKEN)
                 val displayNameIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME)
+                val sizeIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.SIZE)
 
                 do {
                     val id = it.getString(idIndex)
@@ -111,9 +113,10 @@ object PhotoUtil {
                     val height = it.getInt(heightIndex)
                     val dateTaken = it.getLong(dateTakenIndex)
                     val displayName = it.getString(displayNameIndex)
+                    val size = it.getLong(sizeIndex);
 
                     images.add(
-                        ImageEntity(id, mimeType, thumbnail, imageData, width, height, modifyDate, dateTaken, displayName)
+                        ImageEntity(id, mimeType, thumbnail, imageData, width, height, modifyDate, dateTaken, displayName, size)
                     )
                 } while (it.moveToNext())
             }
@@ -135,7 +138,8 @@ object PhotoUtil {
             MediaStore.Images.ImageColumns.WIDTH,
             MediaStore.Images.ImageColumns.HEIGHT,
             MediaStore.Images.ImageColumns.DATE_TAKEN,
-            MediaStore.Images.ImageColumns.DISPLAY_NAME
+            MediaStore.Images.ImageColumns.DISPLAY_NAME,
+            MediaStore.Images.ImageColumns.SIZE
         )
 
         val orderBy = "${MediaStore.Images.ImageColumns.DATE_TAKEN} DESC"
@@ -155,6 +159,7 @@ object PhotoUtil {
                 val heightIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.HEIGHT)
                 val dateTakenIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.DATE_TAKEN)
                 val displayNameIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME)
+                val sizeIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.SIZE)
 
                 do {
                     val id = it.getString(idIndex)
@@ -166,9 +171,10 @@ object PhotoUtil {
                     val height = it.getInt(heightIndex)
                     val dateTaken = it.getLong(dateTakenIndex)
                     val displayName = it.getString(displayNameIndex)
+                    val size = it.getLong(sizeIndex);
 
                     images.add(
-                        ImageEntity(id, mimeType, thumbnail, imageData, width, height, modifyDate, dateTaken, displayName)
+                        ImageEntity(id, mimeType, thumbnail, imageData, width, height, modifyDate, dateTaken, displayName, size)
                     )
                 } while (it.moveToNext())
             }
@@ -189,7 +195,8 @@ object PhotoUtil {
             MediaStore.Images.ImageColumns.WIDTH,
             MediaStore.Images.ImageColumns.HEIGHT,
             MediaStore.Images.ImageColumns.DATE_TAKEN,
-            MediaStore.Images.ImageColumns.DISPLAY_NAME
+            MediaStore.Images.ImageColumns.DISPLAY_NAME,
+            MediaStore.Images.ImageColumns.SIZE
         )
 
         val orderBy = "${MediaStore.Images.ImageColumns.DATE_TAKEN} DESC"
@@ -209,6 +216,7 @@ object PhotoUtil {
                 val heightIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.HEIGHT)
                 val dateTakenIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.DATE_TAKEN)
                 val displayNameIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME)
+                val sizeIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.SIZE)
 
                 do {
                     val id = it.getString(idIndex)
@@ -220,9 +228,10 @@ object PhotoUtil {
                     val height = it.getInt(heightIndex)
                     val dateTaken = it.getLong(dateTakenIndex)
                     val displayName = it.getString(displayNameIndex)
+                    val size = it.getLong(sizeIndex);
 
                     images.add(
-                        ImageEntity(id, mimeType, thumbnail, imageData, width, height, modifyDate, dateTaken, displayName)
+                        ImageEntity(id, mimeType, thumbnail, imageData, width, height, modifyDate, dateTaken, displayName, size)
                     )
                 } while (it.moveToNext())
             }
@@ -243,7 +252,8 @@ object PhotoUtil {
             MediaStore.Images.ImageColumns.WIDTH,
             MediaStore.Images.ImageColumns.HEIGHT,
             MediaStore.Images.ImageColumns.DATE_TAKEN,
-            MediaStore.Images.ImageColumns.DISPLAY_NAME
+            MediaStore.Images.ImageColumns.DISPLAY_NAME,
+            MediaStore.Images.ImageColumns.SIZE
         )
 
         val orderBy = "${MediaStore.Images.ImageColumns.DATE_TAKEN} DESC"
@@ -264,6 +274,7 @@ object PhotoUtil {
                 val heightIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.HEIGHT)
                 val dateTakenIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.DATE_TAKEN)
                 val displayNameIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME)
+                val sizeIndex = it.getColumnIndex(MediaStore.Images.ImageColumns.SIZE)
 
                 val id = it.getString(idIndex)
                 val imageData = it.getString(imageDataIndex)
@@ -274,8 +285,9 @@ object PhotoUtil {
                 val height = it.getInt(heightIndex)
                 val dateTaken = it.getLong(dateTakenIndex)
                 val displayName = it.getString(displayNameIndex)
+                val size = it.getLong(sizeIndex);
 
-                result = ImageEntity(id, mimeType, thumbnail, imageData, width, height, modifyDate, dateTaken, displayName)
+                result = ImageEntity(id, mimeType, thumbnail, imageData, width, height, modifyDate, dateTaken, displayName, size)
             }
         }
 
