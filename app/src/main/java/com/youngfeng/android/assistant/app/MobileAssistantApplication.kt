@@ -8,11 +8,15 @@ import android.content.IntentFilter
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.youngfeng.android.assistant.Constants
+import com.youngfeng.android.assistant.db.RoomDatabaseHolder
 import com.youngfeng.android.assistant.model.Command
 import com.youngfeng.android.assistant.model.MobileInfo
 import com.youngfeng.android.assistant.socket.CmdSocketServer
 import com.youngfeng.android.assistant.socket.HeartbeatServer
 import com.youngfeng.android.assistant.util.CommonUtil
+import java.io.File
+import java.util.concurrent.Executors
 
 class MobileAssistantApplication : Application() {
     private val mHandler by lazy { Handler() }
@@ -26,6 +30,9 @@ class MobileAssistantApplication : Application() {
         }
 
         receiver
+    }
+    private val mExecutorService by lazy {
+        Executors.newSingleThreadExecutor()
     }
 
     companion object {
@@ -56,6 +63,28 @@ class MobileAssistantApplication : Application() {
 
         val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         registerReceiver(mBatteryReceiver, filter)
+
+        clearExpiredZipFiles()
+    }
+
+    private fun clearExpiredZipFiles() {
+        mExecutorService.submit {
+            val zipFileRecordDao = RoomDatabaseHolder.getRoomDatabase(this).zipFileRecordDao()
+            val zipFiles = zipFileRecordDao.findAll()
+
+            zipFiles.forEach {
+                val now = System.currentTimeMillis()
+                // 超过指定时间的zip临时文件移除掉
+                if (now - it.createTime > Constants.KEEP_TEMP_ZIP_FILE_DURATION) {
+                    val zipFile = File(it.path)
+                    if (zipFile.exists()) {
+                        if (zipFile.delete()) {
+                            zipFileRecordDao.delete(it)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     fun runOnUiThread(action: () -> Unit) {
@@ -81,5 +110,6 @@ class MobileAssistantApplication : Application() {
         super.onTerminate()
 
         unregisterReceiver(mBatteryReceiver)
+        mExecutorService.shutdownNow()
     }
 }

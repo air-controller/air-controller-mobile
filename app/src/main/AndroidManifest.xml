@@ -26,7 +26,8 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".receiver.CommonReceiver">
+        <receiver android:name=".receiver.CommonReceiver"
+                android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BATTERY_LOW" />
                 <action android:name="android.intent.action.BATTERY_OKAY" />

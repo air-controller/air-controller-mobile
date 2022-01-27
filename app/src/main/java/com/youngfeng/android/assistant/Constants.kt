@@ -20,4 +20,6 @@ object Constants {
     const val SEARCH_RES_PREFIX = "search_msg_received#"
     const val RANDOM_STR_SEARCH = "a2w0nuNyiD6vYogF"
     const val RADNOM_STR_RES_SEARCH = "RBIDoKFHLX9frYTh"
+
+    const val KEEP_TEMP_ZIP_FILE_DURATION = 60 * 60 * 1000;
 }

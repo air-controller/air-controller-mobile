@@ -91,7 +91,7 @@ complexity:
     includeStaticDeclarations: false
     includePrivateDeclarations: false
   ComplexMethod:
-    active: true
+    active: false
     threshold: 15
     ignoreSingleWhenExpression: false
     ignoreSimpleWhenEntries: false
@@ -113,7 +113,7 @@ complexity:
     active: true
     threshold: 600
   LongMethod:
-    active: true
+    active: false
     threshold: 60
   LongParameterList:
     active: true
@@ -217,7 +217,7 @@ exceptions:
   PrintStackTrace:
     active: false
   RethrowCaughtException:
-    active: true
+    active: false
   ReturnFromFinally:
     active: true
     ignoreLabeled: false
