@@ -1,7 +1,6 @@
 package com.youngfeng.android.assistant.web.converter
 
 import android.graphics.Bitmap
-import android.util.Log
 import com.google.gson.Gson
 import com.yanzhenjie.andserver.annotation.Converter
 import com.yanzhenjie.andserver.framework.MessageConverter

@@ -34,12 +34,13 @@ class SimpleSocketServer(private val port: Int) {
 
                 while (isStarted) {
                     val client = mServerSocket!!.accept()
+                    Log.d(TAG, "Client added: $client")
                     mClients.add(client)
                     handleMessage(client)
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
-                Log.e(TAG, "start, error: ${e.message}")
+                Log.e(TAG, "IOException: ${e.message}")
                 onStartFail?.invoke(e.message ?: "Unknown error")
             }
         }
