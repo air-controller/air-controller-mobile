@@ -33,7 +33,6 @@ class AppMessageConverter : MessageConverter {
             val json = mGson.toJson(output)
             return HttpResponseEntityBody(json)
         } else {
-            Log.e("@@@", "${output?.javaClass?.canonicalName}")
             if (output is Bitmap) {
                 val bos = ByteArrayOutputStream()
                 output.compress(Bitmap.CompressFormat.JPEG, 100, bos)
