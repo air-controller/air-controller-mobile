@@ -8,8 +8,10 @@ import android.content.IntentFilter
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.yanzhenjie.andserver.AndServer
 import com.youngfeng.android.assistant.Constants
 import com.youngfeng.android.assistant.db.RoomDatabaseHolder
+import com.youngfeng.android.assistant.manager.DeviceDiscoverManager
 import com.youngfeng.android.assistant.model.Command
 import com.youngfeng.android.assistant.model.MobileInfo
 import com.youngfeng.android.assistant.socket.CmdSocketServer
@@ -17,6 +19,7 @@ import com.youngfeng.android.assistant.socket.HeartbeatServer
 import com.youngfeng.android.assistant.util.CommonUtil
 import java.io.File
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 class MobileAssistantApplication : Application() {
     private val mHandler by lazy { Handler() }
@@ -35,9 +38,18 @@ class MobileAssistantApplication : Application() {
         Executors.newSingleThreadExecutor()
     }
 
+    private val mHttpServer by lazy(mode = LazyThreadSafetyMode.NONE) {
+        AndServer.webServer(this)
+            .port(Constants.Port.HTTP_SERVER)
+            .timeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+            .build()
+    }
+
     companion object {
         private lateinit var INSTANCE: MobileAssistantApplication
         private val TAG = MobileAssistantApplication::class.simpleName
+        // 默认超时时间（单位：秒）
+        private const val DEFAULT_TIMEOUT = 10
 
         @JvmStatic
         fun getInstance() = INSTANCE
@@ -63,6 +75,13 @@ class MobileAssistantApplication : Application() {
 
         val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         registerReceiver(mBatteryReceiver, filter)
+
+        mHttpServer.startup()
+
+        DeviceDiscoverManager.getInstance().onDeviceDiscover {
+            print("Device: ip => ${it.ipAddress}, name => ${it.name}, platform => ${it.platform}")
+        }
+        DeviceDiscoverManager.getInstance().startDiscover()
 
         clearExpiredZipFiles()
     }
@@ -111,5 +130,7 @@ class MobileAssistantApplication : Application() {
 
         unregisterReceiver(mBatteryReceiver)
         mExecutorService.shutdownNow()
+        mHttpServer.shutdown()
+        HeartbeatServer.getInstance().stop()
     }
 }
