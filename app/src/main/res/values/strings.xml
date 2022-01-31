@@ -21,4 +21,15 @@
     <string name="delete_video_file_fail">删除视频文件失败</string>
     <string name="get_download_dir_fail">获取下载目录失败</string>
     <string name="download_dir_not_exist">下载目录不存在</string>
+    <string name="label_device_info">机型信息：</string>
+    <string name="label_device_name">设备名称：</string>
+    <string name="label_wifi_name">无线网络：</string>
+    <string name="label_connection_info">连接信息：</string>
+    <string name="label_computer_name">电脑名称：</string>
+    <string name="label_computer_ip">电脑地址：</string>
+    <string name="label_computer_os">操作系统：</string>
+    <string name="declaration_open_source">本项目完全开源，请放心使用！</string>
+    <string name="support_developer">支持作者</string>
+    <string name="intro_open_link_and_star">打开以上链接，点击star支持我们</string>
+    <string name="disconnect">断开连接</string>
 </resources>
