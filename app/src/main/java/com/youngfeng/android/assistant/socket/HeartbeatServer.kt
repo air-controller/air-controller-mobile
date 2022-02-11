@@ -13,6 +13,8 @@ class HeartbeatServer(private val application: MobileAssistantApplication) {
     private val mGson by lazy {
         Gson()
     }
+    var onDeviceConnected: (() -> Unit)? = null
+    var onDeviceDisconnected: (() -> Unit)? = null
 
     companion object {
         private val instance = HeartbeatServer(MobileAssistantApplication.getInstance())
@@ -48,6 +50,18 @@ class HeartbeatServer(private val application: MobileAssistantApplication) {
         mSocketServer.onStopComplete {
             Log.d(TAG, "HeartbeatServer stop complete.")
         }
+
+        mSocketServer.onClientConnect = {
+            onDeviceConnected?.invoke()
+        }
+
+        mSocketServer.onClientDisconnect = {
+            onDeviceDisconnected?.invoke()
+        }
+    }
+
+    fun disconnect() {
+        mSocketServer.disconnect()
     }
 
     fun start() {

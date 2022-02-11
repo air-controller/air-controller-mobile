@@ -20,6 +20,9 @@ class SimpleSocketServer(private val port: Int) {
     private var onMessage: ((client: Socket, data: ByteArray) -> Unit)? = null
     private var onStopComplete: (() -> Unit)? = null
     private val mClients = mutableListOf<Socket>()
+    var onSecondaryClientEnter: ((client: Socket) -> Unit)? = null
+    var onClientConnect: ((client: Socket) -> Unit)? = null
+    var onClientDisconnect: ((client: Socket) -> Unit)? = null
 
     companion object {
         private val TAG = SimpleSocketServer::class.simpleName
@@ -34,9 +37,15 @@ class SimpleSocketServer(private val port: Int) {
 
                 while (isStarted) {
                     val client = mServerSocket!!.accept()
-                    Log.d(TAG, "Client added: $client")
-                    mClients.add(client)
-                    handleMessage(client)
+                    if (mClients.isNotEmpty()) {
+                        onSecondaryClientEnter?.invoke(client)
+                        client.close()
+                    } else {
+                        Log.d(TAG, "Client added: $client")
+                        onClientConnect?.invoke(client)
+                        mClients.add(client)
+                        handleMessage(client)
+                    }
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -47,27 +56,34 @@ class SimpleSocketServer(private val port: Int) {
     }
 
     private fun handleMessage(client: Socket) {
-        val inputStream = client.getInputStream()
-        do {
-            val data = mutableListOf<Byte>()
+        mExecutorService.submit {
+            val inputStream = client.getInputStream()
+            do {
+                val data = mutableListOf<Byte>()
 
-            val buffer = ByteArray(1024)
+                val buffer = ByteArray(1024)
 
-            val bytesRead = inputStream.read(buffer)
-            if (-1 != bytesRead) {
-                data.addAll(buffer.slice(0 until bytesRead))
+                val bytesRead = inputStream.read(buffer)
+                if (-1 != bytesRead) {
+                    data.addAll(buffer.slice(0 until bytesRead))
 
-                onMessage?.invoke(client, data.toByteArray())
-            } else {
-                mClients.remove(client)
-                Log.d(TAG, "Remove this client [$client], bytesRead = -1")
-            }
-        } while (bytesRead != -1)
+                    Log.d(TAG, "handleMessage, port: ${client.localPort}, data length: ${data.size}, value: ${String(data.toByteArray())}, $onMessage")
+                    onMessage?.invoke(client, data.toByteArray())
+                } else {
+                    mClients.remove(client)
+                    onClientDisconnect?.invoke(client)
+                    Log.d(TAG, "Remove this client [$client], bytesRead = -1")
+                }
+            } while (bytesRead != -1)
+        }
     }
 
     fun stop() {
         try {
             mServerSocket?.close()
+            if (mClients.isNotEmpty()) {
+                onClientDisconnect?.invoke(mClients.single())
+            }
         } catch (e: IOException) {
             e.printStackTrace()
             Log.e(TAG, "Stop server socket cause error: ${e.message}")
@@ -86,6 +102,7 @@ class SimpleSocketServer(private val port: Int) {
             } catch (e: IOException) {
                 e.printStackTrace()
                 mClients.remove(client)
+                onClientDisconnect?.invoke(client)
                 Log.e(TAG, "send to client [$client] fail, reason: ${e.message}")
             }
         }
@@ -113,6 +130,17 @@ class SimpleSocketServer(private val port: Int) {
 
     fun onStopComplete(callback: () -> Unit) {
         this.onStopComplete = callback
+    }
+
+    fun disconnect() {
+        if (mClients.isNotEmpty()) {
+            try {
+                mClients.single().close()
+                mClients.clear()
+            } catch (e: Exception) {
+                Log.e(TAG, "${e.message}")
+            }
+        }
     }
 
     fun isStarted(): Boolean {

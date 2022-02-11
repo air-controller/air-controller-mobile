@@ -27,8 +27,13 @@ class CmdSocketServer(private val application: MobileAssistantApplication) {
         }
 
         mSocketServer.onMessage { _, data ->
+            Log.e("@@@", "xxxxx, $data")
             application.runOnUiThread {
-                val command = mGson.fromJson<Command<Any>>(String(data), Command::class.java)
+                val str = String(data)
+                Log.e("@@@", "yyyyyy, $str")
+
+                Log.d(TAG, "Message received: $str")
+                val command = mGson.fromJson<Command<Any>>(str, Command::class.java)
                 onCommandReceive?.invoke(command)
             }
         }
@@ -56,6 +61,10 @@ class CmdSocketServer(private val application: MobileAssistantApplication) {
 
     fun onCommandReceive(callback: (cmd: Command<Any>) -> Unit) {
         onCommandReceive = callback
+    }
+
+    fun disconnect() {
+        mSocketServer.disconnect()
     }
 
     fun isStarted() = mSocketServer.isStarted()

@@ -5,6 +5,7 @@ import android.content.Context
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.text.format.Formatter
+import android.util.Log
 import com.youngfeng.android.assistant.Constants
 import com.youngfeng.android.assistant.app.MobileAssistantApplication
 import com.youngfeng.android.assistant.model.Device
@@ -64,6 +65,10 @@ class DeviceDiscoverManagerImpl : DeviceDiscoverManager {
         Executors.newSingleThreadExecutor()
     }
 
+    companion object {
+        private const val TAG = "DeviceDiscoverManager"
+    }
+
     override fun startDiscover() {
         mExecutor.submit {
             if (null == mDatagramSocket) {
@@ -87,7 +92,7 @@ class DeviceDiscoverManagerImpl : DeviceDiscoverManager {
                 val data = String(buffer)
                 if (isValidResponse(data)) {
                     val device = convertToDevice(data)
-                    print("当前设备：${device.name}, platform: ${device.platform}, ip address: ${device.ipAddress}")
+                    print("当前设备：${device.name}, platform: ${device.platform}, ip address: ${device.ip}")
                 } else {
                     print("It's not valid, data: $data")
                 }
@@ -125,21 +130,28 @@ class DeviceDiscoverManagerImpl : DeviceDiscoverManager {
 
     @SuppressLint("WifiManagerLeak")
     private fun sendBroadcastMsg() {
-        val wifiManager = MobileAssistantApplication.getInstance().getSystemService(Context.WIFI_SERVICE) as WifiManager
+        try {
+            val wifiManager = MobileAssistantApplication.getInstance()
+                .getSystemService(Context.WIFI_SERVICE) as WifiManager
 
-        val ip = Formatter.formatIpAddress(wifiManager.connectionInfo.ipAddress)
-        val name = Build.MODEL
+            val ip = Formatter.formatIpAddress(wifiManager.connectionInfo.ipAddress)
+            val name = Build.MODEL
 
-        val searchCmd = "${Constants.SEARCH_PREFIX}${Constants
-            .RANDOM_STR_SEARCH}#${Constants.PLATFORM_ANDROID}#$name#$ip"
+            val searchCmd = "${Constants.SEARCH_PREFIX}${
+            Constants
+                .RANDOM_STR_SEARCH
+            }#${Constants.PLATFORM_ANDROID}#$name#$ip"
 
-        val cmdByteArray = searchCmd.toByteArray()
+            val cmdByteArray = searchCmd.toByteArray()
 
-        val address = InetSocketAddress("255.255.255.255", Constants.Port.UDP_DEVICE_DISCOVER)
-        val packet = DatagramPacket(cmdByteArray, cmdByteArray.size, address)
+            val address = InetSocketAddress("255.255.255.255", Constants.Port.UDP_DEVICE_DISCOVER)
+            val packet = DatagramPacket(cmdByteArray, cmdByteArray.size, address)
 
-        print("Send msg to 255.255.255.255")
-        mDatagramSocket?.send(packet)
+            print("Send msg to 255.255.255.255")
+            mDatagramSocket?.send(packet)
+        } catch (e: Exception) {
+            Log.e(TAG, e.message ?: "Unknown error")
+        }
     }
 
     private fun isValidData(data: String): Boolean {

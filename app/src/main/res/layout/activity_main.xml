@@ -1,265 +1,350 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:context=".MainActivity">
+        xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.core.widget.NestedScrollView
+    <data>
+        <import type="android.view.View"/>
+
+        <variable
+                name="viewModel"
+                type="com.youngfeng.android.assistant.home.HomeViewModel" />
+    </data>
+
+    <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fillViewport="true">
-
-        <LinearLayout
+            android:layout_height="match_parent">
+        <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="@{viewModel.isWifiConnected ? View.VISIBLE : View.GONE}"
+                tools:context=".MainActivity">
+
+            <androidx.core.widget.NestedScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fillViewport="true">
+
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                    <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/btn_indicator"
+                            android:layout_width="120dp"
+                            android:layout_height="120dp"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="30dp"
+                            android:background="@drawable/shape_circle_green" />
+
+                    <TextView
+                            android:id="@+id/text_indicator"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="15dp"
+                            android:textSize="16sp"
+                            android:text="已连接"
+                            tools:text="已连接" />
+
+                    <androidx.cardview.widget.CardView
+                            android:id="@+id/card_device_info"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="20dp"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginEnd="20dp"
+                            app:cardElevation ="5dp">
+
+                        <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="15dp"
+                                android:layout_marginBottom="10dp"
+                                android:orientation="vertical">
+
+                            <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="10dp"
+                                    android:textSize="16sp"
+                                    android:textColor="#333333"
+                                    android:text="@string/label_device_info"
+                                    android:textStyle="bold"
+                                    tools:text="设备信息：" />
+
+                            <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:background="#f5f5f5"
+                                    android:layout_marginStart="10dp"
+                                    android:layout_marginEnd="10dp"
+                                    android:layout_marginTop="10dp" />
+
+                            <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="10dp"
+                                    android:layout_marginTop="10dp">
+
+                                <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/label_text_color"
+                                        android:text="@string/label_device_name"
+                                        android:textSize="16sp"
+                                        tools:text="设备名称：" />
+
+                                <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@{viewModel.deviceName}"
+                                        android:textSize="16sp"
+                                        android:textColor="@color/yaHei"
+                                        tools:text="MIX2S" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="10dp"
+                                    android:layout_marginTop="10dp"
+                                    android:layout_marginBottom="10dp">
+
+                                <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/label_text_color"
+                                        android:text="@string/label_wifi_name"
+                                        android:textSize="16sp"
+                                        tools:text="无线网络：" />
+
+                                <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@{viewModel.wlanName}"
+                                        android:textSize="16sp"
+                                        android:textColor="@color/yaHei"
+                                        tools:text="YHDM" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="30dp"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginEnd="20dp"
+                            android:visibility="@{viewModel.isDeviceConnected() ? View.VISIBLE : View.GONE}"
+                            app:cardElevation ="5dp">
+
+                        <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="15dp"
+                                android:layout_marginBottom="10dp"
+                                android:orientation="vertical">
+
+                            <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="10dp"
+                                    android:textSize="16sp"
+                                    android:textColor="#333333"
+                                    android:text="@string/label_connection_info"
+                                    android:textStyle="bold"
+                                    tools:text="连接信息：" />
+
+                            <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:background="#f5f5f5"
+                                    android:layout_marginStart="10dp"
+                                    android:layout_marginEnd="10dp"
+                                    android:layout_marginTop="10dp" />
+
+                            <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="10dp"
+                                    android:layout_marginTop="10dp">
+
+                                <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/label_text_color"
+                                        android:text="@string/label_computer_name"
+                                        android:textSize="16sp"
+                                        tools:text="电脑名称：" />
+
+                                <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@{viewModel.desktopInfo.name}"
+                                        android:textSize="16sp"
+                                        android:textColor="@color/yaHei"
+                                        tools:text="MacBook" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="10dp"
+                                    android:layout_marginTop="10dp">
+
+                                <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/label_text_color"
+                                        android:text="@string/label_computer_ip"
+                                        android:textSize="16sp"
+                                        tools:text="电脑地址：" />
+
+                                <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@{viewModel.desktopInfo.ip}"
+                                        android:textSize="16sp"
+                                        android:textColor="@color/yaHei"
+                                        tools:text="192.168.1.200" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="10dp"
+                                    android:layout_marginTop="10dp"
+                                    android:layout_marginBottom="10dp">
+
+                                <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/label_text_color"
+                                        android:text="@string/label_computer_os"
+                                        android:textSize="16sp"
+                                        tools:text="操作系统：" />
+
+                                <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@{viewModel.desktopInfo.os}"
+                                        android:textSize="16sp"
+                                        android:textColor="@color/yaHei"
+                                        tools:text="MacOS 11.8" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="20dp"
+                            android:orientation="vertical">
+
+                        <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:src="@mipmap/ic_launcher">
+
+                        </ImageView>
+
+                        <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:text="@string/declaration_open_source"
+                                android:textSize="16sp"
+                                android:textColor="@color/yaHei"
+                                tools:text="本项目完全开源，请放心使用" />
+
+                        <TextView
+                                android:id="@+id/text_support_developer"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:text="@string/support_developer"
+                                android:textSize="16sp"
+                                android:textColor="#ff2869d3"
+                                android:textStyle="bold"
+                                android:padding="10dp"
+                                tools:text="支持作者" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.core.widget.NestedScrollView>
 
             <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btn_indicator"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="30dp"
-                    android:background="@drawable/shape_circle_green" />
-
-            <TextView
-                    android:id="@+id/text_indicator"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="15dp"
-                    android:layout_below="@+id/btn_indicator"
-                    android:layout_centerHorizontal="true"
+                    android:id="@+id/btn_disconnect"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_alignParentBottom="true"
+                    android:text="@string/disconnect"
                     android:textSize="16sp"
-                    android:text="已连接"
-                    tools:text="已连接" />
-
-            <androidx.cardview.widget.CardView
-                    android:id="@+id/card_device_info"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp">
-
-                <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="15dp"
-                        android:layout_marginBottom="10dp"
-                        android:orientation="vertical">
-
-                    <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="10dp"
-                            android:textSize="16sp"
-                            android:textColor="#333333"
-                            android:text="@string/label_device_info"
-                            android:textStyle="bold"
-                            tools:text="设备信息：" />
-
-                    <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="#f5f5f5"
-                            android:layout_marginStart="10dp"
-                            android:layout_marginEnd="10dp"
-                            android:layout_marginTop="10dp" />
-
-                    <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="10dp"
-                            android:layout_marginTop="10dp">
-
-                        <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/label_text_color"
-                                android:text="@string/label_device_name"
-                                android:textSize="16sp"
-                                tools:text="设备名称：" />
-
-                        <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                tools:text="MIX2S" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="10dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginBottom="10dp">
-
-                        <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/label_text_color"
-                                android:text="@string/label_wifi_name"
-                                android:textSize="16sp"
-                                tools:text="无线网络：" />
-
-                        <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                tools:text="YHDM" />
-                    </LinearLayout>
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    tools:text="断开连接"
                     android:layout_marginTop="30dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
-                    android:layout_below="@+id/card_device_info"
-                    android:layout_centerHorizontal="true">
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginBottom="30dp"
+                    android:visibility="@{viewModel.isDeviceConnected() ? View.VISIBLE : View.GONE}"
+                    android:background="@drawable/background_btn_disconnect" />
 
-                <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="15dp"
-                        android:layout_marginBottom="10dp"
-                        android:orientation="vertical">
+        </RelativeLayout>
 
-                    <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="10dp"
-                            android:textSize="16sp"
-                            android:textColor="#333333"
-                            android:text="@string/label_connection_info"
-                            android:textStyle="bold"
-                            tools:text="连接信息：" />
-
-                    <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="#f5f5f5"
-                            android:layout_marginStart="10dp"
-                            android:layout_marginEnd="10dp"
-                            android:layout_marginTop="10dp" />
-
-                    <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="10dp"
-                            android:layout_marginTop="10dp">
-
-                        <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/label_text_color"
-                                android:text="@string/label_computer_name"
-                                android:textSize="16sp"
-                                tools:text="电脑名称：" />
-
-                        <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                tools:text="MacBook" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="10dp"
-                            android:layout_marginTop="10dp">
-
-                        <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/label_text_color"
-                                android:text="@string/label_computer_ip"
-                                android:textSize="16sp"
-                                tools:text="电脑地址：" />
-
-                        <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                tools:text="192.168.1.200" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="10dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginBottom="10dp">
-
-                        <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/label_text_color"
-                                android:text="@string/label_computer_os"
-                                android:textSize="16sp"
-                                tools:text="操作系统：" />
-
-                        <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                tools:text="MacOS 11.8" />
-                    </LinearLayout>
-
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="@{viewModel.isWifiConnected ? View.GONE : View.VISIBLE}"
+                android:background="#fdfdfd"
+                tools:visibility="gone">
 
             <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="20dp"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:padding="10dp"
+                    android:layout_centerInParent="true">
 
                 <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="150dp"
+                        android:layout_height="140dp"
                         android:layout_gravity="center_horizontal"
-                        android:src="@mipmap/ic_launcher">
-
-                </ImageView>
+                        android:src="@mipmap/ic_wifi" />
 
                 <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
                         android:layout_marginTop="10dp"
-                        android:text="@string/declaration_open_source"
-                        tools:text="本项目完全开源，请放心使用" />
+                        android:textSize="16sp"
+                        android:textColor="#adadad"
+                        android:text="@string/tip_phone_not_connected_to_wlan"
+                        android:gravity="center" />
 
-                <TextView
-                        android:id="@+id/text_support_developer"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btn_open_wifi_settings"
+                        android:layout_width="250dp"
+                        android:layout_height="50dp"
                         android:layout_gravity="center_horizontal"
-                        android:text="@string/support_developer"
-                        android:textSize="14sp"
-                        android:textColor="#ff2869d3"
-                        android:padding="10dp"
-                        tools:text="支持作者" />
+                        android:layout_marginTop="25dp"
+                        android:layout_marginBottom="10dp"
+                        android:elevation="3dp"
+                        android:padding="0dp"
+                        android:text="@string/connected_to_wifi"
+                        android:textColor="#626262"
+                        android:textSize="16sp"
+                        android:background="@drawable/background_connect_to_wlan"
+                        style="?android:attr/borderlessButtonStyle" />
             </LinearLayout>
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+        </RelativeLayout>
+    </FrameLayout>
+</layout>
 
-    <Button
-            android:id="@+id/btn_disconnect"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_alignParentBottom="true"
-            android:text="@string/disconnect"
-            android:textSize="14sp"
-            android:textColor="@color/white"
-            tools:text="断开连接"
-            android:layout_marginTop="30dp"
-            android:layout_marginStart="30dp"
-            android:layout_marginEnd="30dp"
-            android:layout_marginBottom="30dp" />
-
-</RelativeLayout>

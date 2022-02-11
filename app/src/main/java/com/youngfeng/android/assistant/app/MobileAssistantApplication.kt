@@ -8,21 +8,27 @@ import android.content.IntentFilter
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.google.gson.Gson
 import com.yanzhenjie.andserver.AndServer
 import com.youngfeng.android.assistant.Constants
 import com.youngfeng.android.assistant.db.RoomDatabaseHolder
+import com.youngfeng.android.assistant.event.DeviceConnectEvent
+import com.youngfeng.android.assistant.event.DeviceDisconnectEvent
+import com.youngfeng.android.assistant.event.DeviceReportEvent
 import com.youngfeng.android.assistant.manager.DeviceDiscoverManager
 import com.youngfeng.android.assistant.model.Command
+import com.youngfeng.android.assistant.model.Device
 import com.youngfeng.android.assistant.model.MobileInfo
 import com.youngfeng.android.assistant.socket.CmdSocketServer
 import com.youngfeng.android.assistant.socket.HeartbeatServer
 import com.youngfeng.android.assistant.util.CommonUtil
+import org.greenrobot.eventbus.EventBus
 import java.io.File
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 class MobileAssistantApplication : Application() {
-    private val mHandler by lazy { Handler() }
+    private val mHandler by lazy { Handler(Looper.getMainLooper()) }
     private val mBatteryReceiver by lazy {
         val receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
@@ -44,6 +50,8 @@ class MobileAssistantApplication : Application() {
             .timeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
             .build()
     }
+
+    private val mGson by lazy { Gson() }
 
     companion object {
         private lateinit var INSTANCE: MobileAssistantApplication
@@ -69,8 +77,21 @@ class MobileAssistantApplication : Application() {
         CmdSocketServer.getInstance().onOpen = {
             updateMobileInfo()
         }
+        CmdSocketServer.getInstance().onCommandReceive {
+            processCmd(it)
+        }
         CmdSocketServer.getInstance().start()
 
+        HeartbeatServer.getInstance().onDeviceConnected = {
+            Log.d(TAG, "Device connected.")
+
+            EventBus.getDefault().post(DeviceConnectEvent())
+        }
+        HeartbeatServer.getInstance().onDeviceDisconnected = {
+            Log.d(TAG, "Device disconnected.")
+
+            EventBus.getDefault().post(DeviceDisconnectEvent())
+        }
         HeartbeatServer.getInstance().start()
 
         val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
@@ -79,11 +100,21 @@ class MobileAssistantApplication : Application() {
         mHttpServer.startup()
 
         DeviceDiscoverManager.getInstance().onDeviceDiscover {
-            print("Device: ip => ${it.ipAddress}, name => ${it.name}, platform => ${it.platform}")
+            print("Device: ip => ${it.ip}, name => ${it.name}, platform => ${it.platform}")
         }
         DeviceDiscoverManager.getInstance().startDiscover()
 
         clearExpiredZipFiles()
+    }
+
+    private fun processCmd(cmd: Command<Any>) {
+        if (cmd.cmd == Command.CMD_REPORT_DESKTOP_INFO) {
+            val str = mGson.toJson(cmd.data)
+            val device = mGson.fromJson(str, Device::class.java)
+
+            Log.d(TAG, "Cmd received, cmd: $cmd, device name: ${device.name}")
+            EventBus.getDefault().post(DeviceReportEvent(device))
+        }
     }
 
     private fun clearExpiredZipFiles() {
