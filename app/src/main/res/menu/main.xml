@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+            android:id="@+id/menu_more"
+            android:icon="@mipmap/ic_add"
+            android:title="@string/expand"
+            app:showAsAction="always">
+        <menu>
+            <group android:checkableBehavior = "none">
+                <item
+                        android:id="@+id/menu_scan"
+                        android:title="@string/scan"
+                        android:icon="@mipmap/ic_scan" />
+                <item
+                        android:id="@+id/menu_about"
+                        android:title="@string/about"
+                        android:icon="@mipmap/ic_about" />
+            </group>
+        </menu>
+    </item>
+</menu>

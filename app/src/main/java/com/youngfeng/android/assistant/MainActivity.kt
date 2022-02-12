@@ -12,6 +12,8 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -23,6 +25,7 @@ import com.youngfeng.android.assistant.event.DeviceReportEvent
 import com.youngfeng.android.assistant.home.HomeViewModel
 import com.youngfeng.android.assistant.model.DesktopInfo
 import com.youngfeng.android.assistant.model.Device
+import com.youngfeng.android.assistant.scan.ScanActivity
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -156,6 +159,20 @@ class MainActivity : AppCompatActivity() {
         }
         val desktopInfo = DesktopInfo(event.device.name, event.device.ip, os)
         mViewModel.setDesktopInfo(desktopInfo)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.main, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.menu_scan) {
+            val intent = Intent(this, ScanActivity::class.java)
+            startActivity(intent)
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onDestroy() {

@@ -9,4 +9,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="label_text_color">#666666</color>
     <color name="yaHei">#333333</color>
+    <color name="primaryColor">#383839</color>
 </resources>

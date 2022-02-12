@@ -1,26 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.youngfeng.android.assistant">
+        package="com.youngfeng.android.assistant">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
-        android:name=".app.MobileAssistantApplication"
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:requestLegacyExternalStorage="true"
-        android:theme="@style/Theme.AndroidMobileAssistant">
+            android:name=".app.MobileAssistantApplication"
+            android:allowBackup="true"
+            android:hardwareAccelerated="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name"
+            android:requestLegacyExternalStorage="true"
+            android:supportsRtl="true"
+            android:theme="@style/Theme.AndroidMobileAssistant">
         <activity
-            android:name=".MainActivity"
-            android:exported="true">
+                android:name=".scan.ScanActivity"
+                android:screenOrientation="fullSensor"
+                android:label="@string/scan"
+                android:exported="false" />
+        <activity
+                android:name=".MainActivity"
+                android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,13 +35,14 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".receiver.CommonReceiver"
+        <receiver
+                android:name=".receiver.CommonReceiver"
                 android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BATTERY_LOW" />
                 <action android:name="android.intent.action.BATTERY_OKAY" />
-                <action android:name="android.intent.action.ACTION_POWER_CONNECTED"/>
-                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED"/>
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
             </intent-filter>
         </receiver>
     </application>

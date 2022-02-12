@@ -37,4 +37,10 @@
     <string name="tip_disconnect">确定断开连接吗？</string>
     <string name="sure">确定</string>
     <string name="cancel">取消</string>
+    <string name="expand">展开</string>
+    <string name="scan">扫一扫</string>
+    <string name="about">关于</string>
+    <string name="rationale_camera_perm">扫描二维码需要开启摄像头权限，请前往设置页面开启</string>
+    <string name="rationale_ask_ok">立即前往</string>
+    <string name="rationale_ask_cancel">退出</string>
 </resources>
