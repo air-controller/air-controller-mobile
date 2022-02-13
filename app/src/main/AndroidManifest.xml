@@ -21,10 +21,14 @@
             android:supportsRtl="true"
             android:theme="@style/Theme.AndroidMobileAssistant">
         <activity
+                android:name=".about.AboutActivity"
+                android:exported="false"
+                android:label="@string/about"/>
+        <activity
                 android:name=".scan.ScanActivity"
-                android:screenOrientation="fullSensor"
+                android:exported="false"
                 android:label="@string/scan"
-                android:exported="false" />
+                android:screenOrientation="fullSensor" />
         <activity
                 android:name=".MainActivity"
                 android:exported="true">

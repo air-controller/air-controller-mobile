@@ -18,6 +18,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import com.youngfeng.android.assistant.about.AboutActivity
 import com.youngfeng.android.assistant.databinding.ActivityMainBinding
 import com.youngfeng.android.assistant.event.DeviceConnectEvent
 import com.youngfeng.android.assistant.event.DeviceDisconnectEvent
@@ -169,6 +170,12 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.menu_scan) {
             val intent = Intent(this, ScanActivity::class.java)
+            startActivity(intent)
+            return true
+        }
+
+        if (item.itemId == R.id.menu_about) {
+            val intent = Intent(this, AboutActivity::class.java)
             startActivity(intent)
             return true
         }

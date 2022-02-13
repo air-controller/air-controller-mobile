@@ -43,4 +43,6 @@
     <string name="rationale_camera_perm">扫描二维码需要开启摄像头权限，请前往设置页面开启</string>
     <string name="rationale_ask_ok">立即前往</string>
     <string name="rationale_ask_cancel">退出</string>
+    <string name="project_address">项目地址</string>
+    <string name="url_project">https://github.com/air-controller</string>
 </resources>
