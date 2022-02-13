@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.youngfeng.android.assistant.model.DesktopInfo
+import com.youngfeng.android.assistant.model.RunStatus
 import com.youngfeng.android.assistant.socket.CmdSocketServer
 import com.youngfeng.android.assistant.socket.HeartbeatServer
 
@@ -23,6 +24,9 @@ class HomeViewModel : ViewModel() {
     private val _desktopInfo = MutableLiveData<DesktopInfo>()
     val desktopInfo: LiveData<DesktopInfo> = _desktopInfo
 
+    private val _currentRunStatus = MutableLiveData<RunStatus>()
+    val currentRunStatus: LiveData<RunStatus> = _currentRunStatus
+
     fun setWifiConnectStatus(isConnected: Boolean) {
         _isWifiConnected.value = isConnected
     }
@@ -41,6 +45,10 @@ class HomeViewModel : ViewModel() {
 
     fun setDesktopInfo(desktopInfo: DesktopInfo) {
         _desktopInfo.value = desktopInfo
+    }
+
+    fun updateRunStatus(status: RunStatus) {
+        _currentRunStatus.value = status
     }
 
     fun disconnect() {

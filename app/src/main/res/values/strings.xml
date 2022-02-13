@@ -41,8 +41,20 @@
     <string name="scan">扫一扫</string>
     <string name="about">关于</string>
     <string name="rationale_camera_perm">扫描二维码需要开启摄像头权限，请前往设置页面开启</string>
-    <string name="rationale_ask_ok">立即前往</string>
+    <string name="rationale_ask_ok">立即开启</string>
     <string name="rationale_ask_cancel">退出</string>
     <string name="project_address">项目地址</string>
     <string name="url_project">https://github.com/air-controller</string>
+    <string name="url_project_desktop">https://github.com/air-controller/air-controller-desktop</string>
+    <string name="tip_support_developer">点击"必须支持"打开项目网页后，可点击右上角star支持我，非常感谢你的支持！</string>
+    <string name="support">必须支持</string>
+    <string name="refuse">残忍拒绝</string>
+    <string name="hint_connected_and_operation_normal">已连接，运行正常</string>
+    <string name="hint_connected_and_part_of_normal">已连接，部分桌面功能运行异常，请点击上面按钮进行修复</string>
+    <string name="hint_connected_and_all_not_working">已连接，桌面功能运行异常，请点击上面按钮进行修复</string>
+    <string name="hint_disconnected">未连接</string>
+    <string name="fix_immediately">立即修复</string>
+    <string name="rationale_permissions">为确保功能运行正常，请点击立即开启并允许应用开启所需权限</string>
+    <string name="readiness">准备就绪</string>
+    <string name="enjoying">Enjoying</string>
 </resources>

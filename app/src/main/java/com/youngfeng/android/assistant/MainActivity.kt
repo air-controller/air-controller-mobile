@@ -1,5 +1,7 @@
 package com.youngfeng.android.assistant
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Paint
@@ -14,6 +16,7 @@ import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.MotionEvent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -26,12 +29,17 @@ import com.youngfeng.android.assistant.event.DeviceReportEvent
 import com.youngfeng.android.assistant.home.HomeViewModel
 import com.youngfeng.android.assistant.model.DesktopInfo
 import com.youngfeng.android.assistant.model.Device
+import com.youngfeng.android.assistant.model.PermissionGrantStatus
+import com.youngfeng.android.assistant.model.RunStatus
 import com.youngfeng.android.assistant.scan.ScanActivity
+import com.youngfeng.android.assistant.util.CommonUtil
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import pub.devrel.easypermissions.EasyPermissions
+import pub.devrel.easypermissions.PermissionRequest
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
     private var mViewDataBinding: ActivityMainBinding? = null
     private val mViewModel by viewModels<HomeViewModel>()
     private val mDisconnectConfirmDialog by lazy {
@@ -45,11 +53,24 @@ class MainActivity : AppCompatActivity() {
             }.setTitle(R.string.tip_disconnect)
             .create()
     }
+    private val mSupportDeveloperDialog by lazy {
+        AlertDialog.Builder(this)
+            .setPositiveButton(
+                R.string.support
+            ) { _, _ -> CommonUtil.openExternalBrowser(this, getString(R.string.url_project_desktop)) }
+            .setNegativeButton(R.string.refuse) {
+                dialog, _ ->
+                dialog.dismiss()
+            }.setTitle(R.string.tip_support_developer)
+            .create()
+    }
 
     companion object {
         private const val TAG = "MainActivity"
+        private const val RC_PERMISSIONS = 1
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mViewDataBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -73,10 +94,36 @@ class MainActivity : AppCompatActivity() {
                     mDisconnectConfirmDialog.show()
                 }
             }
+
+            this.textSupportDeveloper.setOnClickListener {
+                if (!mSupportDeveloperDialog.isShowing) mSupportDeveloperDialog.show()
+            }
+
+            this.btnIndicator.setOnTouchListener { v, event ->
+                if (event.action == MotionEvent.ACTION_DOWN) {
+                    btnIndicator.alpha = 0.6f
+                }
+
+                if (event.action == MotionEvent.ACTION_UP) {
+                    requestPermissions(false)
+                    btnIndicator.alpha = 1f
+                }
+
+                if (event.action == MotionEvent.ACTION_CANCEL) {
+                    btnIndicator.alpha = 1f
+                }
+
+                return@setOnTouchListener true
+            }
         }
 
         registerNetworkListener()
         setUpDeviceInfo()
+        updateRunStatus()
+
+        observeRunStatusChange()
+
+        requestPermissions(true)
 
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this)
@@ -139,6 +186,107 @@ class MainActivity : AppCompatActivity() {
         mViewModel.setWlanName(ssid?.replace(oldValue = "\"", newValue = "") ?: "Unknown SSID")
     }
 
+    private fun updateRunStatus() {
+        mViewModel.isDeviceConnected.observe(this) { isConnected ->
+            if (isConnected) {
+                when (getPermissionGrantStatus()) {
+                    PermissionGrantStatus.AllGranted -> mViewModel.updateRunStatus(RunStatus.Normal)
+                    PermissionGrantStatus.PartOfGranted -> mViewModel.updateRunStatus(RunStatus.PartNormal)
+                    else -> mViewModel.updateRunStatus(RunStatus.AllNotWorking)
+                }
+            } else {
+                mViewModel.updateRunStatus(RunStatus.Disconnected)
+            }
+        }
+    }
+
+    private fun observeRunStatusChange() {
+        mViewModel.currentRunStatus.observe(this) { status ->
+            updateIndicatorUIWith(status)
+            updateIndicatorHintWith(status)
+        }
+    }
+
+    private fun updateIndicatorUIWith(status: RunStatus) {
+        when (status) {
+            RunStatus.Normal -> {
+                mViewDataBinding?.btnIndicator?.setBackgroundResource(R.drawable.shape_circle_green)
+                mViewDataBinding?.btnIndicator?.setText(R.string.enjoying)
+                mViewDataBinding?.btnIndicator?.isEnabled = false
+            }
+            RunStatus.PartNormal -> {
+                mViewDataBinding?.btnIndicator?.setBackgroundResource(R.drawable.shape_circle_yellow)
+                mViewDataBinding?.btnIndicator?.setText(R.string.fix_immediately)
+                mViewDataBinding?.btnIndicator?.isEnabled = true
+            }
+            RunStatus.AllNotWorking -> {
+                mViewDataBinding?.btnIndicator?.setBackgroundResource(R.drawable.shape_circle_red)
+                mViewDataBinding?.btnIndicator?.setText(R.string.fix_immediately)
+                mViewDataBinding?.btnIndicator?.isEnabled = true
+            }
+            else -> {
+                mViewDataBinding?.btnIndicator?.setBackgroundResource(R.drawable.shape_circle_gray)
+                mViewDataBinding?.btnIndicator?.setText(R.string.readiness)
+                mViewDataBinding?.btnIndicator?.isEnabled = false
+            }
+        }
+    }
+
+    private fun updateIndicatorHintWith(status: RunStatus) {
+        when (status) {
+            RunStatus.Normal -> {
+                mViewDataBinding?.textIndicator?.setText(R.string.hint_connected_and_operation_normal)
+            }
+            RunStatus.PartNormal -> {
+                mViewDataBinding?.textIndicator?.setText(R.string.hint_connected_and_part_of_normal)
+            }
+            RunStatus.AllNotWorking -> {
+                mViewDataBinding?.textIndicator?.setText(R.string.hint_connected_and_all_not_working)
+            }
+            else -> {
+                mViewDataBinding?.textIndicator?.setText(R.string.hint_disconnected)
+            }
+        }
+    }
+
+    // 这里指桌面端所需权限授予状态
+    private fun getPermissionGrantStatus(): PermissionGrantStatus {
+        var status = PermissionGrantStatus.AllNotGranted
+
+        if (EasyPermissions.hasPermissions(this, Manifest.permission.READ_EXTERNAL_STORAGE) &&
+            EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        ) {
+            status = PermissionGrantStatus.AllGranted
+        }
+
+        if (!EasyPermissions.hasPermissions(this, Manifest.permission.READ_EXTERNAL_STORAGE) ||
+            !EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        ) {
+            status = PermissionGrantStatus.PartOfGranted
+        }
+
+        return status
+    }
+
+    // 请求必要权限，includeAppNeeded为false时，表示只请求桌面端所需手机权限，否则请求所有app所需权限
+    private fun requestPermissions(includeAppNeeded: Boolean) {
+        val perms = mutableListOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)
+
+        if (includeAppNeeded) {
+            perms.add(Manifest.permission.CAMERA)
+            perms.add(Manifest.permission.ACCESS_FINE_LOCATION)
+            perms.add(Manifest.permission.ACCESS_COARSE_LOCATION)
+        }
+
+        EasyPermissions.requestPermissions(
+            PermissionRequest.Builder(this, RC_PERMISSIONS, *(perms.toTypedArray()))
+                .setRationale(R.string.rationale_permissions)
+                .setPositiveButtonText(R.string.rationale_ask_ok)
+                .setNegativeButtonText(R.string.rationale_ask_cancel)
+                .build()
+        )
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onDeviceConnected(event: DeviceConnectEvent) {
         mViewModel.setDeviceConnected(true)
@@ -180,6 +328,28 @@ class MainActivity : AppCompatActivity() {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
+        updateRunStatus()
+    }
+
+    override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
+        updateRunStatus()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateRunStatus()
     }
 
     override fun onDestroy() {

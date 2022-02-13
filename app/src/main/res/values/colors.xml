@@ -10,4 +10,7 @@
     <color name="label_text_color">#666666</color>
     <color name="yaHei">#333333</color>
     <color name="primaryColor">#383839</color>
+    <color name="indicatorNormal">#05e504</color>
+    <color name="indicatorPartialError">#FF9800</color>
+    <color name="indicatorTotalError">#CD2424</color>
 </resources>
