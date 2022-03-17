@@ -51,7 +51,7 @@ object VideoUtil {
 
                         val album = VideoFolder(
                             id = bucketId,
-                            name = bucketName,
+                            name = bucketName ?: "Unknown folder",
                             coverVideoId = videoId,
                             path = folder
                         )
