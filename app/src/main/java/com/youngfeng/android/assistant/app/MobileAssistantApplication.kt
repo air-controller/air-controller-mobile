@@ -10,6 +10,7 @@ import android.os.Looper
 import android.util.Log
 import com.google.gson.Gson
 import com.yanzhenjie.andserver.AndServer
+import com.youngfeng.android.assistant.BuildConfig
 import com.youngfeng.android.assistant.Constants
 import com.youngfeng.android.assistant.db.RoomDatabaseHolder
 import com.youngfeng.android.assistant.event.DeviceConnectEvent
@@ -21,8 +22,12 @@ import com.youngfeng.android.assistant.model.Device
 import com.youngfeng.android.assistant.model.MobileInfo
 import com.youngfeng.android.assistant.socket.CmdSocketServer
 import com.youngfeng.android.assistant.socket.HeartbeatServer
+import com.youngfeng.android.assistant.socket.heartbeat.HeartbeatClient
+import com.youngfeng.android.assistant.socket.heartbeat.HeartbeatListener
+import com.youngfeng.android.assistant.socket.heartbeat.HeartbeatServerPlus
 import com.youngfeng.android.assistant.util.CommonUtil
 import org.greenrobot.eventbus.EventBus
+import timber.log.Timber
 import java.io.File
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -82,17 +87,40 @@ class MobileAssistantApplication : Application() {
         }
         CmdSocketServer.getInstance().start()
 
-        HeartbeatServer.getInstance().onDeviceConnected = {
-            Log.d(TAG, "Device connected.")
+        val heartbeatServer = HeartbeatServerPlus.create()
+        heartbeatServer.addListener(object : HeartbeatListener() {
+            override fun onStart() {
+                super.onStart()
 
-            EventBus.getDefault().post(DeviceConnectEvent())
-        }
-        HeartbeatServer.getInstance().onDeviceDisconnected = {
-            Log.d(TAG, "Device disconnected.")
+                Timber.d("Heartbeat server start success.")
+            }
 
-            EventBus.getDefault().post(DeviceDisconnectEvent())
-        }
-        HeartbeatServer.getInstance().start()
+            override fun onStop() {
+                super.onStop()
+
+                Timber.d("Heartbeat server stop success.")
+            }
+
+            override fun onClientTimeout(client: HeartbeatClient) {
+                super.onClientTimeout(client)
+
+                EventBus.getDefault().post(DeviceDisconnectEvent())
+                Timber.d("Heartbeat server, onClientTimeout.")
+            }
+
+            override fun onClientConnected(client: HeartbeatClient?) {
+                super.onClientConnected(client)
+
+                EventBus.getDefault().post(DeviceConnectEvent())
+                Timber.d("Heartbeat server, onNewClientJoin.")
+            }
+
+            override fun onClientDisconnected() {
+                super.onClientDisconnected()
+                EventBus.getDefault().post(DeviceDisconnectEvent())
+            }
+        })
+        heartbeatServer.start()
 
         val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         registerReceiver(mBatteryReceiver, filter)
@@ -105,6 +133,10 @@ class MobileAssistantApplication : Application() {
         DeviceDiscoverManager.getInstance().startDiscover()
 
         clearExpiredZipFiles()
+
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        }
     }
 
     private fun processCmd(cmd: Command<Any>) {
