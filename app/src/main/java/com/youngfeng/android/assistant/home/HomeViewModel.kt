@@ -3,10 +3,11 @@ package com.youngfeng.android.assistant.home
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.youngfeng.android.assistant.event.RequestDisconnectClientEvent
 import com.youngfeng.android.assistant.model.DesktopInfo
 import com.youngfeng.android.assistant.model.RunStatus
 import com.youngfeng.android.assistant.socket.CmdSocketServer
-import com.youngfeng.android.assistant.socket.HeartbeatServer
+import org.greenrobot.eventbus.EventBus
 
 class HomeViewModel : ViewModel() {
     private val _isWifiConnected = MutableLiveData<Boolean>()
@@ -53,7 +54,7 @@ class HomeViewModel : ViewModel() {
 
     fun disconnect() {
         CmdSocketServer.getInstance().disconnect()
-        HeartbeatServer.getInstance().disconnect()
+        EventBus.getDefault().post(RequestDisconnectClientEvent())
         _isDeviceConnected.value = false
     }
 }

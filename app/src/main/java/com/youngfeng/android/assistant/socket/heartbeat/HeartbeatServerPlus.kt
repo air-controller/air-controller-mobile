@@ -15,6 +15,8 @@ interface HeartbeatServerPlus {
 
     fun addListener(listener: HeartbeatListener)
 
+    fun disconnectClient()
+
     companion object {
         fun create(config: HeartbeatConfig? = null) = HeartbeatServerPlusImpl(config ?: HeartbeatConfig())
     }
@@ -114,5 +116,12 @@ class HeartbeatServerPlusImpl(private var config: HeartbeatConfig) : HeartbeatSe
 
     override fun addListener(listener: HeartbeatListener) {
         mListeners.add(listener)
+    }
+
+    override fun disconnectClient() {
+        if (mClients.isNotEmpty()) {
+            mClients.single().disconnect()
+            mClients.clear()
+        }
     }
 }

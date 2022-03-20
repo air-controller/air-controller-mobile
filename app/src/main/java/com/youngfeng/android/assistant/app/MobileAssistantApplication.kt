@@ -16,17 +16,19 @@ import com.youngfeng.android.assistant.db.RoomDatabaseHolder
 import com.youngfeng.android.assistant.event.DeviceConnectEvent
 import com.youngfeng.android.assistant.event.DeviceDisconnectEvent
 import com.youngfeng.android.assistant.event.DeviceReportEvent
+import com.youngfeng.android.assistant.event.RequestDisconnectClientEvent
 import com.youngfeng.android.assistant.manager.DeviceDiscoverManager
 import com.youngfeng.android.assistant.model.Command
 import com.youngfeng.android.assistant.model.Device
 import com.youngfeng.android.assistant.model.MobileInfo
 import com.youngfeng.android.assistant.socket.CmdSocketServer
-import com.youngfeng.android.assistant.socket.HeartbeatServer
 import com.youngfeng.android.assistant.socket.heartbeat.HeartbeatClient
 import com.youngfeng.android.assistant.socket.heartbeat.HeartbeatListener
 import com.youngfeng.android.assistant.socket.heartbeat.HeartbeatServerPlus
 import com.youngfeng.android.assistant.util.CommonUtil
 import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import timber.log.Timber
 import java.io.File
 import java.util.concurrent.Executors
@@ -58,6 +60,8 @@ class MobileAssistantApplication : Application() {
 
     private val mGson by lazy { Gson() }
 
+    private lateinit var heartbeatServer: HeartbeatServerPlus
+
     companion object {
         private lateinit var INSTANCE: MobileAssistantApplication
         private val TAG = MobileAssistantApplication::class.simpleName
@@ -73,12 +77,13 @@ class MobileAssistantApplication : Application() {
     }
 
     private fun notifyBatteryChanged() {
-        Log.d(TAG, "notifyBatteryChanged")
         updateMobileInfo()
     }
 
     override fun onCreate() {
         super.onCreate()
+
+        registerEventBus()
         CmdSocketServer.getInstance().onOpen = {
             updateMobileInfo()
         }
@@ -87,7 +92,7 @@ class MobileAssistantApplication : Application() {
         }
         CmdSocketServer.getInstance().start()
 
-        val heartbeatServer = HeartbeatServerPlus.create()
+        heartbeatServer = HeartbeatServerPlus.create()
         heartbeatServer.addListener(object : HeartbeatListener() {
             override fun onStart() {
                 super.onStart()
@@ -136,6 +141,25 @@ class MobileAssistantApplication : Application() {
 
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onRequestDisconnectClient(event: RequestDisconnectClientEvent) {
+        if (this::heartbeatServer.isInitialized) {
+            this.heartbeatServer.disconnectClient()
+        }
+    }
+
+    private fun registerEventBus() {
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this)
+        }
+    }
+
+    private fun unRegisterEventBus() {
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this)
         }
     }
 
@@ -194,6 +218,7 @@ class MobileAssistantApplication : Application() {
         unregisterReceiver(mBatteryReceiver)
         mExecutorService.shutdownNow()
         mHttpServer.shutdown()
-        HeartbeatServer.getInstance().stop()
+
+        unRegisterEventBus()
     }
 }
