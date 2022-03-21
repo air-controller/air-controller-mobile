@@ -14,41 +14,41 @@ enum class HttpModule(var value: Int) {
     Download(5)
 }
 
-enum class HttpError(var code: String, var value: String) {
+enum class HttpError(var code: String, var value: Int) {
     // 文件模块
     NoReadExternalStoragePerm(
         "01",
-        MobileAssistantApplication.getInstance().getString(R.string.no_read_external_storage_perm)
+        R.string.no_read_external_storage_perm
     ),
-    FileIsNotADir("02", MobileAssistantApplication.getInstance().getString(R.string.this_file_is_not_a_dir)),
+    FileIsNotADir("02", R.string.this_file_is_not_a_dir),
     NoWriteExternalStoragePerm(
         "03",
-        MobileAssistantApplication.getInstance().getString(R.string.no_read_external_storage_perm)
+        R.string.no_read_external_storage_perm
     ),
-    InvalidFileName("04", MobileAssistantApplication.getInstance().getString(R.string.invalid_file_name)),
-    FileNameEmpty("05", MobileAssistantApplication.getInstance().getString(R.string.file_name_cant_empty)),
-    FolderCantEmpty("06", MobileAssistantApplication.getInstance().getString(R.string.folder_cant_empty)),
-    CreateFileFail("06", MobileAssistantApplication.getInstance().getString(R.string.file_create_fail)),
-    FilePathCantEmpty("07", MobileAssistantApplication.getInstance().getString(R.string.file_path_cant_empty)),
-    DeleteFileFail("08", MobileAssistantApplication.getInstance().getString(R.string.delete_file_fail)),
-    RenameFileFail("09", MobileAssistantApplication.getInstance().getString(R.string.rename_file_fail)),
-    MoveFileFail("10", MobileAssistantApplication.getInstance().getString(R.string.move_file_fail)),
+    InvalidFileName("04", R.string.invalid_file_name),
+    FileNameEmpty("05", R.string.file_name_cant_empty),
+    FolderCantEmpty("06", R.string.folder_cant_empty),
+    CreateFileFail("06", R.string.file_create_fail),
+    FilePathCantEmpty("07", R.string.file_path_cant_empty),
+    DeleteFileFail("08", R.string.delete_file_fail),
+    RenameFileFail("09", R.string.rename_file_fail),
+    MoveFileFail("10", R.string.move_file_fail),
 
     // 图片模块
-    DeleteImageFail("01", MobileAssistantApplication.getInstance().getString(R.string.delete_image_fail)),
-    DeleteMultiImageFail("02", MobileAssistantApplication.getInstance().getString(R.string.delete_image_fail)),
-    ImageFileNotExist("03", MobileAssistantApplication.getInstance().getString(R.string.image_not_exist)),
-    DeleteAlbumFail("04", "删除相册失败"),
+    DeleteImageFail("01", R.string.delete_image_fail),
+    DeleteMultiImageFail("02", R.string.delete_image_fail),
+    ImageFileNotExist("03", R.string.image_not_exist),
+    DeleteAlbumFail("04", R.string.delete_album_fail),
 
     // 音频模块
-    DeleteAudioFail("01", MobileAssistantApplication.getInstance().getString(R.string.delete_audio_file_fail)),
+    DeleteAudioFail("01", R.string.delete_audio_file_fail),
 
     // 视频模块
-    DeleteVideoFail("01", MobileAssistantApplication.getInstance().getString(R.string.delete_video_file_fail)),
+    DeleteVideoFail("01", R.string.delete_video_file_fail),
 
     // 下载模块
-    GetDownloadDirFail("01", MobileAssistantApplication.getInstance().getString(R.string.get_download_dir_fail)),
-    DownloadDirNotExist("02", MobileAssistantApplication.getInstance().getString(R.string.download_dir_not_exist));
+    GetDownloadDirFail("01", R.string.get_download_dir_fail),
+    DownloadDirNotExist("02", R.string.download_dir_not_exist);
 
     fun getString(strRes: Int): String {
         return MobileAssistantApplication.getInstance().getString(strRes)

@@ -8,6 +8,7 @@ import android.text.TextUtils
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.yanzhenjie.andserver.annotation.*
+import com.yanzhenjie.andserver.http.HttpRequest
 import com.youngfeng.android.assistant.app.MobileAssistantApplication
 import com.youngfeng.android.assistant.ext.isValidFileName
 import com.youngfeng.android.assistant.web.HttpError
@@ -18,6 +19,7 @@ import com.youngfeng.android.assistant.web.request.*
 import com.youngfeng.android.assistant.web.util.ErrorBuilder
 import java.io.*
 import java.lang.Exception
+import java.util.Locale
 
 @RestController
 @RequestMapping("/file")
@@ -26,14 +28,17 @@ open class FileController {
 
     @PostMapping("/list")
     @ResponseBody
-    fun getFileList(@RequestBody requestBody: GetFileListRequest): HttpResponseEntity<List<FileEntity>> {
+    fun getFileList(httpRequest: HttpRequest, @RequestBody requestBody: GetFileListRequest): HttpResponseEntity<List<FileEntity>> {
+        val languageCode = httpRequest.getHeader("languageCode")
+        val locale = if (!TextUtils.isEmpty(languageCode)) Locale(languageCode!!) else Locale("en")
+
         // 先判断是否存在读取外部存储权限
         if (ContextCompat.checkSelfPermission(
                 MobileAssistantApplication.getInstance(),
                 Manifest.permission.READ_EXTERNAL_STORAGE
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.NoReadExternalStoragePerm).build()
+            return ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.NoReadExternalStoragePerm).build()
         }
 
         var path = requestBody.path
@@ -44,7 +49,7 @@ open class FileController {
         val dir = File(path)
 
         if (!dir.isDirectory) {
-            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.FileIsNotADir).build()
+            return ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.FileIsNotADir).build()
         }
 
         val files = dir.listFiles()
@@ -85,29 +90,32 @@ open class FileController {
 
     @PostMapping("/create")
     @ResponseBody
-    fun createFile(@RequestBody request: CreateFileRequest): HttpResponseEntity<Map<String, Any>> {
+    fun createFile(httpRequest: HttpRequest, @RequestBody request: CreateFileRequest): HttpResponseEntity<Map<String, Any>> {
+        val languageCode = httpRequest.getHeader("languageCode")
+        val locale = if (!TextUtils.isEmpty(languageCode)) Locale(languageCode!!) else Locale("en")
+
         // 先判断是否存在写入外部存储权限
         if (ContextCompat.checkSelfPermission(
                 MobileAssistantApplication.getInstance(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.NoWriteExternalStoragePerm).build()
+            return ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.NoWriteExternalStoragePerm).build()
         }
 
         val fileName = request.name
         if (TextUtils.isEmpty(fileName)) {
-            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.FileNameEmpty).build()
+            return ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.FileNameEmpty).build()
         }
 
         if (!fileName.isValidFileName()) {
-            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.InvalidFileName).build()
+            return ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.InvalidFileName).build()
         }
 
         val folder = request.folder
 
         if (TextUtils.isEmpty(folder)) {
-            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.FolderCantEmpty).build()
+            return ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.FolderCantEmpty).build()
         }
 
         val file = File("$folder/$fileName")
@@ -124,7 +132,7 @@ open class FileController {
                         )
                     )
                 } else {
-                    ErrorBuilder().module(HttpModule.FileModule).error(HttpError.CreateFileFail)
+                    ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.CreateFileFail)
                         .build()
                 }
             } else {
@@ -137,13 +145,13 @@ open class FileController {
                         )
                     )
                 } else {
-                    ErrorBuilder().module(HttpModule.FileModule).error(HttpError.CreateFileFail)
+                    ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.CreateFileFail)
                         .build()
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            val response = ErrorBuilder().module(HttpModule.FileModule).error(HttpError.CreateFileFail).build<Map<String, Any>>()
+            val response = ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.CreateFileFail).build<Map<String, Any>>()
             response.msg = e.message
             return response
         }
@@ -154,20 +162,23 @@ open class FileController {
      */
     @PostMapping("/delete")
     @ResponseBody
-    fun delete(@RequestBody request: DeleteFileRequest): HttpResponseEntity<Map<String, Any>> {
+    fun delete(httpRequest: HttpRequest, @RequestBody request: DeleteFileRequest): HttpResponseEntity<Map<String, Any>> {
+        val languageCode = httpRequest.getHeader("languageCode")
+        val locale = if (!TextUtils.isEmpty(languageCode)) Locale(languageCode!!) else Locale("en")
+
         // 先判断是否存在写入外部存储权限
         if (ContextCompat.checkSelfPermission(
                 MobileAssistantApplication.getInstance(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.NoWriteExternalStoragePerm).build()
+            return ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.NoWriteExternalStoragePerm).build()
         }
 
         val path = request.file
 
         if (TextUtils.isEmpty(path)) {
-            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.FilePathCantEmpty).build()
+            return ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.FilePathCantEmpty).build()
         }
 
         val file = File(path)
@@ -181,11 +192,11 @@ open class FileController {
                     )
                 )
             } else {
-                ErrorBuilder().module(HttpModule.FileModule).error(HttpError.DeleteFileFail).build()
+                ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.DeleteFileFail).build()
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            val response = ErrorBuilder().module(HttpModule.FileModule).error(HttpError.DeleteFileFail).build<Map<String, Any>>()
+            val response = ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.DeleteFileFail).build<Map<String, Any>>()
             response.msg = e.message
             return response
         }
@@ -196,14 +207,17 @@ open class FileController {
      */
     @PostMapping("/deleteMulti")
     @ResponseBody
-    fun deleteMulti(@RequestBody request: DeleteMultiFileRequest): HttpResponseEntity<Any> {
+    fun deleteMulti(httpRequest: HttpRequest, @RequestBody request: DeleteMultiFileRequest): HttpResponseEntity<Any> {
+        val languageCode = httpRequest.getHeader("languageCode")
+        val locale = if (!TextUtils.isEmpty(languageCode)) Locale(languageCode!!) else Locale("en")
+
         // 先判断是否存在写入外部存储权限
         if (ContextCompat.checkSelfPermission(
                 MobileAssistantApplication.getInstance(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.NoWriteExternalStoragePerm).build()
+            return ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.NoWriteExternalStoragePerm).build()
         }
 
         try {
@@ -232,13 +246,13 @@ open class FileController {
             if (deleteCount == paths.size) {
                 return HttpResponseEntity.success()
             } else {
-                val response = ErrorBuilder().module(HttpModule.FileModule).error(HttpError.DeleteFileFail).build<Any>()
+                val response = ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.DeleteFileFail).build<Any>()
                 response.msg = "${deleteCount}删除成功，${paths.size - deleteCount}删除失败"
                 return response
             }
         } catch (e: IOException) {
             e.printStackTrace()
-            val response = ErrorBuilder().module(HttpModule.FileModule).error(HttpError.DeleteFileFail).build<Any>()
+            val response = ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.DeleteFileFail).build<Any>()
             response.msg = e.message
             return response
         }
@@ -249,20 +263,23 @@ open class FileController {
      */
     @PostMapping("/rename")
     @ResponseBody
-    fun rename(@RequestBody request: RenameFileRequest): HttpResponseEntity<Map<String, String>> {
+    fun rename(httpRequest: HttpRequest, @RequestBody request: RenameFileRequest): HttpResponseEntity<Map<String, String>> {
+        val languageCode = httpRequest.getHeader("languageCode")
+        val locale = if (!TextUtils.isEmpty(languageCode)) Locale(languageCode!!) else Locale("en")
+
         // 先判断是否存在写入外部存储权限
         if (ContextCompat.checkSelfPermission(
                 MobileAssistantApplication.getInstance(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.NoWriteExternalStoragePerm).build()
+            return ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.NoWriteExternalStoragePerm).build()
         }
 
         val fileName = request.file
 
         if (TextUtils.isEmpty(fileName)) {
-            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.FileNameEmpty).build()
+            return ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.FileNameEmpty).build()
         }
 
         val folder = request.folder
@@ -282,11 +299,11 @@ open class FileController {
                     )
                 )
             } else {
-                ErrorBuilder().module(HttpModule.FileModule).error(HttpError.RenameFileFail).build()
+                ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.RenameFileFail).build()
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            val response = ErrorBuilder().module(HttpModule.FileModule).error(HttpError.RenameFileFail).build<Map<String, String>>()
+            val response = ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.RenameFileFail).build<Map<String, String>>()
             response.msg = e.message
             return response
         }
@@ -294,20 +311,23 @@ open class FileController {
 
     @PostMapping("/move")
     @ResponseBody
-    fun move(@RequestBody request: MoveFileRequest): HttpResponseEntity<Map<String, String>> {
+    fun move(httpRequest: HttpRequest, @RequestBody request: MoveFileRequest): HttpResponseEntity<Map<String, String>> {
+        val languageCode = httpRequest.getHeader("languageCode")
+        val locale = if (!TextUtils.isEmpty(languageCode)) Locale(languageCode!!) else Locale("en")
+
         // 先判断是否存在写入外部存储权限
         if (ContextCompat.checkSelfPermission(
                 MobileAssistantApplication.getInstance(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.NoWriteExternalStoragePerm).build()
+            return ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.NoWriteExternalStoragePerm).build()
         }
 
         val fileName = request.fileName
 
         if (TextUtils.isEmpty(fileName)) {
-            return ErrorBuilder().module(HttpModule.FileModule).error(HttpError.FileNameEmpty).build()
+            return ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.FileNameEmpty).build()
         }
 
         val oldFolder = request.oldFolder
@@ -327,11 +347,11 @@ open class FileController {
                     )
                 )
             } else {
-                ErrorBuilder().module(HttpModule.FileModule).error(HttpError.MoveFileFail).build()
+                ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.MoveFileFail).build()
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            val response = ErrorBuilder().module(HttpModule.FileModule).error(HttpError.MoveFileFail).build<Map<String, String>>()
+            val response = ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.MoveFileFail).build<Map<String, String>>()
             response.msg = e.message
             return response
         }
@@ -339,15 +359,18 @@ open class FileController {
 
     @ResponseBody
     @PostMapping("/downloadedFiles")
-    fun getDownloadFileList(): HttpResponseEntity<List<FileEntity>> {
+    fun getDownloadFileList(httpRequest: HttpRequest): HttpResponseEntity<List<FileEntity>> {
+        val languageCode = httpRequest.getHeader("languageCode")
+        val locale = if (!TextUtils.isEmpty(languageCode)) Locale(languageCode!!) else Locale("en")
+
         val downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
 
         if (null == downloadDir) {
-            return ErrorBuilder().module(HttpModule.Download).error(HttpError.GetDownloadDirFail).build()
+            return ErrorBuilder().locale(locale).module(HttpModule.Download).error(HttpError.GetDownloadDirFail).build()
         }
 
         if (!downloadDir.exists()) {
-            return ErrorBuilder().module(HttpModule.Download).error(HttpError.DownloadDirNotExist).build()
+            return ErrorBuilder().locale(locale).module(HttpModule.Download).error(HttpError.DownloadDirNotExist).build()
         }
 
         var data = downloadDir.listFiles()?.map {

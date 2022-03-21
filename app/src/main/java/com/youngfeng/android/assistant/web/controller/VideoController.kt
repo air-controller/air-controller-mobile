@@ -1,6 +1,7 @@
 package com.youngfeng.android.assistant.web.controller
 
 import android.media.MediaScannerConnection
+import android.text.TextUtils
 import com.yanzhenjie.andserver.annotation.GetMapping
 import com.yanzhenjie.andserver.annotation.PathVariable
 import com.yanzhenjie.andserver.annotation.PostMapping
@@ -8,8 +9,10 @@ import com.yanzhenjie.andserver.annotation.RequestBody
 import com.yanzhenjie.andserver.annotation.RequestMapping
 import com.yanzhenjie.andserver.annotation.ResponseBody
 import com.yanzhenjie.andserver.annotation.RestController
+import com.yanzhenjie.andserver.http.HttpRequest
 import com.youngfeng.android.assistant.R
 import com.youngfeng.android.assistant.app.MobileAssistantApplication
+import com.youngfeng.android.assistant.ext.getString
 import com.youngfeng.android.assistant.util.VideoUtil
 import com.youngfeng.android.assistant.web.HttpError
 import com.youngfeng.android.assistant.web.HttpModule
@@ -21,6 +24,7 @@ import com.youngfeng.android.assistant.web.request.GetVideosRequest
 import com.youngfeng.android.assistant.web.util.ErrorBuilder
 import java.io.File
 import java.lang.Exception
+import java.util.Locale
 
 @RestController
 @RequestMapping("/video")
@@ -47,7 +51,10 @@ class VideoController {
     }
 
     @PostMapping("/delete")
-    fun delete(@RequestBody request: DeleteVideosRequest): HttpResponseEntity<Any> {
+    fun delete(httpRequest: HttpRequest, @RequestBody request: DeleteVideosRequest): HttpResponseEntity<Any> {
+        val languageCode = httpRequest.getHeader("languageCode")
+        val locale = if (!TextUtils.isEmpty(languageCode)) Locale(languageCode!!) else Locale("en")
+
         try {
             val paths = request.paths
 
@@ -55,14 +62,14 @@ class VideoController {
             paths.forEach { path ->
                 val file = File(path)
                 if (!file.exists()) {
-                    val response = ErrorBuilder().module(HttpModule.VideoModule).error(HttpError.DeleteVideoFail).build<Any>()
-                    response.msg = convertToDeleteVideoError(paths.size, deleteItemNum)
+                    val response = ErrorBuilder().locale(locale).module(HttpModule.VideoModule).error(HttpError.DeleteVideoFail).build<Any>()
+                    response.msg = convertToDeleteVideoError(locale, paths.size, deleteItemNum)
                     return response
                 } else {
                     val isSuccess = file.deleteRecursively()
                     if (!isSuccess) {
-                        val response = ErrorBuilder().module(HttpModule.VideoModule).error(HttpError.DeleteVideoFail).build<Any>()
-                        response.msg = convertToDeleteVideoError(paths.size, deleteItemNum)
+                        val response = ErrorBuilder().locale(locale).module(HttpModule.VideoModule).error(HttpError.DeleteVideoFail).build<Any>()
+                        response.msg = convertToDeleteVideoError(locale, paths.size, deleteItemNum)
                         return response
                     } else {
                         MediaScannerConnection.scanFile(mContext, arrayOf(path), null, null)
@@ -75,19 +82,19 @@ class VideoController {
             return HttpResponseEntity.success()
         } catch (e: Exception) {
             e.printStackTrace()
-            val response = ErrorBuilder().module(HttpModule.ImageModule).error(HttpError.DeleteAlbumFail).build<Any>()
+            val response = ErrorBuilder().locale(locale).module(HttpModule.ImageModule).error(HttpError.DeleteAlbumFail).build<Any>()
             response.msg = e.message
             return response
         }
     }
 
-    private fun convertToDeleteVideoError(albumNum: Int, deletedItemNum: Int): String {
+    private fun convertToDeleteVideoError(locale: Locale, albumNum: Int, deletedItemNum: Int): String {
         if (deletedItemNum > 0) {
-            return mContext.getString(R.string.place_holder_delete_part_of_success)
+            return mContext.getString(locale, R.string.place_holder_delete_part_of_success)
                 .format(albumNum, deletedItemNum)
         }
 
-        return mContext.getString(R.string.delete_video_file_fail)
+        return mContext.getString(locale, R.string.delete_video_file_fail)
     }
 
     @GetMapping("/item/{id}")

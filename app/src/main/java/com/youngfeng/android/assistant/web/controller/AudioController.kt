@@ -1,6 +1,7 @@
 package com.youngfeng.android.assistant.web.controller
 
 import android.media.MediaScannerConnection
+import android.text.TextUtils
 import com.yanzhenjie.andserver.annotation.GetMapping
 import com.yanzhenjie.andserver.annotation.PathVariable
 import com.yanzhenjie.andserver.annotation.PostMapping
@@ -8,8 +9,10 @@ import com.yanzhenjie.andserver.annotation.RequestBody
 import com.yanzhenjie.andserver.annotation.RequestMapping
 import com.yanzhenjie.andserver.annotation.ResponseBody
 import com.yanzhenjie.andserver.annotation.RestController
+import com.yanzhenjie.andserver.http.HttpRequest
 import com.youngfeng.android.assistant.R
 import com.youngfeng.android.assistant.app.MobileAssistantApplication
+import com.youngfeng.android.assistant.ext.getString
 import com.youngfeng.android.assistant.util.AudioUtil
 import com.youngfeng.android.assistant.web.HttpError
 import com.youngfeng.android.assistant.web.HttpModule
@@ -18,6 +21,7 @@ import com.youngfeng.android.assistant.web.entity.HttpResponseEntity
 import com.youngfeng.android.assistant.web.request.DeleteAudioRequest
 import com.youngfeng.android.assistant.web.util.ErrorBuilder
 import java.io.File
+import java.util.Locale
 
 @RestController
 @RequestMapping("/audio")
@@ -33,7 +37,10 @@ class AudioController {
 
     @PostMapping("/delete")
     @ResponseBody
-    fun delete(@RequestBody request: DeleteAudioRequest): HttpResponseEntity<Any> {
+    fun delete(httpRequest: HttpRequest, @RequestBody request: DeleteAudioRequest): HttpResponseEntity<Any> {
+        val languageCode = httpRequest.getHeader("languageCode")
+        val locale = if (!TextUtils.isEmpty(languageCode)) Locale(languageCode!!) else Locale("en")
+
         try {
             val paths = request.paths
 
@@ -42,8 +49,8 @@ class AudioController {
 
                 val isSuccess = audioFile.delete()
                 if (!isSuccess) {
-                    val response = ErrorBuilder().module(HttpModule.AudioModule).error(HttpError.DeleteAudioFail).build<Any>()
-                    response.msg = mContext.getString(R.string.delete_audio_file_fail).replace(
+                    val response = ErrorBuilder().locale(locale).module(HttpModule.AudioModule).error(HttpError.DeleteAudioFail).build<Any>()
+                    response.msg = mContext.getString(locale, R.string.delete_audio_file_fail).replace(
                         "%s",
                         audioFile.absolutePath
                     )
@@ -54,7 +61,7 @@ class AudioController {
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            val response = ErrorBuilder().module(HttpModule.AudioModule).error(HttpError.DeleteAudioFail).build<Any>()
+            val response = ErrorBuilder().locale(locale).module(HttpModule.AudioModule).error(HttpError.DeleteAudioFail).build<Any>()
             response.msg = e.message
             return response
         }

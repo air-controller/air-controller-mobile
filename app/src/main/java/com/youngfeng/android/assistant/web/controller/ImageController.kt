@@ -1,13 +1,16 @@
 package com.youngfeng.android.assistant.web.controller
 
 import android.media.MediaScannerConnection
+import android.text.TextUtils
 import com.yanzhenjie.andserver.annotation.PostMapping
 import com.yanzhenjie.andserver.annotation.RequestBody
 import com.yanzhenjie.andserver.annotation.RequestMapping
 import com.yanzhenjie.andserver.annotation.ResponseBody
 import com.yanzhenjie.andserver.annotation.RestController
+import com.yanzhenjie.andserver.http.HttpRequest
 import com.youngfeng.android.assistant.R
 import com.youngfeng.android.assistant.app.MobileAssistantApplication
+import com.youngfeng.android.assistant.ext.getString
 import com.youngfeng.android.assistant.util.PhotoUtil
 import com.youngfeng.android.assistant.web.HttpError
 import com.youngfeng.android.assistant.web.HttpModule
@@ -18,6 +21,7 @@ import com.youngfeng.android.assistant.web.request.GetAlbumImagesRequest
 import com.youngfeng.android.assistant.web.util.ErrorBuilder
 import java.io.File
 import java.lang.Exception
+import java.util.Locale
 
 @RestController
 @RequestMapping("/image")
@@ -57,7 +61,10 @@ class ImageController {
 
     @PostMapping("/delete")
     @ResponseBody
-    fun deleteImage(@RequestBody request: DeleteImageRequest): HttpResponseEntity<Any> {
+    fun deleteImage(httpRequest: HttpRequest, @RequestBody request: DeleteImageRequest): HttpResponseEntity<Any> {
+        val languageCode = httpRequest.getHeader("languageCode")
+        val locale = if (!TextUtils.isEmpty(languageCode)) Locale(languageCode!!) else Locale("en")
+
         try {
             val resultMap = HashMap<String, String>()
             val imageFiles = ArrayList<String>()
@@ -67,28 +74,28 @@ class ImageController {
                 imageFiles.add(imageFile.absolutePath)
                 if (!imageFile.exists()) {
                     isAllSuccess = false
-                    resultMap[imgPath] = HttpError.ImageFileNotExist.value
+                    resultMap[imgPath] = mContext.getString(locale, HttpError.ImageFileNotExist.value)
                 } else {
                     val isSuccess = imageFile.delete()
                     if (!isSuccess) {
                         isAllSuccess = false
-                        resultMap[imgPath] = HttpError.DeleteImageFail.value
+                        resultMap[imgPath] = mContext.getString(locale, HttpError.DeleteImageFail.value)
                     }
                 }
             }
             if (imageFiles.size > 0) {
                 MediaScannerConnection.scanFile(mContext, imageFiles.toTypedArray(), null) { path, uri ->
-                    println("Path: $path, uri: ${uri.path}")
+                    println("Path: $path, uri: ${uri?.path}")
                 }
             }
             if (!isAllSuccess) {
-                val response = ErrorBuilder().module(HttpModule.ImageModule).error(HttpError.DeleteImageFail).build<Any>()
+                val response = ErrorBuilder().locale(locale).module(HttpModule.ImageModule).error(HttpError.DeleteImageFail).build<Any>()
                 response.msg = resultMap.map { "${it.key}[${it.value}];" }.toString()
                 return response
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            val response = ErrorBuilder().module(HttpModule.ImageModule).error(HttpError.DeleteImageFail).build<Any>()
+            val response = ErrorBuilder().locale(locale).module(HttpModule.ImageModule).error(HttpError.DeleteImageFail).build<Any>()
             response.msg = e.message
             return response
         }
@@ -98,7 +105,9 @@ class ImageController {
 
     @PostMapping("/deleteAlbums")
     @ResponseBody
-    fun deleteAlbums(@RequestBody request: DeleteAlbumsRequest): HttpResponseEntity<Any> {
+    fun deleteAlbums(httpRequest: HttpRequest, @RequestBody request: DeleteAlbumsRequest): HttpResponseEntity<Any> {
+        val languageCode = httpRequest.getHeader("languageCode")
+        val locale = if (!TextUtils.isEmpty(languageCode)) Locale(languageCode!!) else Locale("en")
         try {
             val paths = request.paths
 
@@ -106,14 +115,14 @@ class ImageController {
             paths.forEach { path ->
                 val file = File(path)
                 if (!file.exists()) {
-                    val response = ErrorBuilder().module(HttpModule.ImageModule).error(HttpError.DeleteAlbumFail).build<Any>()
-                    response.msg = convertToDeleteAlbumError(paths.size, deleteItemNum)
+                    val response = ErrorBuilder().locale(locale).module(HttpModule.ImageModule).error(HttpError.DeleteAlbumFail).build<Any>()
+                    response.msg = convertToDeleteAlbumError(locale, paths.size, deleteItemNum)
                     return response
                 } else {
                     val isSuccess = file.deleteRecursively()
                     if (!isSuccess) {
-                        val response = ErrorBuilder().module(HttpModule.ImageModule).error(HttpError.DeleteAlbumFail).build<Any>()
-                        response.msg = convertToDeleteAlbumError(paths.size, deleteItemNum)
+                        val response = ErrorBuilder().locale(locale).module(HttpModule.ImageModule).error(HttpError.DeleteAlbumFail).build<Any>()
+                        response.msg = convertToDeleteAlbumError(locale, paths.size, deleteItemNum)
                         return response
                     } else {
                         MediaScannerConnection.scanFile(mContext, arrayOf(path), null, null)
@@ -126,19 +135,19 @@ class ImageController {
             return HttpResponseEntity.success()
         } catch (e: Exception) {
             e.printStackTrace()
-            val response = ErrorBuilder().module(HttpModule.ImageModule).error(HttpError.DeleteAlbumFail).build<Any>()
+            val response = ErrorBuilder().locale(locale).module(HttpModule.ImageModule).error(HttpError.DeleteAlbumFail).build<Any>()
             response.msg = e.message
             return response
         }
     }
 
-    private fun convertToDeleteAlbumError(albumNum: Int, deletedItemNum: Int): String {
+    private fun convertToDeleteAlbumError(locale: Locale, albumNum: Int, deletedItemNum: Int): String {
         if (deletedItemNum > 0) {
-            return mContext.getString(R.string.place_holder_delete_part_of_success)
+            return mContext.getString(locale, R.string.place_holder_delete_part_of_success)
                 .format(albumNum, deletedItemNum)
         }
 
-        return mContext.getString(R.string.delete_album_fail)
+        return mContext.getString(locale, R.string.delete_album_fail)
     }
 
     @PostMapping("/imagesOfAlbum")

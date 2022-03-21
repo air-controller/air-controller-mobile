@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
             .setNegativeButton(R.string.cancel) {
                 dialog, _ ->
                 dialog.dismiss()
-            }.setTitle(R.string.tip_disconnect)
+            }.setMessage(R.string.tip_disconnect)
             .create()
     }
     private val mSupportDeveloperDialog by lazy {
@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
             .setNegativeButton(R.string.refuse) {
                 dialog, _ ->
                 dialog.dismiss()
-            }.setTitle(R.string.tip_support_developer)
+            }.setMessage(R.string.tip_support_developer)
             .create()
     }
 
