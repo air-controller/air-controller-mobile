@@ -81,8 +81,8 @@ dependencies {
     implementation 'com.google.android.material:material:1.4.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
 
-    implementation 'com.yanzhenjie.andserver:api:2.1.9'
-    kapt 'com.yanzhenjie.andserver:processor:2.1.9'
+    implementation 'com.yanzhenjie.andserver:api:2.1.10'
+    kapt 'com.yanzhenjie.andserver:processor:2.1.10'
     implementation 'javax.activation:javax.activation-api:1.2.0'
 
     implementation 'com.google.code.gson:gson:2.8.9'

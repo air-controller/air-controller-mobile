@@ -57,4 +57,6 @@
     <string name="rationale_permissions">为确保功能运行正常，请点击立即开启并允许应用开启所需权限</string>
     <string name="readiness">准备就绪</string>
     <string name="enjoying">Enjoying</string>
+    <string name="install_bundle_upload_failure">安装包上传失败，原因：%s</string>
+    <string name="installation_package_not_found">安装包未找到!</string>
 </resources>

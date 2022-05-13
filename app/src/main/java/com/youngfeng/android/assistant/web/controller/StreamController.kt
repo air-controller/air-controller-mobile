@@ -2,6 +2,9 @@ package com.youngfeng.android.assistant.web.controller
 
 import android.content.ContentUris
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
@@ -16,12 +19,12 @@ import com.yanzhenjie.andserver.annotation.RestController
 import com.youngfeng.android.assistant.app.MobileAssistantApplication
 import com.youngfeng.android.assistant.db.RoomDatabaseHolder
 import com.youngfeng.android.assistant.db.entity.ZipFileRecord
+import com.youngfeng.android.assistant.util.CommonUtil
 import com.youngfeng.android.assistant.util.MD5Helper
 import com.youngfeng.android.assistant.util.PhotoUtil
 import com.youngfeng.android.assistant.util.VideoUtil
 import net.lingala.zip4j.ZipFile
 import java.io.File
-import java.lang.IllegalArgumentException
 
 @RestController
 @RequestMapping("/stream")
@@ -274,5 +277,42 @@ class StreamController {
         }
 
         return null
+    }
+
+    @GetMapping("/drawable")
+    fun drawable(@QueryParam("package") packageName: String): Bitmap? {
+        return try {
+            val packageManager = mContext.packageManager
+            val drawable = packageManager.getApplicationIcon(packageName)
+
+            if (drawable is BitmapDrawable) {
+                val oldBitmap = drawable.bitmap
+                val newBitmap = Bitmap.createBitmap(oldBitmap.width, oldBitmap.height, Bitmap.Config.ARGB_8888)
+
+                val canvas = Canvas(newBitmap)
+                canvas.drawColor(Color.WHITE)
+                canvas.drawBitmap(oldBitmap, 0f, 0f, null)
+                return newBitmap
+            }
+
+            return if (drawable.intrinsicWidth > 0 && drawable.intrinsicHeight > 0) {
+                val bitmap = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
+                val canvas = Canvas(bitmap)
+                canvas.drawColor(Color.WHITE)
+                drawable.setBounds(0, 0, canvas.width, canvas.height)
+                drawable.draw(canvas)
+                bitmap
+            } else {
+                null
+            }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            null
+        }
+    }
+
+    @GetMapping("/downloadApk")
+    fun downloadApk(@QueryParam("package") packageName: String): File {
+        return CommonUtil.getApkFile(mContext, packageName)
     }
 }

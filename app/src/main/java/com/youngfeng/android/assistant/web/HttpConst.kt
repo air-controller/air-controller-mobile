@@ -11,7 +11,7 @@ import com.youngfeng.android.assistant.app.MobileAssistantApplication
 
 enum class HttpModule(var value: Int) {
     FileModule(1), ImageModule(2), AudioModule(3), VideoModule(4),
-    Download(5)
+    Download(5), CommonModule(6)
 }
 
 enum class HttpError(var code: String, var value: Int) {
@@ -48,7 +48,11 @@ enum class HttpError(var code: String, var value: Int) {
 
     // 下载模块
     GetDownloadDirFail("01", R.string.get_download_dir_fail),
-    DownloadDirNotExist("02", R.string.download_dir_not_exist);
+    DownloadDirNotExist("02", R.string.download_dir_not_exist),
+
+    // Common module
+    UploadInstallFileFailure("01", R.string.install_bundle_upload_failure),
+    InstallationFileNotFound("02", R.string.installation_package_not_found);
 
     fun getString(strRes: Int): String {
         return MobileAssistantApplication.getInstance().getString(strRes)

@@ -22,4 +22,6 @@ object Constants {
     const val RADNOM_STR_RES_SEARCH = "RBIDoKFHLX9frYTh"
 
     const val KEEP_TEMP_ZIP_FILE_DURATION = 60 * 60 * 1000;
+
+    const val DATABASE_VERSION = 2
 }
