@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Environment
 import androidx.core.content.FileProvider
 import com.youngfeng.android.assistant.model.StorageSize
+import com.youngfeng.android.assistant.web.entity.ApkInfo
 import java.io.File
 
 object CommonUtil {
@@ -55,5 +56,18 @@ object CommonUtil {
         val packageManager = context.packageManager
         val applicationInfo = packageManager.getApplicationInfo(packageName, 0)
         return File(applicationInfo.publicSourceDir)
+    }
+
+    fun getApkInfo(context: Context, packageName: String): ApkInfo {
+        val packageManager = context.packageManager
+        val applicationInfo = packageManager.getApplicationInfo(packageName, 0)
+        val file = File(applicationInfo.publicSourceDir)
+
+        val appName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageName, 0)).toString()
+
+        return ApkInfo(packageName = packageName, localizeName = appName, file = file)
+    }
+
+    fun batchUninstall(context: Context, packages: List<String>) {
     }
 }

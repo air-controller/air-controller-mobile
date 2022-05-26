@@ -54,5 +54,23 @@ object PathHelper {
         return context.filesDir
     }
 
+    fun tempFileDir(): File {
+        val temp = File(rootFileDir(), "temp")
+
+        if (!temp.exists()) {
+            try {
+                if (temp.mkdirs()) {
+                    return temp
+                }
+            } catch (e: Exception) {
+                Timber.e("Create temp dir failure, reason: ${e.message}")
+            }
+        } else {
+            return temp
+        }
+
+        return backFileDir()
+    }
+
     private fun backFileDir() = MobileAssistantApplication.getInstance().filesDir
 }

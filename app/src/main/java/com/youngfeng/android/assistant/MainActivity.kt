@@ -9,20 +9,23 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.youngfeng.android.assistant.about.AboutActivity
 import com.youngfeng.android.assistant.databinding.ActivityMainBinding
+import com.youngfeng.android.assistant.event.BatchUninstallEvent
 import com.youngfeng.android.assistant.event.DeviceConnectEvent
 import com.youngfeng.android.assistant.event.DeviceDisconnectEvent
 import com.youngfeng.android.assistant.event.DeviceReportEvent
@@ -38,6 +41,7 @@ import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import pub.devrel.easypermissions.EasyPermissions
 import pub.devrel.easypermissions.PermissionRequest
+import timber.log.Timber
 
 class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
     private var mViewDataBinding: ActivityMainBinding? = null
@@ -64,10 +68,13 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
             }.setMessage(R.string.tip_support_developer)
             .create()
     }
+    private val mUninstalledPackages = mutableListOf<String>()
+    private lateinit var mUninstallLauncher: ActivityResultLauncher<Intent>
 
     companion object {
         private const val TAG = "MainActivity"
         private const val RC_PERMISSIONS = 1
+        private const val RC_UNINSTALL = 2
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -85,7 +92,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
                     val intent = Intent(Settings.ACTION_WIFI_SETTINGS)
                     startActivity(intent)
                 } catch (e: Exception) {
-                    Log.e(TAG, e.message ?: "Open wifi settings fail.")
+                    Timber.e("Open wifi setting failure, reason: ${e.message}")
                 }
             }
 
@@ -127,6 +134,19 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
 
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this)
+        }
+
+        registerUninstallLauncher()
+    }
+
+    private fun registerUninstallLauncher() {
+        mUninstallLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (mUninstalledPackages.isNotEmpty()) {
+                val firstPackageName = mUninstalledPackages.first()
+                mUninstalledPackages.removeFirst()
+
+                batchUninstall(firstPackageName)
+            }
         }
     }
 
@@ -308,6 +328,25 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         }
         val desktopInfo = DesktopInfo(event.device.name, event.device.ip, os)
         mViewModel.setDesktopInfo(desktopInfo)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onBatchUninstall(event: BatchUninstallEvent) {
+        mUninstalledPackages.addAll(event.packages)
+
+        if (mUninstalledPackages.isNotEmpty()) {
+            val packageName = mUninstalledPackages.first()
+            mUninstalledPackages.removeFirst()
+
+            batchUninstall(packageName)
+        }
+    }
+
+    private fun batchUninstall(packageName: String) {
+        val intent = Intent()
+        intent.action = Intent.ACTION_DELETE
+        intent.data = Uri.parse("package:$packageName")
+        mUninstallLauncher.launch(intent)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.text.TextUtils
 import com.yanzhenjie.andserver.annotation.PostMapping
+import com.yanzhenjie.andserver.annotation.RequestBody
 import com.yanzhenjie.andserver.annotation.RequestMapping
 import com.yanzhenjie.andserver.annotation.RequestParam
 import com.yanzhenjie.andserver.annotation.ResponseBody
@@ -14,6 +15,7 @@ import com.yanzhenjie.andserver.http.multipart.MultipartFile
 import com.youngfeng.android.assistant.app.MobileAssistantApplication
 import com.youngfeng.android.assistant.db.RoomDatabaseHolder
 import com.youngfeng.android.assistant.db.entity.UploadFileRecord
+import com.youngfeng.android.assistant.event.BatchUninstallEvent
 import com.youngfeng.android.assistant.model.MobileInfo
 import com.youngfeng.android.assistant.util.CommonUtil
 import com.youngfeng.android.assistant.util.MD5Helper
@@ -23,6 +25,7 @@ import com.youngfeng.android.assistant.web.HttpModule
 import com.youngfeng.android.assistant.web.entity.HttpResponseEntity
 import com.youngfeng.android.assistant.web.entity.InstalledAppEntity
 import com.youngfeng.android.assistant.web.util.ErrorBuilder
+import org.greenrobot.eventbus.EventBus
 import timber.log.Timber
 import java.io.File
 import java.util.Locale
@@ -150,5 +153,12 @@ class CommonController {
 
         return ErrorBuilder().locale(locale).module(HttpModule.CommonModule)
             .error(HttpError.InstallationFileNotFound).build()
+    }
+
+    @ResponseBody
+    @PostMapping("/uninstall")
+    fun unInstall(@RequestBody packages: List<String>): HttpResponseEntity<Any> {
+        EventBus.getDefault().post(BatchUninstallEvent(packages))
+        return HttpResponseEntity.success()
     }
 }

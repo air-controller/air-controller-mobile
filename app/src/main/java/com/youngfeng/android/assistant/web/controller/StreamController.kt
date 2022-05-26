@@ -21,6 +21,7 @@ import com.youngfeng.android.assistant.db.RoomDatabaseHolder
 import com.youngfeng.android.assistant.db.entity.ZipFileRecord
 import com.youngfeng.android.assistant.util.CommonUtil
 import com.youngfeng.android.assistant.util.MD5Helper
+import com.youngfeng.android.assistant.util.PathHelper
 import com.youngfeng.android.assistant.util.PhotoUtil
 import com.youngfeng.android.assistant.util.VideoUtil
 import net.lingala.zip4j.ZipFile
@@ -311,8 +312,79 @@ class StreamController {
         }
     }
 
-    @GetMapping("/downloadApk")
-    fun downloadApk(@QueryParam("package") packageName: String): File {
-        return CommonUtil.getApkFile(mContext, packageName)
+    @GetMapping("/downloadApks")
+    fun downloadApks(@QueryParam("packages") packagesJson: String): File? {
+        val packages = mGson.fromJson<List<String>>(packagesJson, object : TypeToken<List<String>>() {}.type)
+
+        if (packages.isEmpty()) return null
+
+        if (packages.size == 1) return CommonUtil.getApkFile(mContext, packages.single())
+
+        val sortedOriginalPackagesMD5 = MD5Helper.md5(packages.sorted().joinToString(","))
+
+        val db = RoomDatabaseHolder.getRoomDatabase(mContext)
+        val zipFileRecordDao = db.zipFileRecordDao()
+        val zipFileRecord = zipFileRecordDao.findByOriginalPathsMd5(sortedOriginalPackagesMD5).singleOrNull()
+
+        if (null != zipFileRecord) {
+            if (zipFileRecord.isMultiOriginalFile) {
+                var isMatch = true
+
+                val originalFileMD5Map = mGson.fromJson<Map<String, String>>(zipFileRecord.originalFilesMD5, object : TypeToken<Map<String, String>>() {}.type)
+
+                kotlin.run {
+                    packages.forEach {
+                        val file = CommonUtil.getApkFile(mContext, it)
+
+                        if (MD5Helper.md5(file) != originalFileMD5Map[it]) {
+                            isMatch = false
+                            return@run
+                        }
+                    }
+                }
+
+                if (isMatch) {
+                    val zipOldFile = File(zipFileRecord.path)
+
+                    if (zipOldFile.exists()) return zipOldFile
+                }
+            }
+        }
+
+        val name = "Apps_${System.currentTimeMillis()}.zip"
+
+        val zipDir = PathHelper.zipFileDir()
+        if (!zipDir.exists()) {
+            zipDir.mkdirs()
+        }
+
+        val zipFile = ZipFile("${zipDir.absolutePath}/${name}")
+
+        val originalFilesMD5Json = mutableMapOf<String, String>()
+
+        packages.forEach {
+            val apkInfo = CommonUtil.getApkInfo(mContext, it)
+
+            val apkFile = apkInfo.file
+            val newApkFile = File("${PathHelper.tempFileDir()}/zip/${apkInfo.localizeName}.apk")
+            apkFile.copyTo(newApkFile)
+            zipFile.addFile(newApkFile)
+
+            originalFilesMD5Json[it] = MD5Helper.md5(newApkFile)
+        }
+
+        val record = ZipFileRecord(
+            name = name,
+            path = zipFile.file.path,
+            md5 = MD5Helper.md5(zipFile.file),
+            originalFilesMD5 = mGson.toJson(originalFilesMD5Json),
+            originalPathsMD5 = sortedOriginalPackagesMD5,
+            createTime = System.currentTimeMillis(),
+            isMultiOriginalFile = true
+        )
+
+        zipFileRecordDao.insert(record)
+
+        return zipFile.file
     }
 }
