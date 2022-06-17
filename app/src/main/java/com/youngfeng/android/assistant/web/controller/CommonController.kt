@@ -53,10 +53,17 @@ class CommonController {
         val packages = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
 
         val apps = mutableListOf<InstalledAppEntity>()
+        var index = 0
         packages.forEach {
-            val appName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(it.packageName, 0)).toString()
+            index++
+            val appName = packageManager.getApplicationLabel(
+                packageManager.getApplicationInfo(
+                    it.packageName,
+                    0
+                )
+            ).toString()
             val packageInfo = packageManager.getPackageInfo(it.packageName, 0)
-            val versionName = packageInfo.versionName
+            val versionName = packageInfo.versionName ?: "Unknown"
             val versionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 packageInfo.longVersionCode
             } else {

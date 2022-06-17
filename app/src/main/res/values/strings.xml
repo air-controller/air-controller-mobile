@@ -59,4 +59,12 @@
     <string name="enjoying">Enjoying</string>
     <string name="install_bundle_upload_failure">安装包上传失败，原因：%s</string>
     <string name="installation_package_not_found">安装包未找到!</string>
+    <string name="create_contact_failure">联系人创建失败</string>
+    <string name="contact_not_found">联系人未找到。</string>
+    <string name="update_photo_failure">修改联系人头像失败！</string>
+    <string name="delete_contact_failure">删除联系人失败！</string>
+    <string name="rationale_get_accounts">为正常使用该功能，我们需要读取账户权限，请前往设置->应用管理页面开启</string>
+    <string name="rationale_read_contacts">为正常使用该功能，我们需要读取联系人权限，请前往设置->应用管理页面开启</string>
+    <string name="rationale_write_contacts">为正常使用该功能，我们需要修改联系人权限，请前往设置->应用管理页面开启</string>
+    <string name="lack_of_necessary_permissions">缺少必要权限，请在手机端点击确定并开启</string>
 </resources>

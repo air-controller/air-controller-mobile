@@ -29,6 +29,8 @@ import com.youngfeng.android.assistant.event.BatchUninstallEvent
 import com.youngfeng.android.assistant.event.DeviceConnectEvent
 import com.youngfeng.android.assistant.event.DeviceDisconnectEvent
 import com.youngfeng.android.assistant.event.DeviceReportEvent
+import com.youngfeng.android.assistant.event.Permission
+import com.youngfeng.android.assistant.event.RequestPermissionsEvent
 import com.youngfeng.android.assistant.home.HomeViewModel
 import com.youngfeng.android.assistant.model.DesktopInfo
 import com.youngfeng.android.assistant.model.Device
@@ -51,8 +53,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
             .setPositiveButton(
                 R.string.sure
             ) { _, _ -> mViewModel.disconnect() }
-            .setNegativeButton(R.string.cancel) {
-                dialog, _ ->
+            .setNegativeButton(R.string.cancel) { dialog, _ ->
                 dialog.dismiss()
             }.setMessage(R.string.tip_disconnect)
             .create()
@@ -61,20 +62,30 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         AlertDialog.Builder(this)
             .setPositiveButton(
                 R.string.support
-            ) { _, _ -> CommonUtil.openExternalBrowser(this, getString(R.string.url_project_desktop)) }
-            .setNegativeButton(R.string.refuse) {
-                dialog, _ ->
+            ) { _, _ ->
+                CommonUtil.openExternalBrowser(
+                    this,
+                    getString(R.string.url_project_desktop)
+                )
+            }
+            .setNegativeButton(R.string.refuse) { dialog, _ ->
                 dialog.dismiss()
             }.setMessage(R.string.tip_support_developer)
             .create()
     }
     private val mUninstalledPackages = mutableListOf<String>()
     private lateinit var mUninstallLauncher: ActivityResultLauncher<Intent>
+    private val mPermissionManager by lazy {
+        com.youngfeng.android.assistant.manager.PermissionManager.with(this)
+    }
 
     companion object {
         private const val TAG = "MainActivity"
         private const val RC_PERMISSIONS = 1
         private const val RC_UNINSTALL = 2
+        private const val RC_PERM_GET_ACCOUNTS = 3
+        private const val RC_PERM_READ_CONTACTS = 4
+        private const val RC_PERM_WRITE_CONTACTS = 5
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -140,39 +151,45 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
     }
 
     private fun registerUninstallLauncher() {
-        mUninstallLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (mUninstalledPackages.isNotEmpty()) {
-                val firstPackageName = mUninstalledPackages.first()
-                mUninstalledPackages.removeFirst()
+        mUninstallLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (mUninstalledPackages.isNotEmpty()) {
+                    val firstPackageName = mUninstalledPackages.first()
+                    mUninstalledPackages.removeFirst()
 
-                batchUninstall(firstPackageName)
+                    batchUninstall(firstPackageName)
+                }
             }
-        }
     }
 
     private fun registerNetworkListener() {
-        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager =
+            getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            connectivityManager.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
-                override fun onAvailable(network: Network) {
-                    super.onAvailable(network)
+            connectivityManager.registerDefaultNetworkCallback(object :
+                    ConnectivityManager.NetworkCallback() {
+                    override fun onAvailable(network: Network) {
+                        super.onAvailable(network)
 
-                    runOnUiThread {
-                        val isWifiConnected = connectivityManager.getNetworkCapabilities(network)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
-                        mViewModel.setWifiConnectStatus(isWifiConnected == true)
+                        runOnUiThread {
+                            val isWifiConnected = connectivityManager.getNetworkCapabilities(network)
+                                ?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+                            mViewModel.setWifiConnectStatus(isWifiConnected == true)
+                        }
                     }
-                }
 
-                override fun onLost(network: Network) {
-                    super.onLost(network)
+                    override fun onLost(network: Network) {
+                        super.onLost(network)
 
-                    runOnUiThread {
-                        mViewModel.setWifiConnectStatus(false)
+                        runOnUiThread {
+                            mViewModel.setWifiConnectStatus(false)
+                        }
                     }
-                }
-            })
+                })
         } else {
-            val request = NetworkRequest.Builder().addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET).build()
+            val request =
+                NetworkRequest.Builder().addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                    .build()
             connectivityManager.registerNetworkCallback(
                 request,
                 object : ConnectivityManager.NetworkCallback() {
@@ -180,7 +197,9 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
                         super.onAvailable(network)
 
                         runOnUiThread {
-                            val isWifiConnected = connectivityManager.getNetworkCapabilities(network)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+                            val isWifiConnected =
+                                connectivityManager.getNetworkCapabilities(network)
+                                    ?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
                             mViewModel.setWifiConnectStatus(isWifiConnected == true)
                         }
                     }
@@ -290,7 +309,10 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
 
     // 请求必要权限，includeAppNeeded为false时，表示只请求桌面端所需手机权限，否则请求所有app所需权限
     private fun requestPermissions(includeAppNeeded: Boolean) {
-        val perms = mutableListOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)
+        val perms = mutableListOf(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
 
         if (includeAppNeeded) {
             perms.add(Manifest.permission.CAMERA)
@@ -339,6 +361,33 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
             mUninstalledPackages.removeFirst()
 
             batchUninstall(packageName)
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onRequestPermissions(event: RequestPermissionsEvent) {
+        val permissions = event.permissions.map {
+            when (it) {
+                Permission.GetAccounts -> Manifest.permission.GET_ACCOUNTS
+                Permission.ReadContacts -> Manifest.permission.READ_CONTACTS
+                Permission.WriteContacts -> Manifest.permission.WRITE_CONTACTS
+            }
+        }.toTypedArray()
+
+        if (permissions.size > 1) {
+            mPermissionManager.requestMultiplePermissions(RC_PERMISSIONS, *permissions)
+        } else if (permissions.size == 1) {
+            when (event.permissions.single()) {
+                Permission.GetAccounts -> mPermissionManager.requestReadAccountPermission(
+                    RC_PERMISSIONS
+                )
+                Permission.ReadContacts -> mPermissionManager.requestReadContactsPermission(
+                    RC_PERMISSIONS
+                )
+                Permission.WriteContacts -> mPermissionManager.requestWriteContactPermission(
+                    RC_PERMISSIONS
+                )
+            }
         }
     }
 

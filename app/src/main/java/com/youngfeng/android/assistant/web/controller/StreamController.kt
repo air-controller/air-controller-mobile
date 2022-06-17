@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
+import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
@@ -24,7 +25,12 @@ import com.youngfeng.android.assistant.util.MD5Helper
 import com.youngfeng.android.assistant.util.PathHelper
 import com.youngfeng.android.assistant.util.PhotoUtil
 import com.youngfeng.android.assistant.util.VideoUtil
+import contacts.core.Contacts
+import contacts.core.equalTo
+import contacts.core.util.photoBitmap
+import contacts.core.util.toRawContact
 import net.lingala.zip4j.ZipFile
+import timber.log.Timber
 import java.io.File
 
 @RestController
@@ -386,5 +392,27 @@ class StreamController {
         zipFileRecordDao.insert(record)
 
         return zipFile.file
+    }
+
+    @GetMapping("/photoUri")
+    fun photoUri(@QueryParam("uri") uri: String): Bitmap? {
+        return try {
+            val bitmap =
+                MediaStore.Images.Media.getBitmap(mContext.contentResolver, Uri.parse(uri))
+            bitmap
+        } catch (e: Exception) {
+            Timber.e(e)
+            null
+        }
+    }
+
+    @GetMapping("/rawContactPhoto")
+    fun rawContactPhoto(@QueryParam("id") id: Long): Bitmap? {
+        val contacts = Contacts(mContext)
+        val blankRawContact = contacts.accounts().queryRawContacts().where { Id equalTo id }.find().firstOrNull() ?: return null
+
+        val rawContact = blankRawContact.toRawContact(contacts) ?: return null
+
+        return rawContact.photoBitmap(contacts)
     }
 }

@@ -10,7 +10,7 @@ import java.util.Locale
 class ErrorBuilder {
     var mode: HttpModule? = null
     var error: HttpError? = null
-    var locale: Locale = Locale("en")
+    var locale: Locale? = null
 
     fun locale(locale: Locale): ErrorBuilder {
         this.locale = locale
@@ -32,7 +32,11 @@ class ErrorBuilder {
         var msg: String? = null
 
         error?.apply {
-            msg = MobileAssistantApplication.getInstance().getString(locale, this.value)
+            msg = if (null != locale) {
+                MobileAssistantApplication.getInstance().getString(locale!!, this.value)
+            } else {
+                MobileAssistantApplication.getInstance().getString(this.value)
+            }
         }
         return HttpResponseEntity(code = code.toIntOrNull() ?: -1, msg = msg, data = null)
     }

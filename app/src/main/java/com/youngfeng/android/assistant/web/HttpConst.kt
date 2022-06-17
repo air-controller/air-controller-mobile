@@ -11,7 +11,7 @@ import com.youngfeng.android.assistant.app.MobileAssistantApplication
 
 enum class HttpModule(var value: Int) {
     FileModule(1), ImageModule(2), AudioModule(3), VideoModule(4),
-    Download(5), CommonModule(6)
+    Download(5), CommonModule(6), ContactModule(7),
 }
 
 enum class HttpError(var code: String, var value: Int) {
@@ -49,6 +49,15 @@ enum class HttpError(var code: String, var value: Int) {
     // 下载模块
     GetDownloadDirFail("01", R.string.get_download_dir_fail),
     DownloadDirNotExist("02", R.string.download_dir_not_exist),
+
+    // Contact module
+    UploadPhotoAndNewContactFailure("01", R.string.create_contact_failure),
+    ContactNotFound("02", R.string.contact_not_found),
+    UpdatePhotoFailure("03", R.string.update_photo_failure),
+    CreateContactFailure("04", R.string.create_contact_failure),
+    RawContactNotFound("05", R.string.contact_not_found),
+    DeleteRawContactsFailure("06", R.string.delete_contact_failure),
+    LackOfNecessaryPermissions("07", R.string.lack_of_necessary_permissions),
 
     // Common module
     UploadInstallFileFailure("01", R.string.install_bundle_upload_failure),

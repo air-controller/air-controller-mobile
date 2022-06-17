@@ -60,8 +60,11 @@ class AppMessageConverter : MessageConverter {
     }
 
     override fun <T : Any?> convert(stream: InputStream, mediaType: MediaType?, type: Type): T? {
-        val charset: Charset = mediaType?.charset
-            ?: return JsonUtils.parseJson(IOUtils.toString(stream), type)
-        return JsonUtils.parseJson(IOUtils.toString(stream, charset), type)
+        val charset: Charset? = mediaType?.charset
+        return if (null == charset) {
+            JsonUtils.parseJson(IOUtils.toString(stream), type)
+        } else {
+            JsonUtils.parseJson(IOUtils.toString(stream, charset), type)
+        }
     }
 }

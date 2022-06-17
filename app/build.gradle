@@ -76,22 +76,22 @@ project.afterEvaluate {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.6.0'
-    implementation 'androidx.appcompat:appcompat:1.3.1'
-    implementation 'com.google.android.material:material:1.4.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
+    implementation 'androidx.core:core-ktx:1.8.0'
+    implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
     implementation 'com.yanzhenjie.andserver:api:2.1.10'
     kapt 'com.yanzhenjie.andserver:processor:2.1.10'
     implementation 'javax.activation:javax.activation-api:1.2.0'
 
-    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'com.google.code.gson:gson:2.9.0'
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.19.0-RC1")
 
     implementation 'org.java-websocket:Java-WebSocket:1.5.2'
     implementation "net.lingala.zip4j:zip4j:2.9.1"
 
-    def room_version = "2.4.1"
+    def room_version = "2.4.2"
 
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
@@ -110,4 +110,6 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    implementation 'com.github.vestrel00:contacts-android:0.2.2'
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.6.21"
 }

@@ -59,4 +59,12 @@
     <string name="enjoying">Enjoying</string>
     <string name="install_bundle_upload_failure">Upload install bundle failure，reason：%s</string>
     <string name="installation_package_not_found">Installation package not found!</string>
+    <string name="create_contact_failure">Create new contact failure.</string>
+    <string name="contact_not_found">Contact not found.</string>
+    <string name="update_photo_failure">Update contact photo failure!</string>
+    <string name="delete_contact_failure">Delete contacts failure!</string>
+    <string name="rationale_get_accounts">In order to use this function normally, we need to read accounts permission, please go to Settings -> Application Management page to enable it</string>
+    <string name="rationale_read_contacts">In order to use this function normally, we need to read contacts permission, please go to Settings -> Application Management page to enable it</string>
+    <string name="rationale_write_contacts">In order to use this function normally, we need to write contacts permission, please go to Settings -> Application Management page to enable it</string>
+    <string name="lack_of_necessary_permissions">Lack of necessary permissions, please click OK and enable on the mobile phone</string>
 </resources>
