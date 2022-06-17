@@ -1,6 +1,7 @@
 package com.youngfeng.android.assistant.socket
 
 import android.util.Log
+import timber.log.Timber
 import java.io.IOException
 import java.net.ServerSocket
 import java.net.Socket
@@ -49,7 +50,7 @@ class SimpleSocketServer(private val port: Int) {
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
-                Log.e(TAG, "IOException: ${e.message}")
+                Timber.e("IOException: ${e.message}")
                 onStartFail?.invoke(e.message ?: "Unknown error")
             }
         }
@@ -86,7 +87,7 @@ class SimpleSocketServer(private val port: Int) {
             }
         } catch (e: IOException) {
             e.printStackTrace()
-            Log.e(TAG, "Stop server socket cause error: ${e.message}")
+            Timber.e("Stop server socket cause error: ${e.message}")
         }
         mExecutorService.shutdown()
         isStarted = false
@@ -103,7 +104,7 @@ class SimpleSocketServer(private val port: Int) {
                 e.printStackTrace()
                 mClients.remove(client)
                 onClientDisconnect?.invoke(client)
-                Log.e(TAG, "send to client [$client] fail, reason: ${e.message}")
+                Timber.e("send to client [$client] fail, reason: ${e.message}")
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.youngfeng.android.assistant.util
 
 import org.apache.commons.codec.digest.DigestUtils
+import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -13,7 +14,7 @@ object MD5Helper {
 
     private fun calcMD5HashForDir(dirToHash: File, includeHiddenFiles: Boolean): String? {
         val fileStreams: Vector<FileInputStream> = Vector<FileInputStream>()
-        println("Found files for hashing:")
+        Timber.d("Found files for hashing:")
         collectInputStreams(dirToHash, fileStreams, includeHiddenFiles)
         val seqStream = SequenceInputStream(fileStreams.elements())
         return try {

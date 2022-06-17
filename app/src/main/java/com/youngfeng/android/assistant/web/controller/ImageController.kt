@@ -19,6 +19,7 @@ import com.youngfeng.android.assistant.web.request.DeleteAlbumsRequest
 import com.youngfeng.android.assistant.web.request.DeleteImageRequest
 import com.youngfeng.android.assistant.web.request.GetAlbumImagesRequest
 import com.youngfeng.android.assistant.web.util.ErrorBuilder
+import timber.log.Timber
 import java.io.File
 import java.lang.Exception
 import java.util.Locale
@@ -85,7 +86,7 @@ class ImageController {
             }
             if (imageFiles.size > 0) {
                 MediaScannerConnection.scanFile(mContext, imageFiles.toTypedArray(), null) { path, uri ->
-                    println("Path: $path, uri: ${uri?.path}")
+                    Timber.d("Path: $path, uri: ${uri?.path}")
                 }
             }
             if (!isAllSuccess) {

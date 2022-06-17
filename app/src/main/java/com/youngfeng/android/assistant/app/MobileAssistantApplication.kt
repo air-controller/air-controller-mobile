@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import com.google.gson.Gson
 import com.yanzhenjie.andserver.AndServer
 import com.youngfeng.android.assistant.BuildConfig
@@ -133,7 +132,7 @@ class MobileAssistantApplication : Application() {
         mHttpServer.startup()
 
         DeviceDiscoverManager.getInstance().onDeviceDiscover {
-            print("Device: ip => ${it.ip}, name => ${it.name}, platform => ${it.platform}")
+            Timber.d("Device: ip => ${it.ip}, name => ${it.name}, platform => ${it.platform}")
         }
         DeviceDiscoverManager.getInstance().startDiscover()
 
@@ -168,7 +167,7 @@ class MobileAssistantApplication : Application() {
             val str = mGson.toJson(cmd.data)
             val device = mGson.fromJson(str, Device::class.java)
 
-            Log.d(TAG, "Cmd received, cmd: $cmd, device name: ${device.name}")
+            Timber.d("Cmd received, cmd: $cmd, device name: ${device.name}")
             EventBus.getDefault().post(DeviceReportEvent(device))
         }
     }

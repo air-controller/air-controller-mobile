@@ -5,10 +5,10 @@ import android.content.Context
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.text.format.Formatter
-import android.util.Log
 import com.youngfeng.android.assistant.Constants
 import com.youngfeng.android.assistant.app.MobileAssistantApplication
 import com.youngfeng.android.assistant.model.Device
+import timber.log.Timber
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetSocketAddress
@@ -92,9 +92,9 @@ class DeviceDiscoverManagerImpl : DeviceDiscoverManager {
                 val data = String(buffer)
                 if (isValidResponse(data)) {
                     val device = convertToDevice(data)
-                    print("当前设备：${device.name}, platform: ${device.platform}, ip address: ${device.ip}")
+                    Timber.d("当前设备：${device.name}, platform: ${device.platform}, ip address: ${device.ip}")
                 } else {
-                    print("It's not valid, data: $data")
+                    Timber.d("It's not valid, data: $data")
                 }
             }
 
@@ -147,10 +147,10 @@ class DeviceDiscoverManagerImpl : DeviceDiscoverManager {
             val address = InetSocketAddress("255.255.255.255", Constants.Port.UDP_DEVICE_DISCOVER)
             val packet = DatagramPacket(cmdByteArray, cmdByteArray.size, address)
 
-            print("Send msg to 255.255.255.255")
+            Timber.d("Send msg to 255.255.255.255")
             mDatagramSocket?.send(packet)
         } catch (e: Exception) {
-            Log.e(TAG, e.message ?: "Unknown error")
+            Timber.e(e.message ?: "Unknown error")
         }
     }
 
