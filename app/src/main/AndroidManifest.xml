@@ -17,7 +17,7 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
     <application
-            android:name=".app.MobileAssistantApplication"
+            android:name=".app.AirControllerApp"
             android:allowBackup="true"
             android:hardwareAccelerated="true"
             android:icon="@mipmap/ic_launcher"

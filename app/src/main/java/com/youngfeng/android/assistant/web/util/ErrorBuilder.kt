@@ -1,6 +1,6 @@
 package com.youngfeng.android.assistant.web.util
 
-import com.youngfeng.android.assistant.app.MobileAssistantApplication
+import com.youngfeng.android.assistant.app.AirControllerApp
 import com.youngfeng.android.assistant.ext.getString
 import com.youngfeng.android.assistant.web.HttpError
 import com.youngfeng.android.assistant.web.HttpModule
@@ -33,9 +33,9 @@ class ErrorBuilder {
 
         error?.apply {
             msg = if (null != locale) {
-                MobileAssistantApplication.getInstance().getString(locale!!, this.value)
+                AirControllerApp.getInstance().getString(locale!!, this.value)
             } else {
-                MobileAssistantApplication.getInstance().getString(this.value)
+                AirControllerApp.getInstance().getString(this.value)
             }
         }
         return HttpResponseEntity(code = code.toIntOrNull() ?: -1, msg = msg, data = null)

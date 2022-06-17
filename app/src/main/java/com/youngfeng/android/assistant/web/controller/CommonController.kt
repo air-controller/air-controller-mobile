@@ -12,7 +12,7 @@ import com.yanzhenjie.andserver.annotation.ResponseBody
 import com.yanzhenjie.andserver.annotation.RestController
 import com.yanzhenjie.andserver.http.HttpRequest
 import com.yanzhenjie.andserver.http.multipart.MultipartFile
-import com.youngfeng.android.assistant.app.MobileAssistantApplication
+import com.youngfeng.android.assistant.app.AirControllerApp
 import com.youngfeng.android.assistant.db.RoomDatabaseHolder
 import com.youngfeng.android.assistant.db.entity.UploadFileRecord
 import com.youngfeng.android.assistant.event.BatchUninstallEvent
@@ -33,7 +33,7 @@ import java.util.Locale
 @RestController
 @RequestMapping("/common")
 class CommonController {
-    private val mContext by lazy { MobileAssistantApplication.getInstance() }
+    private val mContext by lazy { AirControllerApp.getInstance() }
 
     @PostMapping("/mobileInfo")
     @ResponseBody

@@ -9,7 +9,7 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import com.yanzhenjie.andserver.annotation.*
 import com.yanzhenjie.andserver.http.HttpRequest
-import com.youngfeng.android.assistant.app.MobileAssistantApplication
+import com.youngfeng.android.assistant.app.AirControllerApp
 import com.youngfeng.android.assistant.ext.isValidFileName
 import com.youngfeng.android.assistant.web.HttpError
 import com.youngfeng.android.assistant.web.HttpModule
@@ -24,7 +24,7 @@ import java.util.Locale
 @RestController
 @RequestMapping("/file")
 open class FileController {
-    private val mContext by lazy { MobileAssistantApplication.getInstance() }
+    private val mContext by lazy { AirControllerApp.getInstance() }
 
     @PostMapping("/list")
     @ResponseBody
@@ -34,7 +34,7 @@ open class FileController {
 
         // 先判断是否存在读取外部存储权限
         if (ContextCompat.checkSelfPermission(
-                MobileAssistantApplication.getInstance(),
+                AirControllerApp.getInstance(),
                 Manifest.permission.READ_EXTERNAL_STORAGE
             ) != PackageManager.PERMISSION_GRANTED
         ) {
@@ -96,7 +96,7 @@ open class FileController {
 
         // 先判断是否存在写入外部存储权限
         if (ContextCompat.checkSelfPermission(
-                MobileAssistantApplication.getInstance(),
+                AirControllerApp.getInstance(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) != PackageManager.PERMISSION_GRANTED
         ) {
@@ -168,7 +168,7 @@ open class FileController {
 
         // 先判断是否存在写入外部存储权限
         if (ContextCompat.checkSelfPermission(
-                MobileAssistantApplication.getInstance(),
+                AirControllerApp.getInstance(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) != PackageManager.PERMISSION_GRANTED
         ) {
@@ -213,7 +213,7 @@ open class FileController {
 
         // 先判断是否存在写入外部存储权限
         if (ContextCompat.checkSelfPermission(
-                MobileAssistantApplication.getInstance(),
+                AirControllerApp.getInstance(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) != PackageManager.PERMISSION_GRANTED
         ) {
@@ -269,7 +269,7 @@ open class FileController {
 
         // 先判断是否存在写入外部存储权限
         if (ContextCompat.checkSelfPermission(
-                MobileAssistantApplication.getInstance(),
+                AirControllerApp.getInstance(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) != PackageManager.PERMISSION_GRANTED
         ) {
@@ -317,7 +317,7 @@ open class FileController {
 
         // 先判断是否存在写入外部存储权限
         if (ContextCompat.checkSelfPermission(
-                MobileAssistantApplication.getInstance(),
+                AirControllerApp.getInstance(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) != PackageManager.PERMISSION_GRANTED
         ) {

@@ -17,7 +17,7 @@ import com.yanzhenjie.andserver.annotation.PathVariable
 import com.yanzhenjie.andserver.annotation.QueryParam
 import com.yanzhenjie.andserver.annotation.RequestMapping
 import com.yanzhenjie.andserver.annotation.RestController
-import com.youngfeng.android.assistant.app.MobileAssistantApplication
+import com.youngfeng.android.assistant.app.AirControllerApp
 import com.youngfeng.android.assistant.db.RoomDatabaseHolder
 import com.youngfeng.android.assistant.db.entity.ZipFileRecord
 import com.youngfeng.android.assistant.util.CommonUtil
@@ -36,7 +36,7 @@ import java.io.File
 @RestController
 @RequestMapping("/stream")
 class StreamController {
-    private val mContext by lazy { MobileAssistantApplication.getInstance() }
+    private val mContext by lazy { AirControllerApp.getInstance() }
     private val mGson by lazy { Gson() }
 
     companion object {

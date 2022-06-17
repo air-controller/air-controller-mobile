@@ -3,10 +3,10 @@ package com.youngfeng.android.assistant.socket
 import android.util.Log
 import com.google.gson.Gson
 import com.youngfeng.android.assistant.Constants
-import com.youngfeng.android.assistant.app.MobileAssistantApplication
+import com.youngfeng.android.assistant.app.AirControllerApp
 import com.youngfeng.android.assistant.model.Command
 
-class CmdSocketServer(private val application: MobileAssistantApplication) {
+class CmdSocketServer(private val application: AirControllerApp) {
     private val mSocketServer by lazy {
         SimpleSocketServer(Constants.Port.CMD_SERVER)
     }
@@ -44,7 +44,7 @@ class CmdSocketServer(private val application: MobileAssistantApplication) {
     }
 
     companion object {
-        private val instance = CmdSocketServer(MobileAssistantApplication.getInstance())
+        private val instance = CmdSocketServer(AirControllerApp.getInstance())
         private val TAG = CmdSocketServer::class.simpleName
 
         fun getInstance() = instance

@@ -606,13 +606,12 @@ class ContactController {
         return Contacts(mContext).delete()
             .rawContactsWhere { Id `in` request.ids }
             .commit().isSuccessful.let { isSuccessful ->
-            if (isSuccessful) {
-                HttpResponseEntity.success()
-            } else {
-                ErrorBuilder().module(HttpModule.ContactModule)
-                    .error(HttpError.DeleteRawContactsFailure).build()
+                if (isSuccessful) {
+                    HttpResponseEntity.success()
+                } else {
+                    ErrorBuilder().module(HttpModule.ContactModule)
+                        .error(HttpError.DeleteRawContactsFailure).build()
+                }
             }
-
-        }
     }
 }

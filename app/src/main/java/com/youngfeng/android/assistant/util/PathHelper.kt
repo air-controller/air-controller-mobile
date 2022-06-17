@@ -1,7 +1,7 @@
 package com.youngfeng.android.assistant.util
 
 import android.os.Environment
-import com.youngfeng.android.assistant.app.MobileAssistantApplication
+import com.youngfeng.android.assistant.app.AirControllerApp
 import timber.log.Timber
 import java.io.File
 
@@ -44,7 +44,7 @@ object PathHelper {
     }
 
     private fun rootFileDir(): File {
-        val context = MobileAssistantApplication.getInstance()
+        val context = AirControllerApp.getInstance()
         val externalDir = context.getExternalFilesDir(null)
 
         if (Environment.getExternalStorageState(externalDir) == Environment.MEDIA_MOUNTED) {
@@ -72,5 +72,5 @@ object PathHelper {
         return backFileDir()
     }
 
-    private fun backFileDir() = MobileAssistantApplication.getInstance().filesDir
+    private fun backFileDir() = AirControllerApp.getInstance().filesDir
 }

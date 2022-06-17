@@ -1,7 +1,7 @@
 package com.youngfeng.android.assistant.web
 
 import com.youngfeng.android.assistant.R
-import com.youngfeng.android.assistant.app.MobileAssistantApplication
+import com.youngfeng.android.assistant.app.AirControllerApp
 
 /**
  * 错误码由模块加具体错误码，注意不同模块的错误码应该从01开始，到19结束，最多20个错误
@@ -64,6 +64,6 @@ enum class HttpError(var code: String, var value: Int) {
     InstallationFileNotFound("02", R.string.installation_package_not_found);
 
     fun getString(strRes: Int): String {
-        return MobileAssistantApplication.getInstance().getString(strRes)
+        return AirControllerApp.getInstance().getString(strRes)
     }
 }

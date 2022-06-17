@@ -33,7 +33,7 @@ import java.io.File
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-class MobileAssistantApplication : Application() {
+class AirControllerApp : Application() {
     private val mHandler by lazy { Handler(Looper.getMainLooper()) }
     private val mBatteryReceiver by lazy {
         val receiver = object : BroadcastReceiver() {
@@ -62,8 +62,8 @@ class MobileAssistantApplication : Application() {
     private lateinit var heartbeatServer: HeartbeatServerPlus
 
     companion object {
-        private lateinit var INSTANCE: MobileAssistantApplication
-        private val TAG = MobileAssistantApplication::class.simpleName
+        private lateinit var INSTANCE: AirControllerApp
+        private val TAG = AirControllerApp::class.simpleName
         // 默认超时时间（单位：秒）
         private const val DEFAULT_TIMEOUT = 10
 

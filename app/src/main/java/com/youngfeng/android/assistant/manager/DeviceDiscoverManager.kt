@@ -6,7 +6,7 @@ import android.net.wifi.WifiManager
 import android.os.Build
 import android.text.format.Formatter
 import com.youngfeng.android.assistant.Constants
-import com.youngfeng.android.assistant.app.MobileAssistantApplication
+import com.youngfeng.android.assistant.app.AirControllerApp
 import com.youngfeng.android.assistant.model.Device
 import timber.log.Timber
 import java.net.DatagramPacket
@@ -131,7 +131,7 @@ class DeviceDiscoverManagerImpl : DeviceDiscoverManager {
     @SuppressLint("WifiManagerLeak")
     private fun sendBroadcastMsg() {
         try {
-            val wifiManager = MobileAssistantApplication.getInstance()
+            val wifiManager = AirControllerApp.getInstance()
                 .getSystemService(Context.WIFI_SERVICE) as WifiManager
 
             val ip = Formatter.formatIpAddress(wifiManager.connectionInfo.ipAddress)

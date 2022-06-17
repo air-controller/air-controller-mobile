@@ -11,7 +11,7 @@ import com.yanzhenjie.andserver.annotation.ResponseBody
 import com.yanzhenjie.andserver.annotation.RestController
 import com.yanzhenjie.andserver.http.HttpRequest
 import com.youngfeng.android.assistant.R
-import com.youngfeng.android.assistant.app.MobileAssistantApplication
+import com.youngfeng.android.assistant.app.AirControllerApp
 import com.youngfeng.android.assistant.ext.getString
 import com.youngfeng.android.assistant.util.VideoUtil
 import com.youngfeng.android.assistant.web.HttpError
@@ -29,7 +29,7 @@ import java.util.Locale
 @RestController
 @RequestMapping("/video")
 class VideoController {
-    private val mContext by lazy { MobileAssistantApplication.getInstance() }
+    private val mContext by lazy { AirControllerApp.getInstance() }
 
     @PostMapping("/folders")
     @ResponseBody
