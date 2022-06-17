@@ -9,7 +9,7 @@ import com.yanzhenjie.andserver.annotation.RequestParam
 import com.yanzhenjie.andserver.annotation.ResponseBody
 import com.yanzhenjie.andserver.annotation.RestController
 import com.yanzhenjie.andserver.http.multipart.MultipartFile
-import com.youngfeng.android.assistant.app.MobileAssistantApplication
+import com.youngfeng.android.assistant.app.AirControllerApp
 import com.youngfeng.android.assistant.event.Permission
 import com.youngfeng.android.assistant.event.RequestPermissionsEvent
 import com.youngfeng.android.assistant.util.ContactUtil
@@ -31,7 +31,6 @@ import contacts.core.Contacts
 import contacts.core.RawContactsFields
 import contacts.core.entities.AddressEntity
 import contacts.core.entities.EmailEntity
-import contacts.core.entities.Group
 import contacts.core.entities.GroupMembershipEntity
 import contacts.core.entities.ImEntity
 import contacts.core.entities.MutableNameEntity
@@ -64,7 +63,7 @@ import timber.log.Timber
 @RestController
 @RequestMapping("/contact")
 class ContactController {
-    private val mContext by lazy { MobileAssistantApplication.getInstance() }
+    private val mContext by lazy { AirControllerApp.getInstance() }
 
     @PostMapping("/accountsAndGroups")
     fun accountsAndGroups(): HttpResponseEntity<ContactAndGroups> {
@@ -545,34 +544,20 @@ class ContactController {
                 )
         }?.toMutableList() ?: mutableListOf()
 
-        val note = request.note
-        if (null != note) {
-            rawContact.note = NewNote(
-                note = note
-            )
+        request.note?.also { note ->
+            rawContact.note?.apply { this.note = note } ?: run {
+                rawContact.note = NewNote(
+                    note = note
+                )
+            }
         }
 
-        val account = request.account
-
-        var newAccount: Account? = null
-        account?.apply {
-            newAccount = Account(
-                this.name, this.type
-            )
-        }
-
-        val group = request.group
-        var contactsGroup: Group? = null
-
-        if (null != group) {
-            contactsGroup =
-                contacts.groups().query().where { Id equalTo group.id }.find()
-                    .firstOrNull()
-        }
-
-        if (null != newAccount && null != contactsGroup) {
+        request.group?.let { group ->
+            contacts.groups().query().where { Id equalTo group.id }.find()
+                .firstOrNull()
+        }?.apply {
             val memberships: MutableList<GroupMembershipEntity> = mutableListOf()
-            memberships.add(contactsGroup.newMembership())
+            memberships.add(this.newMembership())
             rawContact.groupMemberships = memberships
         }
 

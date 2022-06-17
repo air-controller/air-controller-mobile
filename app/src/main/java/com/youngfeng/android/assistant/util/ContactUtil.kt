@@ -14,7 +14,6 @@ import com.youngfeng.android.assistant.web.response.ContactAndGroups
 import contacts.core.Contacts
 import contacts.core.ContactsFields
 import contacts.core.GroupsFields
-import contacts.core.RawContactsFields
 import contacts.core.asc
 import contacts.core.entities.AddressEntity
 import contacts.core.entities.EmailEntity
@@ -97,7 +96,6 @@ object ContactUtil {
                         .map { it.number }
                         .joinToString(separator = ",")
                 )
-
             }
 
     fun getContactDetail(context: Context, id: Long): ContactDetail? {
@@ -111,7 +109,7 @@ object ContactUtil {
         val contacts = Contacts(context)
 
         val phones = rawContact.phones.map { phone ->
-            var phoneType = phone.type?.let {
+            val phoneType = phone.type?.let {
                 ContactDataType(
                     value = it.value,
                     typeLabel = it.labelStr(context.resources, null),
@@ -237,7 +235,7 @@ object ContactUtil {
             relations = relations,
             accounts = accounts,
             groups = groups,
-            notes = note
+            note = note
         )
     }
 }

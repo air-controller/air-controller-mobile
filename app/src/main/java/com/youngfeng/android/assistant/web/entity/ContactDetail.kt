@@ -11,5 +11,5 @@ data class ContactDetail(
     val addresses: List<ContactFieldItem>? = null,
     val ims: List<ContactFieldItem>? = null,
     val relations: List<ContactFieldItem>? = null,
-    val notes: ContactNote? = null
+    val note: ContactNote? = null
 )
