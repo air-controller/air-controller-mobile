@@ -17,6 +17,8 @@ interface PermissionManager {
 
     fun requestWriteContactPermission(requestCode: Int)
 
+    fun requestReadInstallPackagesPermission(requestCode: Int)
+
     fun requestMultiplePermissions(requestCode: Int, vararg permissions: String)
 
     companion object {
@@ -63,6 +65,15 @@ class PermissionManagerImpl(private val activity: Activity) : PermissionManager 
             activity.getString(R.string.rationale_write_contacts),
             requestCode,
             "android.permission.WRITE_CONTACTS"
+        )
+    }
+
+    override fun requestReadInstallPackagesPermission(requestCode: Int) {
+        EasyPermissions.requestPermissions(
+            activity,
+            activity.getString(R.string.rationale_read_install_packages),
+            requestCode,
+            "android.permission.REQUEST_INSTALL_PACKAGES"
         )
     }
 

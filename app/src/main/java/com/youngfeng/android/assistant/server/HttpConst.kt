@@ -61,7 +61,8 @@ enum class HttpError(var code: String, var value: Int) {
 
     // Common module
     UploadInstallFileFailure("01", R.string.install_bundle_upload_failure),
-    InstallationFileNotFound("02", R.string.installation_package_not_found);
+    InstallationFileNotFound("02", R.string.installation_package_not_found),
+    LackOfNecessaryPermissionsInCommon("03", R.string.lack_of_necessary_permissions), ;
 
     fun getString(strRes: Int): String {
         return AirControllerApp.getInstance().getString(strRes)

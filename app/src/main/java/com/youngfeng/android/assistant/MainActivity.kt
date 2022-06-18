@@ -20,6 +20,7 @@ import android.view.MotionEvent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -388,6 +389,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onRequestPermissions(event: RequestPermissionsEvent) {
         val permissions = event.permissions.map {
@@ -395,6 +397,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
                 Permission.GetAccounts -> Manifest.permission.GET_ACCOUNTS
                 Permission.ReadContacts -> Manifest.permission.READ_CONTACTS
                 Permission.WriteContacts -> Manifest.permission.WRITE_CONTACTS
+                Permission.RequestInstallPackages -> Manifest.permission.REQUEST_INSTALL_PACKAGES
             }
         }.toTypedArray()
 
@@ -409,6 +412,9 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
                     RC_PERMISSIONS
                 )
                 Permission.WriteContacts -> mPermissionManager.requestWriteContactPermission(
+                    RC_PERMISSIONS
+                )
+                Permission.RequestInstallPackages -> mPermissionManager.requestReadInstallPackagesPermission(
                     RC_PERMISSIONS
                 )
             }

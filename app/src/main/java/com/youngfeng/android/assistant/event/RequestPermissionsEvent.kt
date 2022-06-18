@@ -3,7 +3,8 @@ package com.youngfeng.android.assistant.event
 enum class Permission {
     GetAccounts,
     ReadContacts,
-    WriteContacts
+    WriteContacts,
+    RequestInstallPackages
 }
 
 data class RequestPermissionsEvent(val permissions: Array<Permission>) {

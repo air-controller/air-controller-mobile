@@ -67,4 +67,5 @@
     <string name="rationale_read_contacts">In order to use this function normally, we need to read contacts permission, please go to Settings -> Application Management page to enable it</string>
     <string name="rationale_write_contacts">In order to use this function normally, we need to write contacts permission, please go to Settings -> Application Management page to enable it</string>
     <string name="lack_of_necessary_permissions">Lack of necessary permissions, please click OK and enable on the mobile phone</string>
+    <string name="rationale_read_install_packages">In order to use this function normally, we need to request install packages permission, please go to Settings -> Application Management page to enable it</string>
 </resources>
