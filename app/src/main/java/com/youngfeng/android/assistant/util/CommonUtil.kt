@@ -8,7 +8,7 @@ import android.os.Build
 import android.os.Environment
 import androidx.core.content.FileProvider
 import com.youngfeng.android.assistant.model.StorageSize
-import com.youngfeng.android.assistant.web.entity.ApkInfo
+import com.youngfeng.android.assistant.server.entity.ApkInfo
 import java.io.File
 
 object CommonUtil {

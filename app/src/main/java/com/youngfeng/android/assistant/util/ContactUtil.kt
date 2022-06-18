@@ -2,15 +2,15 @@ package com.youngfeng.android.assistant.util
 
 import android.accounts.Account
 import android.content.Context
-import com.youngfeng.android.assistant.web.entity.ContactAccount
-import com.youngfeng.android.assistant.web.entity.ContactBasicInfo
-import com.youngfeng.android.assistant.web.entity.ContactDataType
-import com.youngfeng.android.assistant.web.entity.ContactDetail
-import com.youngfeng.android.assistant.web.entity.ContactFieldItem
-import com.youngfeng.android.assistant.web.entity.ContactGroup
-import com.youngfeng.android.assistant.web.entity.ContactNote
-import com.youngfeng.android.assistant.web.response.ContactAccountInfo
-import com.youngfeng.android.assistant.web.response.ContactAndGroups
+import com.youngfeng.android.assistant.server.entity.ContactAccount
+import com.youngfeng.android.assistant.server.entity.ContactBasicInfo
+import com.youngfeng.android.assistant.server.entity.ContactDataType
+import com.youngfeng.android.assistant.server.entity.ContactDetail
+import com.youngfeng.android.assistant.server.entity.ContactFieldItem
+import com.youngfeng.android.assistant.server.entity.ContactGroup
+import com.youngfeng.android.assistant.server.entity.ContactNote
+import com.youngfeng.android.assistant.server.response.ContactAccountInfo
+import com.youngfeng.android.assistant.server.response.ContactAndGroups
 import contacts.core.Contacts
 import contacts.core.ContactsFields
 import contacts.core.GroupsFields

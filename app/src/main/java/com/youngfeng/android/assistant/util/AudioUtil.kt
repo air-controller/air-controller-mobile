@@ -2,7 +2,7 @@ package com.youngfeng.android.assistant.util
 
 import android.content.Context
 import android.provider.MediaStore
-import com.youngfeng.android.assistant.web.entity.AudioEntity
+import com.youngfeng.android.assistant.server.entity.AudioEntity
 
 object AudioUtil {
 

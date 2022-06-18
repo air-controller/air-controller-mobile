@@ -4,8 +4,8 @@ import android.content.Context
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.TextUtils
-import com.youngfeng.android.assistant.web.entity.AlbumEntity
-import com.youngfeng.android.assistant.web.entity.ImageEntity
+import com.youngfeng.android.assistant.server.entity.AlbumEntity
+import com.youngfeng.android.assistant.server.entity.ImageEntity
 
 object PhotoUtil {
 

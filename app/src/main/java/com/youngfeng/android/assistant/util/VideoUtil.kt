@@ -2,8 +2,8 @@ package com.youngfeng.android.assistant.util
 
 import android.content.Context
 import android.provider.MediaStore
-import com.youngfeng.android.assistant.web.entity.VideoEntity
-import com.youngfeng.android.assistant.web.entity.VideoFolder
+import com.youngfeng.android.assistant.server.entity.VideoEntity
+import com.youngfeng.android.assistant.server.entity.VideoFolder
 
 object VideoUtil {
 

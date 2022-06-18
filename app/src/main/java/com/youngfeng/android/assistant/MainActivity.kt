@@ -290,29 +290,53 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
 
     // 这里指桌面端所需权限授予状态
     private fun getPermissionGrantStatus(): PermissionGrantStatus {
-        var status = PermissionGrantStatus.AllNotGranted
-
-        if (EasyPermissions.hasPermissions(this, Manifest.permission.READ_EXTERNAL_STORAGE) &&
-            EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        ) {
-            status = PermissionGrantStatus.AllGranted
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            EasyPermissions.hasPermissions(
+                this, Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.GET_ACCOUNTS,
+                Manifest.permission.READ_CONTACTS,
+                Manifest.permission.WRITE_CONTACTS,
+                Manifest.permission.REQUEST_INSTALL_PACKAGES
+            ).let {
+                if (it) {
+                    PermissionGrantStatus.AllGranted
+                } else {
+                    PermissionGrantStatus.PartOfGranted
+                }
+            }
+        } else {
+            EasyPermissions.hasPermissions(
+                this, Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.GET_ACCOUNTS,
+                Manifest.permission.READ_CONTACTS,
+                Manifest.permission.WRITE_CONTACTS,
+            ).let {
+                if (it) {
+                    PermissionGrantStatus.AllGranted
+                } else {
+                    PermissionGrantStatus.PartOfGranted
+                }
+            }
         }
-
-        if (!EasyPermissions.hasPermissions(this, Manifest.permission.READ_EXTERNAL_STORAGE) ||
-            !EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        ) {
-            status = PermissionGrantStatus.PartOfGranted
-        }
-
-        return status
     }
 
     // 请求必要权限，includeAppNeeded为false时，表示只请求桌面端所需手机权限，否则请求所有app所需权限
     private fun requestPermissions(includeAppNeeded: Boolean) {
         val perms = mutableListOf(
             Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.READ_EXTERNAL_STORAGE
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.GET_ACCOUNTS,
+            Manifest.permission.READ_CONTACTS,
+            Manifest.permission.WRITE_CONTACTS,
         )
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            perms.add(
+                Manifest.permission.REQUEST_INSTALL_PACKAGES
+            )
+        }
 
         if (includeAppNeeded) {
             perms.add(Manifest.permission.CAMERA)
