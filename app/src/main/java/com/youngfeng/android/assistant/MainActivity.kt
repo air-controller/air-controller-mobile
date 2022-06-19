@@ -16,7 +16,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
-import android.view.MotionEvent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -35,8 +34,6 @@ import com.youngfeng.android.assistant.event.RequestPermissionsEvent
 import com.youngfeng.android.assistant.home.HomeViewModel
 import com.youngfeng.android.assistant.model.DesktopInfo
 import com.youngfeng.android.assistant.model.Device
-import com.youngfeng.android.assistant.model.PermissionGrantStatus
-import com.youngfeng.android.assistant.model.RunStatus
 import com.youngfeng.android.assistant.scan.ScanActivity
 import com.youngfeng.android.assistant.util.CommonUtil
 import org.greenrobot.eventbus.EventBus
@@ -94,6 +91,22 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         super.onCreate(savedInstanceState)
         mViewDataBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
+        initializeUI()
+
+        registerNetworkListener()
+        setUpDeviceInfo()
+
+        updatePermissionsStatus()
+        requestPermissions(true)
+
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this)
+        }
+
+        registerUninstallLauncher()
+    }
+
+    private fun initializeUI() {
         mViewDataBinding?.apply {
             this.lifecycleOwner = this@MainActivity
             this.textSupportDeveloper.paint.flags = Paint.UNDERLINE_TEXT_FLAG
@@ -118,37 +131,14 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
                 if (!mSupportDeveloperDialog.isShowing) mSupportDeveloperDialog.show()
             }
 
-            this.btnIndicator.setOnTouchListener { v, event ->
-                if (event.action == MotionEvent.ACTION_DOWN) {
-                    btnIndicator.alpha = 0.6f
-                }
+            this.textAuthorizeNow.apply {
+                paintFlags = this.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+            }
 
-                if (event.action == MotionEvent.ACTION_UP) {
-                    requestPermissions(false)
-                    btnIndicator.alpha = 1f
-                }
-
-                if (event.action == MotionEvent.ACTION_CANCEL) {
-                    btnIndicator.alpha = 1f
-                }
-
-                return@setOnTouchListener true
+            this.textAuthorizeNow.setOnClickListener {
+                CommonUtil.openAppDetailSettings(this@MainActivity)
             }
         }
-
-        registerNetworkListener()
-        setUpDeviceInfo()
-        updateRunStatus()
-
-        observeRunStatusChange()
-
-        requestPermissions(true)
-
-        if (!EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().register(this)
-        }
-
-        registerUninstallLauncher()
     }
 
     private fun registerUninstallLauncher() {
@@ -226,100 +216,17 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         mViewModel.setWlanName(ssid?.replace(oldValue = "\"", newValue = "") ?: "Unknown SSID")
     }
 
-    private fun updateRunStatus() {
-        mViewModel.isDeviceConnected.observe(this) { isConnected ->
-            if (isConnected) {
-                when (getPermissionGrantStatus()) {
-                    PermissionGrantStatus.AllGranted -> mViewModel.updateRunStatus(RunStatus.Normal)
-                    PermissionGrantStatus.PartOfGranted -> mViewModel.updateRunStatus(RunStatus.PartNormal)
-                    else -> mViewModel.updateRunStatus(RunStatus.AllNotWorking)
-                }
-            } else {
-                mViewModel.updateRunStatus(RunStatus.Disconnected)
-            }
-        }
-    }
+    private fun updatePermissionsStatus() {
+        val permissions = mutableListOf(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.GET_ACCOUNTS,
+            Manifest.permission.READ_CONTACTS,
+            Manifest.permission.WRITE_CONTACTS,
+        )
 
-    private fun observeRunStatusChange() {
-        mViewModel.currentRunStatus.observe(this) { status ->
-            updateIndicatorUIWith(status)
-            updateIndicatorHintWith(status)
-        }
-    }
-
-    private fun updateIndicatorUIWith(status: RunStatus) {
-        when (status) {
-            RunStatus.Normal -> {
-                mViewDataBinding?.btnIndicator?.setBackgroundResource(R.drawable.shape_circle_green)
-                mViewDataBinding?.btnIndicator?.setText(R.string.enjoying)
-                mViewDataBinding?.btnIndicator?.isEnabled = false
-            }
-            RunStatus.PartNormal -> {
-                mViewDataBinding?.btnIndicator?.setBackgroundResource(R.drawable.shape_circle_yellow)
-                mViewDataBinding?.btnIndicator?.setText(R.string.fix_immediately)
-                mViewDataBinding?.btnIndicator?.isEnabled = true
-            }
-            RunStatus.AllNotWorking -> {
-                mViewDataBinding?.btnIndicator?.setBackgroundResource(R.drawable.shape_circle_red)
-                mViewDataBinding?.btnIndicator?.setText(R.string.fix_immediately)
-                mViewDataBinding?.btnIndicator?.isEnabled = true
-            }
-            else -> {
-                mViewDataBinding?.btnIndicator?.setBackgroundResource(R.drawable.shape_circle_gray)
-                mViewDataBinding?.btnIndicator?.setText(R.string.readiness)
-                mViewDataBinding?.btnIndicator?.isEnabled = false
-            }
-        }
-    }
-
-    private fun updateIndicatorHintWith(status: RunStatus) {
-        when (status) {
-            RunStatus.Normal -> {
-                mViewDataBinding?.textIndicator?.setText(R.string.hint_connected_and_operation_normal)
-            }
-            RunStatus.PartNormal -> {
-                mViewDataBinding?.textIndicator?.setText(R.string.hint_connected_and_part_of_normal)
-            }
-            RunStatus.AllNotWorking -> {
-                mViewDataBinding?.textIndicator?.setText(R.string.hint_connected_and_all_not_working)
-            }
-            else -> {
-                mViewDataBinding?.textIndicator?.setText(R.string.hint_disconnected)
-            }
-        }
-    }
-
-    // 这里指桌面端所需权限授予状态
-    private fun getPermissionGrantStatus(): PermissionGrantStatus {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            EasyPermissions.hasPermissions(
-                this, Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.GET_ACCOUNTS,
-                Manifest.permission.READ_CONTACTS,
-                Manifest.permission.WRITE_CONTACTS,
-                Manifest.permission.REQUEST_INSTALL_PACKAGES
-            ).let {
-                if (it) {
-                    PermissionGrantStatus.AllGranted
-                } else {
-                    PermissionGrantStatus.PartOfGranted
-                }
-            }
-        } else {
-            EasyPermissions.hasPermissions(
-                this, Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.GET_ACCOUNTS,
-                Manifest.permission.READ_CONTACTS,
-                Manifest.permission.WRITE_CONTACTS,
-            ).let {
-                if (it) {
-                    PermissionGrantStatus.AllGranted
-                } else {
-                    PermissionGrantStatus.PartOfGranted
-                }
-            }
+        EasyPermissions.hasPermissions(this, *permissions.toTypedArray()).apply {
+            mViewModel.updateAllPermissionsGranted(this)
         }
     }
 
@@ -458,16 +365,16 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
     }
 
     override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
-        updateRunStatus()
+        updatePermissionsStatus()
     }
 
     override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
-        updateRunStatus()
+        updatePermissionsStatus()
     }
 
     override fun onResume() {
         super.onResume()
-        updateRunStatus()
+        updatePermissionsStatus()
     }
 
     override fun onDestroy() {

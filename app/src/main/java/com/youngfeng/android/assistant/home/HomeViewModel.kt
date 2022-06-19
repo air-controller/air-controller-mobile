@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.youngfeng.android.assistant.event.RequestDisconnectClientEvent
 import com.youngfeng.android.assistant.model.DesktopInfo
-import com.youngfeng.android.assistant.model.RunStatus
 import com.youngfeng.android.assistant.socket.CmdSocketServer
 import org.greenrobot.eventbus.EventBus
 
@@ -25,8 +24,8 @@ class HomeViewModel : ViewModel() {
     private val _desktopInfo = MutableLiveData<DesktopInfo>()
     val desktopInfo: LiveData<DesktopInfo> = _desktopInfo
 
-    private val _currentRunStatus = MutableLiveData<RunStatus>()
-    val currentRunStatus: LiveData<RunStatus> = _currentRunStatus
+    private val _isAllPermissionsGranted = MutableLiveData<Boolean>()
+    val isAllPermissionsGranted: LiveData<Boolean> = _isAllPermissionsGranted
 
     fun setWifiConnectStatus(isConnected: Boolean) {
         _isWifiConnected.value = isConnected
@@ -48,8 +47,8 @@ class HomeViewModel : ViewModel() {
         _desktopInfo.value = desktopInfo
     }
 
-    fun updateRunStatus(status: RunStatus) {
-        _currentRunStatus.value = status
+    fun updateAllPermissionsGranted(isGranted: Boolean) {
+        _isAllPermissionsGranted.value = isGranted
     }
 
     fun disconnect() {

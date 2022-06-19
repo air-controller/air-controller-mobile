@@ -68,6 +68,11 @@ object CommonUtil {
         return ApkInfo(packageName = packageName, localizeName = appName, file = file)
     }
 
-    fun batchUninstall(context: Context, packages: List<String>) {
+    fun openAppDetailSettings(context: Context) {
+        val intent = Intent()
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        intent.action = "android.settings.APPLICATION_DETAILS_SETTINGS"
+        intent.data = Uri.fromParts("package", context.packageName, null)
+        context.startActivity(intent)
     }
 }

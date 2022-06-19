@@ -14,7 +14,7 @@
     <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#f5f5f5">
+            android:background="#fcfcfc">
         <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -33,43 +33,75 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
 
-                    <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="250dp"
-                            android:background="@color/primaryColor">
+                    <FrameLayout
+                            android:layout_width="210dp"
+                            android:layout_height="210dp"
+                            android:layout_marginTop="30dp"
+                            android:layout_marginBottom="20dp"
+                            android:background="@{viewModel.isDeviceConnected() ? @drawable/shape_circle_connected : @drawable/shape_circle_disconnected}"
+                            android:layout_gravity="center_horizontal">
 
-                        <androidx.appcompat.widget.AppCompatButton
-                                android:id="@+id/btn_indicator"
-                                android:layout_width="120dp"
-                                android:layout_height="120dp"
-                                android:layout_marginTop="40dp"
-                                android:background="@drawable/shape_circle_green"
-                                android:elevation="10dp"
-                                android:textSize="18sp"
-                                android:textColor="@color/white"
-                                android:gravity="center"
-                                android:textAllCaps="false"
-                                tools:text="立即修复"
-                                android:layout_centerInParent="true" />
-
-                        <TextView
-                                android:id="@+id/text_indicator"
+                        <androidx.appcompat.widget.LinearLayoutCompat
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="center_horizontal"
-                                android:layout_marginTop="10dp"
-                                android:layout_marginStart="20dp"
-                                android:layout_marginEnd="20dp"
-                                android:layout_below="@+id/btn_indicator"
-                                android:layout_centerHorizontal="true"
-                                android:textSize="16sp"
-                                android:gravity="center"
-                                android:textColor="@color/white"
-                                tools:text="已连接" />
-                    </RelativeLayout>
+                                android:orientation="vertical"
+                                android:layout_gravity="center"
+                                android:gravity="center">
 
+                            <ImageView
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:scaleType="centerCrop"
+                                    android:src="@mipmap/ic_bolt"
+                                    app:tint="@color/white" />
 
+                            <TextView
+                                    android:id="@+id/text_indicator"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
+                                    android:layout_marginTop="10dp"
+                                    android:layout_marginStart="20dp"
+                                    android:layout_marginEnd="20dp"
+                                    android:layout_below="@+id/btn_indicator"
+                                    android:layout_centerHorizontal="true"
+                                    android:textSize="16sp"
+                                    android:gravity="center"
+                                    android:textColor="@color/white"
+                                    android:text="@{viewModel.isDeviceConnected() ? @string/connected : @string/disconnected}"
+                                    tools:text="已连接" />
 
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+                    </FrameLayout>
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:visibility="@{viewModel.isAllPermissionsGranted() ? View.GONE : View.VISIBLE}">
+                        <ImageView
+                                android:layout_width="25dp"
+                                android:layout_height="25dp"
+                                android:scaleType="centerCrop"
+                                android:src="@mipmap/ic_warn" />
+
+                        <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="5dp"
+                                android:text="@string/some_permissions_not_granted"
+                                android:textSize="14sp"
+                                android:textColor="#333333"/>
+                        <TextView
+                                android:id="@+id/text_authorize_now"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:padding="10dp"
+                                android:textColor="#0000ff"
+                                android:textSize="14sp"
+                                android:text="@string/authorize_now"
+                                />
+                    </androidx.appcompat.widget.LinearLayoutCompat>
 
                     <androidx.cardview.widget.CardView
                             android:id="@+id/card_device_info"
