@@ -53,12 +53,6 @@ class CommonController {
     @PostMapping("/installedApps")
     @ResponseBody
     fun getInstalledApps(): HttpResponseEntity<List<InstalledAppEntity>> {
-        if (!EasyPermissions.hasPermissions(mContext, Manifest.permission.REQUEST_INSTALL_PACKAGES)) {
-            EventBus.getDefault().post(RequestPermissionsEvent(arrayOf(Permission.RequestInstallPackages)))
-            return ErrorBuilder().module(HttpModule.CommonModule)
-                .error(HttpError.LackOfNecessaryPermissionsInCommon).build()
-        }
-
         val packageManager = mContext.packageManager
         val packages = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
 
