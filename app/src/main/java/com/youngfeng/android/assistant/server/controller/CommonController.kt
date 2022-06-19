@@ -1,6 +1,5 @@
 package com.youngfeng.android.assistant.server.controller
 
-import android.Manifest
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Build
@@ -17,8 +16,6 @@ import com.youngfeng.android.assistant.app.AirControllerApp
 import com.youngfeng.android.assistant.db.RoomDatabaseHolder
 import com.youngfeng.android.assistant.db.entity.UploadFileRecord
 import com.youngfeng.android.assistant.event.BatchUninstallEvent
-import com.youngfeng.android.assistant.event.Permission
-import com.youngfeng.android.assistant.event.RequestPermissionsEvent
 import com.youngfeng.android.assistant.model.MobileInfo
 import com.youngfeng.android.assistant.server.HttpError
 import com.youngfeng.android.assistant.server.HttpModule
@@ -29,7 +26,6 @@ import com.youngfeng.android.assistant.util.CommonUtil
 import com.youngfeng.android.assistant.util.MD5Helper
 import com.youngfeng.android.assistant.util.PathHelper
 import org.greenrobot.eventbus.EventBus
-import pub.devrel.easypermissions.EasyPermissions
 import timber.log.Timber
 import java.io.File
 import java.util.Locale
