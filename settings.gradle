@@ -7,5 +7,5 @@ dependencyResolutionManagement {
         maven { url "https://jitpack.io" }
     }
 }
-rootProject.name = "AndroidMobileAssistant"
+rootProject.name = "air_controller_mobile"
 include ':app'
