@@ -39,6 +39,7 @@ enum class HttpError(var code: String, var value: Int) {
     DeleteMultiImageFail("02", R.string.delete_image_fail),
     ImageFileNotExist("03", R.string.image_not_exist),
     DeleteAlbumFail("04", R.string.delete_album_fail),
+    GetPhotoDirFailure("05", R.string.get_photo_dir_failure),
 
     // 音频模块
     DeleteAudioFail("01", R.string.delete_audio_file_fail),

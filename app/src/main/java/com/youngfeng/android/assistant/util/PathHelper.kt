@@ -54,6 +54,18 @@ object PathHelper {
         return context.filesDir
     }
 
+    fun photoRootDir(): File? {
+        val externalDir = Environment.getExternalStorageDirectory() ?: return null
+
+        return File(externalDir, "DCIM")
+    }
+
+    fun cameraDir(): File? {
+        val photoDir = photoRootDir() ?: return null
+
+        return File(photoDir, "Camera")
+    }
+
     fun tempFileDir(): File {
         val temp = File(rootFileDir(), "temp")
 

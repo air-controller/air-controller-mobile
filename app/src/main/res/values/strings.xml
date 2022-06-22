@@ -72,4 +72,5 @@
     <string name="disconnected">未连接</string>
     <string name="some_permissions_not_granted">部分权限未开启</string>
     <string name="authorize_now">立即授权</string>
+    <string name="get_photo_dir_failure">获取图片目录失败</string>
 </resources>
