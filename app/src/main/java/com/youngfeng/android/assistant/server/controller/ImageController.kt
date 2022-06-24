@@ -194,38 +194,43 @@ class ImageController {
      * @param pos Present specific position, 1: All pictures, path: .../DCIM/xxx, 2: Camera, path:
      * .../DCIM/Camera/xxx 3: Specific album, path can't empty in this situation.
      */
-    @PostMapping("/uploadPhoto")
+    @PostMapping("/uploadPhotos")
     @ResponseBody
     fun uploadPhoto(
         @RequestParam("pos") pos: Int,
-        @RequestParam("photo") photo: MultipartFile,
+        @RequestParam("photos") photos: Array<MultipartFile>,
         @RequestParam("path") path: String? = null
-    ): HttpResponseEntity<ImageEntity> {
-        var targetPhoto: File? = null
+    ): HttpResponseEntity<List<ImageEntity>> {
+        val images = photos.map { photo ->
+            var targetPhoto: File? = null
 
-        val fileName = photo.filename ?: photo.name
+            val fileName = photo.filename ?: photo.name
 
-        when (pos) {
-            POS_ALL -> PathHelper.photoRootDir()?.apply {
-                targetPhoto = File(this, "AirController/${fileName}")
+            when (pos) {
+                POS_ALL -> PathHelper.photoRootDir()?.apply {
+                    targetPhoto = File(this, "AirController/${fileName}")
+                }
+                POS_CAMERA -> PathHelper.cameraDir()?.apply {
+                    targetPhoto = File(this, fileName)
+                }
+                else -> path?.apply {
+                    targetPhoto = File(path, fileName)
+                }
             }
-            POS_CAMERA -> PathHelper.cameraDir()?.apply {
-                targetPhoto = File(this, fileName)
-            }
-            else -> path?.apply {
-                targetPhoto = File(path, fileName)
-            }
+
+            targetPhoto?.let {
+                photo.transferTo(it)
+
+                MediaScannerConnection.scanFile(mContext, arrayOf(it.path), null, null)
+
+                PhotoUtil.findImageByPath(mContext, it.path)?.apply {
+                    this.createTime = if (createTime == null || createTime!! <= 0L) System.currentTimeMillis() else createTime
+                }
+            } ?: return ErrorBuilder().module(HttpModule.ImageModule)
+                .error(HttpError.GetPhotoDirFailure)
+                .build()
         }
 
-        return targetPhoto?.let {
-            photo.transferTo(targetPhoto!!)
-
-            MediaScannerConnection.scanFile(mContext, arrayOf(targetPhoto!!.path), null, null)
-
-            val image = PhotoUtil.findImageByPath(mContext, targetPhoto!!.path)
-            HttpResponseEntity.success(image)
-        } ?: return ErrorBuilder().module(HttpModule.ImageModule)
-            .error(HttpError.GetPhotoDirFailure)
-            .build()
+        return HttpResponseEntity.success(images)
     }
 }
