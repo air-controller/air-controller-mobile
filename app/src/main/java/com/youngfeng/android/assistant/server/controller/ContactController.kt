@@ -81,8 +81,7 @@ class ContactController {
                     )
                 )
             )
-            return ErrorBuilder().module(HttpModule.ContactModule)
-                .error(HttpError.LackOfNecessaryPermissions).build()
+            return HttpResponseEntity.commonError(HttpError.LackOfNecessaryPermissions)
         }
 
         val result = ContactUtil.findAccountsAndGroups(mContext)
@@ -93,8 +92,7 @@ class ContactController {
     fun getAllContacts(): HttpResponseEntity<List<ContactBasicInfo>> {
         if (!EasyPermissions.hasPermissions(mContext, Manifest.permission.READ_CONTACTS)) {
             EventBus.getDefault().post(RequestPermissionsEvent(arrayOf(Permission.ReadContacts)))
-            return ErrorBuilder().module(HttpModule.ContactModule)
-                .error(HttpError.LackOfNecessaryPermissions).build()
+            return HttpResponseEntity.commonError(HttpError.LackOfNecessaryPermissions)
         }
 
         val contacts = ContactUtil.getAllContacts(mContext)
@@ -118,8 +116,7 @@ class ContactController {
                     )
                 )
             )
-            return ErrorBuilder().module(HttpModule.ContactModule)
-                .error(HttpError.LackOfNecessaryPermissions).build()
+            return HttpResponseEntity.commonError(HttpError.LackOfNecessaryPermissions)
         }
 
         val contacts = ContactUtil.getContactsByAccount(mContext, request.name, request.type)
@@ -143,8 +140,7 @@ class ContactController {
                     )
                 )
             )
-            return ErrorBuilder().module(HttpModule.ContactModule)
-                .error(HttpError.LackOfNecessaryPermissions).build()
+            return HttpResponseEntity.commonError(HttpError.LackOfNecessaryPermissions)
         }
 
         val contacts = ContactUtil.getContactsByGroupId(mContext, request.id)
@@ -156,8 +152,7 @@ class ContactController {
     fun getContactDetailById(@RequestBody request: IdRequest): HttpResponseEntity<ContactDetail> {
         if (!EasyPermissions.hasPermissions(mContext, Manifest.permission.READ_CONTACTS)) {
             EventBus.getDefault().post(RequestPermissionsEvent(arrayOf(Permission.ReadContacts)))
-            return ErrorBuilder().module(HttpModule.ContactModule)
-                .error(HttpError.LackOfNecessaryPermissions).build()
+            return HttpResponseEntity.commonError(HttpError.LackOfNecessaryPermissions)
         }
 
         val contactDetail = ContactUtil.getContactDetail(mContext, request.id)
@@ -169,8 +164,7 @@ class ContactController {
     fun getContactDataTypes(): HttpResponseEntity<ContactDataTypeMap> {
         if (!EasyPermissions.hasPermissions(mContext, Manifest.permission.READ_CONTACTS)) {
             EventBus.getDefault().post(RequestPermissionsEvent(arrayOf(Permission.ReadContacts)))
-            return ErrorBuilder().module(HttpModule.ContactModule)
-                .error(HttpError.LackOfNecessaryPermissions).build()
+            return HttpResponseEntity.commonError(HttpError.LackOfNecessaryPermissions)
         }
 
         val phoneTypes = PhoneTypeFactory.systemTypes(mContext.resources).map {
@@ -236,8 +230,7 @@ class ContactController {
     ): HttpResponseEntity<ContactDetail> {
         if (!EasyPermissions.hasPermissions(mContext, Manifest.permission.WRITE_CONTACTS)) {
             EventBus.getDefault().post(RequestPermissionsEvent(arrayOf(Permission.WriteContacts)))
-            return ErrorBuilder().module(HttpModule.ContactModule)
-                .error(HttpError.LackOfNecessaryPermissions).build()
+            return HttpResponseEntity.commonError(HttpError.LackOfNecessaryPermissions)
         }
 
         val rawContact = NewRawContact()
@@ -361,8 +354,7 @@ class ContactController {
     ): HttpResponseEntity<ContactDetail> {
         if (!EasyPermissions.hasPermissions(mContext, Manifest.permission.WRITE_CONTACTS)) {
             EventBus.getDefault().post(RequestPermissionsEvent(arrayOf(Permission.WriteContacts)))
-            return ErrorBuilder().module(HttpModule.ContactModule)
-                .error(HttpError.LackOfNecessaryPermissions).build()
+            return HttpResponseEntity.commonError(HttpError.LackOfNecessaryPermissions)
         }
 
         val contacts = Contacts(mContext)
@@ -399,8 +391,7 @@ class ContactController {
     ): HttpResponseEntity<ContactDetail> {
         if (!EasyPermissions.hasPermissions(mContext, Manifest.permission.WRITE_CONTACTS)) {
             EventBus.getDefault().post(RequestPermissionsEvent(arrayOf(Permission.WriteContacts)))
-            return ErrorBuilder().module(HttpModule.ContactModule)
-                .error(HttpError.LackOfNecessaryPermissions).build()
+            return HttpResponseEntity.commonError(HttpError.LackOfNecessaryPermissions)
         }
 
         val contacts = Contacts(mContext)
@@ -436,8 +427,7 @@ class ContactController {
     ): HttpResponseEntity<Any> {
         if (!EasyPermissions.hasPermissions(mContext, Manifest.permission.WRITE_CONTACTS)) {
             EventBus.getDefault().post(RequestPermissionsEvent(arrayOf(Permission.WriteContacts)))
-            return ErrorBuilder().module(HttpModule.ContactModule)
-                .error(HttpError.LackOfNecessaryPermissions).build()
+            return HttpResponseEntity.commonError(HttpError.LackOfNecessaryPermissions)
         }
 
         val contacts = Contacts(mContext)
@@ -584,8 +574,7 @@ class ContactController {
     fun deleteRawContacts(@RequestBody request: DeleteRawContactsRequest): HttpResponseEntity<Any> {
         if (!EasyPermissions.hasPermissions(mContext, Manifest.permission.WRITE_CONTACTS)) {
             EventBus.getDefault().post(RequestPermissionsEvent(arrayOf(Permission.WriteContacts)))
-            return ErrorBuilder().module(HttpModule.ContactModule)
-                .error(HttpError.LackOfNecessaryPermissions).build()
+            return HttpResponseEntity.commonError(HttpError.LackOfNecessaryPermissions)
         }
 
         return Contacts(mContext).delete()

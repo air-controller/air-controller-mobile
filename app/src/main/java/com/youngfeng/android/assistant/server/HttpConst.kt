@@ -11,7 +11,7 @@ import com.youngfeng.android.assistant.app.AirControllerApp
 
 enum class HttpModule(var value: Int) {
     FileModule(1), ImageModule(2), AudioModule(3), VideoModule(4),
-    Download(5), CommonModule(6), ContactModule(7),
+    Download(5), CommonModule(6), ContactModule(7), SystemModule(99)
 }
 
 enum class HttpError(var code: String, var value: Int) {
@@ -43,6 +43,7 @@ enum class HttpError(var code: String, var value: Int) {
 
     // 音频模块
     DeleteAudioFail("01", R.string.delete_audio_file_fail),
+    UploadAudioFail("02", R.string.upload_audio_file_fail),
 
     // 视频模块
     DeleteVideoFail("01", R.string.delete_video_file_fail),
@@ -58,12 +59,13 @@ enum class HttpError(var code: String, var value: Int) {
     CreateContactFailure("04", R.string.create_contact_failure),
     RawContactNotFound("05", R.string.contact_not_found),
     DeleteRawContactsFailure("06", R.string.delete_contact_failure),
-    LackOfNecessaryPermissions("07", R.string.lack_of_necessary_permissions),
 
     // Common module
     UploadInstallFileFailure("01", R.string.install_bundle_upload_failure),
     InstallationFileNotFound("02", R.string.installation_package_not_found),
-    LackOfNecessaryPermissionsInCommon("03", R.string.lack_of_necessary_permissions), ;
+
+    // System module, process common error
+    LackOfNecessaryPermissions("01", R.string.lack_of_necessary_permissions);
 
     fun getString(strRes: Int): String {
         return AirControllerApp.getInstance().getString(strRes)

@@ -73,4 +73,5 @@
     <string name="some_permissions_not_granted">Some permissions is not granted</string>
     <string name="authorize_now">Authorize now</string>
     <string name="get_photo_dir_failure">Get photo directory failure</string>
+    <string name="upload_audio_file_fail">Upload audios failure</string>
 </resources>

@@ -60,6 +60,12 @@ object PathHelper {
         return File(externalDir, "DCIM")
     }
 
+    fun audioRootDir(): File? {
+        val externalDir = Environment.getExternalStorageDirectory() ?: return null
+
+        return File(externalDir, "Music")
+    }
+
     fun cameraDir(): File? {
         val photoDir = photoRootDir() ?: return null
 

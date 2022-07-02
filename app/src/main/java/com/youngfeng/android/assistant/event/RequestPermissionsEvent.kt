@@ -4,7 +4,8 @@ enum class Permission {
     GetAccounts,
     ReadContacts,
     WriteContacts,
-    RequestInstallPackages
+    RequestInstallPackages,
+    WriteExternalStorage
 }
 
 data class RequestPermissionsEvent(val permissions: Array<Permission>) {

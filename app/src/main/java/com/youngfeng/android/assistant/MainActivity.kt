@@ -305,27 +305,11 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
                 Permission.ReadContacts -> Manifest.permission.READ_CONTACTS
                 Permission.WriteContacts -> Manifest.permission.WRITE_CONTACTS
                 Permission.RequestInstallPackages -> Manifest.permission.REQUEST_INSTALL_PACKAGES
+                Permission.WriteExternalStorage -> Manifest.permission.WRITE_EXTERNAL_STORAGE
             }
         }.toTypedArray()
 
-        if (permissions.size > 1) {
-            mPermissionManager.requestMultiplePermissions(RC_PERMISSIONS, *permissions)
-        } else if (permissions.size == 1) {
-            when (event.permissions.single()) {
-                Permission.GetAccounts -> mPermissionManager.requestReadAccountPermission(
-                    RC_PERMISSIONS
-                )
-                Permission.ReadContacts -> mPermissionManager.requestReadContactsPermission(
-                    RC_PERMISSIONS
-                )
-                Permission.WriteContacts -> mPermissionManager.requestWriteContactPermission(
-                    RC_PERMISSIONS
-                )
-                Permission.RequestInstallPackages -> mPermissionManager.requestReadInstallPackagesPermission(
-                    RC_PERMISSIONS
-                )
-            }
-        }
+        mPermissionManager.requestMultiplePermissions(RC_PERMISSIONS, *permissions)
     }
 
     private fun batchUninstall(packageName: String) {
