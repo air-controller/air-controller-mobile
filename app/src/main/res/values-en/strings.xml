@@ -74,4 +74,5 @@
     <string name="authorize_now">Authorize now</string>
     <string name="get_photo_dir_failure">Get photo directory failure</string>
     <string name="upload_audio_file_fail">Upload audios failure</string>
+    <string name="upload_video_file_failure">Upload videos failure</string>
 </resources>

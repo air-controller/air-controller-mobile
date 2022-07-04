@@ -47,6 +47,7 @@ enum class HttpError(var code: String, var value: Int) {
 
     // 视频模块
     DeleteVideoFail("01", R.string.delete_video_file_fail),
+    UploadVideoFailure("02", R.string.upload_video_file_failure),
 
     // 下载模块
     GetDownloadDirFail("01", R.string.get_download_dir_fail),

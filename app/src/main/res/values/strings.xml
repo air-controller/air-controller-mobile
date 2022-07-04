@@ -74,4 +74,5 @@
     <string name="authorize_now">立即授权</string>
     <string name="get_photo_dir_failure">获取图片目录失败</string>
     <string name="upload_audio_file_fail">上传音频失败</string>
+    <string name="upload_video_file_failure">上传视频失败</string>
 </resources>

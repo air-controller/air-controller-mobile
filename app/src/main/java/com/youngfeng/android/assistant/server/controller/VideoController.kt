@@ -1,5 +1,6 @@
 package com.youngfeng.android.assistant.server.controller
 
+import android.Manifest
 import android.media.MediaScannerConnection
 import android.text.TextUtils
 import com.yanzhenjie.andserver.annotation.GetMapping
@@ -7,11 +8,15 @@ import com.yanzhenjie.andserver.annotation.PathVariable
 import com.yanzhenjie.andserver.annotation.PostMapping
 import com.yanzhenjie.andserver.annotation.RequestBody
 import com.yanzhenjie.andserver.annotation.RequestMapping
+import com.yanzhenjie.andserver.annotation.RequestParam
 import com.yanzhenjie.andserver.annotation.ResponseBody
 import com.yanzhenjie.andserver.annotation.RestController
 import com.yanzhenjie.andserver.http.HttpRequest
+import com.yanzhenjie.andserver.http.multipart.MultipartFile
 import com.youngfeng.android.assistant.R
 import com.youngfeng.android.assistant.app.AirControllerApp
+import com.youngfeng.android.assistant.event.Permission
+import com.youngfeng.android.assistant.event.RequestPermissionsEvent
 import com.youngfeng.android.assistant.ext.getString
 import com.youngfeng.android.assistant.server.HttpError
 import com.youngfeng.android.assistant.server.HttpModule
@@ -21,7 +26,10 @@ import com.youngfeng.android.assistant.server.entity.VideoFolder
 import com.youngfeng.android.assistant.server.request.DeleteVideosRequest
 import com.youngfeng.android.assistant.server.request.GetVideosRequest
 import com.youngfeng.android.assistant.server.util.ErrorBuilder
+import com.youngfeng.android.assistant.util.PathHelper
 import com.youngfeng.android.assistant.util.VideoUtil
+import org.greenrobot.eventbus.EventBus
+import pub.devrel.easypermissions.EasyPermissions
 import java.io.File
 import java.lang.Exception
 import java.util.Locale
@@ -106,5 +114,43 @@ class VideoController {
         } else {
             throw IllegalArgumentException("Video item is not exist, id: $id")
         }
+    }
+
+    @ResponseBody
+    @PostMapping("/uploadVideos")
+    fun uploadVideos(
+        @RequestParam("videos") videos: Array<MultipartFile>,
+        @RequestParam("folder") folder: String?
+    ): HttpResponseEntity<Any> {
+        if (!EasyPermissions.hasPermissions(
+                mContext,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            )
+        ) {
+            EventBus.getDefault().post(
+                RequestPermissionsEvent(
+                    arrayOf(
+                        Permission.WriteExternalStorage,
+                    )
+                )
+            )
+            return HttpResponseEntity.commonError(HttpError.LackOfNecessaryPermissions)
+        }
+
+        PathHelper.videoRootDir()?.let { videoRootDir ->
+            videos.onEach { video ->
+                val file = if (folder.isNullOrEmpty() || folder == "null") {
+                    File(videoRootDir, "AirController/${video.filename}")
+                } else {
+                    File(folder, "${video.filename}")
+                }
+                video.transferTo(file)
+                MediaScannerConnection.scanFile(
+                    mContext, arrayOf(file.path), null, null
+                )
+            }
+            return HttpResponseEntity.success()
+        } ?: return ErrorBuilder().module(HttpModule.VideoModule).error(HttpError.UploadVideoFailure)
+            .build()
     }
 }
