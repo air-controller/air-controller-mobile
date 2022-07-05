@@ -17,9 +17,19 @@ import com.yanzhenjie.andserver.annotation.PathVariable
 import com.yanzhenjie.andserver.annotation.QueryParam
 import com.yanzhenjie.andserver.annotation.RequestMapping
 import com.yanzhenjie.andserver.annotation.RestController
+import com.yanzhenjie.andserver.framework.body.FileBody
+import com.yanzhenjie.andserver.http.HttpRequest
+import com.yanzhenjie.andserver.http.HttpResponse
+import com.yanzhenjie.andserver.http.ResponseBody
+import com.yanzhenjie.andserver.util.MediaType
 import com.youngfeng.android.assistant.app.AirControllerApp
 import com.youngfeng.android.assistant.db.RoomDatabaseHolder
 import com.youngfeng.android.assistant.db.entity.ZipFileRecord
+import com.youngfeng.android.assistant.ext.isAudio
+import com.youngfeng.android.assistant.ext.isDoc
+import com.youngfeng.android.assistant.ext.isImage
+import com.youngfeng.android.assistant.ext.isVideo
+import com.youngfeng.android.assistant.server.response.RangeSupportResponseBody
 import com.youngfeng.android.assistant.util.CommonUtil
 import com.youngfeng.android.assistant.util.MD5Helper
 import com.youngfeng.android.assistant.util.PathHelper
@@ -32,6 +42,7 @@ import contacts.core.util.toRawContact
 import net.lingala.zip4j.ZipFile
 import timber.log.Timber
 import java.io.File
+import java.net.URLEncoder
 
 @RestController
 @RequestMapping("/stream")
@@ -80,8 +91,38 @@ class StreamController {
     }
 
     @GetMapping("/file")
-    fun file(@QueryParam("path") path: String): File {
-        return File(path)
+    fun file(request: HttpRequest, response: HttpResponse, @QueryParam("path") path: String): ResponseBody {
+        val file = File(path)
+        if (file.isAudio) {
+            val rangeHeader = request.getHeader("Range")
+
+            return RangeSupportResponseBody(
+                contentType = MediaType("audio", file.extension),
+                file = file,
+                rangeHeader = rangeHeader
+            ).attachToResponse(response)
+        } else if (file.isVideo) {
+            val rangeHeader = request.getHeader("Range")
+
+            return RangeSupportResponseBody(
+                contentType = MediaType("video", file.extension),
+                file = file,
+                rangeHeader = rangeHeader
+            ).attachToResponse(response)
+        }
+
+        val encodedFileName = URLEncoder.encode(file.name, "UTF-8")
+
+        var showType = "attachment"
+        if (file.isDoc || file.isImage) {
+            showType = "inline"
+        }
+        if (file.isDoc) {
+            response.setHeader("Content-Type", "application/${file.extension}")
+        }
+        response.addHeader("Content-Disposition", "$showType; filename=\"$encodedFileName\"")
+
+        return FileBody(file)
     }
 
     @GetMapping("/dir")
