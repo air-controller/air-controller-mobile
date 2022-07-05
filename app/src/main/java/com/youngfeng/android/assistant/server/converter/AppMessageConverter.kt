@@ -27,7 +27,7 @@ import java.nio.charset.Charset
 class AppMessageConverter : MessageConverter {
     private val mGson by lazy(mode = LazyThreadSafetyMode.NONE) { Gson() }
 
-    override fun convert(output: Any?, mediaType: MediaType?): ResponseBody {
+    override fun convert(output: Any?, mediaType: MediaType?): ResponseBody? {
         if (output is HttpResponseEntity<*>) {
             val json = mGson.toJson(output)
             return HttpResponseEntityBody(json)
@@ -55,7 +55,7 @@ class AppMessageConverter : MessageConverter {
                 return VideoItemBody(output)
             }
 
-            throw NotImplementedError("AppMessageConverter: convert method not implemented completed")
+            return null
         }
     }
 

@@ -12,7 +12,9 @@ import com.yanzhenjie.andserver.annotation.RequestParam
 import com.yanzhenjie.andserver.annotation.ResponseBody
 import com.yanzhenjie.andserver.annotation.RestController
 import com.yanzhenjie.andserver.http.HttpRequest
+import com.yanzhenjie.andserver.http.HttpResponse
 import com.yanzhenjie.andserver.http.multipart.MultipartFile
+import com.yanzhenjie.andserver.util.MediaType
 import com.youngfeng.android.assistant.R
 import com.youngfeng.android.assistant.app.AirControllerApp
 import com.youngfeng.android.assistant.event.Permission
@@ -23,6 +25,7 @@ import com.youngfeng.android.assistant.server.HttpModule
 import com.youngfeng.android.assistant.server.entity.AudioEntity
 import com.youngfeng.android.assistant.server.entity.HttpResponseEntity
 import com.youngfeng.android.assistant.server.request.DeleteAudioRequest
+import com.youngfeng.android.assistant.server.response.RangeSupportResponseBody
 import com.youngfeng.android.assistant.server.util.ErrorBuilder
 import com.youngfeng.android.assistant.util.AudioUtil
 import com.youngfeng.android.assistant.util.PathHelper
@@ -89,11 +92,18 @@ class AudioController {
     }
 
     @GetMapping("/item/{id}")
-    fun findById(@PathVariable("id") id: String): AudioEntity {
+    fun findById(request: HttpRequest, response: HttpResponse, @PathVariable("id") id: String): com.yanzhenjie.andserver.http.ResponseBody {
         val audioEntity = AudioUtil.findById(mContext, id)
 
         if (null != audioEntity) {
-            return audioEntity
+            val rangeHeader = request.getHeader("Range")
+            val audioFile = File(audioEntity.path)
+
+            return RangeSupportResponseBody(
+                contentType = MediaType("audio", audioFile.extension),
+                file = audioFile,
+                rangeHeader = rangeHeader
+            ).attachToResponse(response)
         } else {
             throw IllegalArgumentException("Audio item is not exist, id: $id")
         }

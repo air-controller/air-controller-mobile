@@ -3,6 +3,7 @@ package com.youngfeng.android.assistant.server.controller
 import android.Manifest
 import android.media.MediaScannerConnection
 import android.text.TextUtils
+import com.yanzhenjie.andserver.annotation.CrossOrigin
 import com.yanzhenjie.andserver.annotation.GetMapping
 import com.yanzhenjie.andserver.annotation.PathVariable
 import com.yanzhenjie.andserver.annotation.PostMapping
@@ -12,7 +13,9 @@ import com.yanzhenjie.andserver.annotation.RequestParam
 import com.yanzhenjie.andserver.annotation.ResponseBody
 import com.yanzhenjie.andserver.annotation.RestController
 import com.yanzhenjie.andserver.http.HttpRequest
+import com.yanzhenjie.andserver.http.HttpResponse
 import com.yanzhenjie.andserver.http.multipart.MultipartFile
+import com.yanzhenjie.andserver.util.MediaType
 import com.youngfeng.android.assistant.R
 import com.youngfeng.android.assistant.app.AirControllerApp
 import com.youngfeng.android.assistant.event.Permission
@@ -25,6 +28,7 @@ import com.youngfeng.android.assistant.server.entity.VideoEntity
 import com.youngfeng.android.assistant.server.entity.VideoFolder
 import com.youngfeng.android.assistant.server.request.DeleteVideosRequest
 import com.youngfeng.android.assistant.server.request.GetVideosRequest
+import com.youngfeng.android.assistant.server.response.RangeSupportResponseBody
 import com.youngfeng.android.assistant.server.util.ErrorBuilder
 import com.youngfeng.android.assistant.util.PathHelper
 import com.youngfeng.android.assistant.util.VideoUtil
@@ -105,12 +109,20 @@ class VideoController {
         return mContext.getString(locale, R.string.delete_video_file_fail)
     }
 
+    @CrossOrigin
     @GetMapping("/item/{id}")
-    fun findById(@PathVariable("id") id: String): VideoEntity {
+    fun findById(request: HttpRequest, response: HttpResponse, @PathVariable("id") id: String): com.yanzhenjie.andserver.http.ResponseBody {
         val videoEntity = VideoUtil.findById(mContext, id)
 
         if (null != videoEntity) {
-            return videoEntity
+            val rangeHeader = request.getHeader("Range")
+            val videoFile = File(videoEntity.path)
+
+            return RangeSupportResponseBody(
+                contentType = MediaType("video", videoFile.extension),
+                file = videoFile,
+                rangeHeader = rangeHeader
+            ).attachToResponse(response)
         } else {
             throw IllegalArgumentException("Video item is not exist, id: $id")
         }
