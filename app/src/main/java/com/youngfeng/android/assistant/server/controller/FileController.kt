@@ -81,10 +81,6 @@ open class FileController {
             }
         }).toMutableList()
 
-        for (entity in data) {
-            Log.e("排序", "${entity.name}")
-        }
-
         return HttpResponseEntity.success(data)
     }
 
@@ -247,7 +243,7 @@ open class FileController {
                 return HttpResponseEntity.success()
             } else {
                 val response = ErrorBuilder().locale(locale).module(HttpModule.FileModule).error(HttpError.DeleteFileFail).build<Any>()
-                response.msg = "${deleteCount}删除成功，${paths.size - deleteCount}删除失败"
+                response.msg = "Delete ${deleteCount} success，${paths.size - deleteCount} failure."
                 return response
             }
         } catch (e: IOException) {
@@ -398,11 +394,6 @@ open class FileController {
             }
         })
 
-        if (null != data) {
-            for (entity in data) {
-                Log.e("排序", "${entity.name}")
-            }
-        }
         return HttpResponseEntity.success(data)
     }
 }
