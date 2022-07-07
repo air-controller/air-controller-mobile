@@ -38,7 +38,7 @@ object PhotoUtil {
                     val bucketId = cursor.getString(bucketIdIndex)
 
                     val album = map[bucketId] ?: let {
-                        val bucketName = cursor.getString(bucketNameIndex)
+                        val bucketName = cursor.getString(bucketNameIndex) ?: ""
                         val coverImageId = cursor.getString(idIndex)
                         val imageUri = cursor.getString(imageUriIndex)
 
