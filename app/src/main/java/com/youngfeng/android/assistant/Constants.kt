@@ -163,4 +163,7 @@ object Constants {
         "x3f",
         "rw2"
     )
+
+    const val ROOT_DIR_TYPE_SDCARD = 1
+    const val ROOT_DIR_TYPE_DOWNLOAD = 2
 }
