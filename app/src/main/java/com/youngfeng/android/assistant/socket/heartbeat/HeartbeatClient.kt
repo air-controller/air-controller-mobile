@@ -9,7 +9,9 @@ import java.io.IOException
 import java.net.Socket
 import java.util.Timer
 import java.util.TimerTask
-import java.util.concurrent.Executors
+import java.util.concurrent.SynchronousQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 
 interface HeartbeatClient {
     fun disconnect()
@@ -30,7 +32,15 @@ class HeartbeatClientImpl(
     private val onTimeout: (client: HeartbeatClient) -> Unit,
     private val onPeerReset: (client: HeartbeatClient) -> Unit
 ) : HeartbeatClient {
-    private val mExecutors by lazy { Executors.newCachedThreadPool() }
+    private val mExecutors by lazy {
+        val executor = ThreadPoolExecutor(
+            4, 8,
+            Long.MAX_VALUE, TimeUnit.SECONDS,
+            SynchronousQueue()
+        )
+        executor.allowCoreThreadTimeOut(false)
+        executor
+    }
     private val mGson by lazy { Gson() }
 
     // 记录上次响应客户端的时间

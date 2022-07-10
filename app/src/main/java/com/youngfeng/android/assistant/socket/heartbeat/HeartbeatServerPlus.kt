@@ -4,7 +4,9 @@ import com.youngfeng.android.assistant.Constants
 import timber.log.Timber
 import java.io.IOException
 import java.net.ServerSocket
-import java.util.concurrent.Executors
+import java.util.concurrent.SynchronousQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 
 interface HeartbeatServerPlus {
     fun start()
@@ -25,7 +27,13 @@ interface HeartbeatServerPlus {
 class HeartbeatServerPlusImpl(private var config: HeartbeatConfig) : HeartbeatServerPlus {
     private var isStarted = false
     private val mSingleExecutors by lazy {
-        Executors.newCachedThreadPool()
+        val executor = ThreadPoolExecutor(
+            4, 8,
+            Long.MAX_VALUE, TimeUnit.SECONDS,
+            SynchronousQueue()
+        )
+        executor.allowCoreThreadTimeOut(false)
+        executor
     }
     private lateinit var mServerSocket: ServerSocket
     private val mListeners = mutableListOf<HeartbeatListener>()

@@ -35,6 +35,7 @@ import com.youngfeng.android.assistant.home.HomeViewModel
 import com.youngfeng.android.assistant.model.DesktopInfo
 import com.youngfeng.android.assistant.model.Device
 import com.youngfeng.android.assistant.scan.ScanActivity
+import com.youngfeng.android.assistant.service.NetworkService
 import com.youngfeng.android.assistant.util.CommonUtil
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -104,6 +105,17 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         }
 
         registerUninstallLauncher()
+        startNetworkService()
+    }
+
+    private fun startNetworkService() {
+        val intent = Intent().setClass(this, NetworkService::class.java)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent)
+        } else {
+            startService(intent)
+        }
     }
 
     private fun initializeUI() {

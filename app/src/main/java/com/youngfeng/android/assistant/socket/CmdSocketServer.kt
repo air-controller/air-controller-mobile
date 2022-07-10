@@ -1,10 +1,10 @@
 package com.youngfeng.android.assistant.socket
 
-import android.util.Log
 import com.google.gson.Gson
 import com.youngfeng.android.assistant.Constants
 import com.youngfeng.android.assistant.app.AirControllerApp
 import com.youngfeng.android.assistant.model.Command
+import timber.log.Timber
 
 class CmdSocketServer(private val application: AirControllerApp) {
     private val mSocketServer by lazy {
@@ -18,34 +18,30 @@ class CmdSocketServer(private val application: AirControllerApp) {
 
     init {
         mSocketServer.onStartComplete {
-            Log.d(TAG, "CmdSocketServer start complete.")
+            Timber.d("CmdSocketServer start complete.")
             onOpen?.invoke()
         }
 
         mSocketServer.onStartFail {
-            Log.d(TAG, "CmdSocketServer start fail, error: $it")
+            Timber.d("CmdSocketServer start fail, error: $it")
         }
 
         mSocketServer.onMessage { _, data ->
-            Log.e("@@@", "xxxxx, $data")
             application.runOnUiThread {
                 val str = String(data)
-                Log.e("@@@", "yyyyyy, $str")
 
-                Log.d(TAG, "Message received: $str")
                 val command = mGson.fromJson<Command<Any>>(str, Command::class.java)
                 onCommandReceive?.invoke(command)
             }
         }
 
         mSocketServer.onStopComplete {
-            Log.d(TAG, "CmdSocketServer stop complete.")
+            Timber.d("CmdSocketServer stop complete.")
         }
     }
 
     companion object {
         private val instance = CmdSocketServer(AirControllerApp.getInstance())
-        private val TAG = CmdSocketServer::class.simpleName
 
         fun getInstance() = instance
     }

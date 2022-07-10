@@ -1,11 +1,12 @@
 package com.youngfeng.android.assistant.socket
 
-import android.util.Log
 import timber.log.Timber
 import java.io.IOException
 import java.net.ServerSocket
 import java.net.Socket
-import java.util.concurrent.Executors
+import java.util.concurrent.SynchronousQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 
 /**
  * 用于快速创建Socket Server，处理通用逻辑。
@@ -13,7 +14,15 @@ import java.util.concurrent.Executors
  * @author Scott Smith 2021/12/29 16:13
  */
 class SimpleSocketServer(private val port: Int) {
-    private val mExecutorService = Executors.newCachedThreadPool()
+    private val mExecutorService by lazy {
+        val executor = ThreadPoolExecutor(
+            4, 8,
+            Long.MAX_VALUE, TimeUnit.SECONDS,
+            SynchronousQueue()
+        )
+        executor.allowCoreThreadTimeOut(false)
+        executor
+    }
     private var mServerSocket: ServerSocket? = null
     private var isStarted = false
     private var onStartComplete: ((server: ServerSocket) -> Unit)? = null
@@ -42,7 +51,6 @@ class SimpleSocketServer(private val port: Int) {
                         onSecondaryClientEnter?.invoke(client)
                         client.close()
                     } else {
-                        Log.d(TAG, "Client added: $client")
                         onClientConnect?.invoke(client)
                         mClients.add(client)
                         handleMessage(client)
@@ -68,12 +76,10 @@ class SimpleSocketServer(private val port: Int) {
                 if (-1 != bytesRead) {
                     data.addAll(buffer.slice(0 until bytesRead))
 
-                    Log.d(TAG, "handleMessage, port: ${client.localPort}, data length: ${data.size}, value: ${String(data.toByteArray())}, $onMessage")
                     onMessage?.invoke(client, data.toByteArray())
                 } else {
                     mClients.remove(client)
                     onClientDisconnect?.invoke(client)
-                    Log.d(TAG, "Remove this client [$client], bytesRead = -1")
                 }
             } while (bytesRead != -1)
         }
@@ -139,7 +145,7 @@ class SimpleSocketServer(private val port: Int) {
                 mClients.single().close()
                 mClients.clear()
             } catch (e: Exception) {
-                Log.e(TAG, "${e.message}")
+                Timber.e("${e.message}")
             }
         }
     }
