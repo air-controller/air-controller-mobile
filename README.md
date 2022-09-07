@@ -1,6 +1,6 @@
 # AirController
 
-[中文文档](https://github.com/air-controller/air-controller-desktop/blob/master/README_zh_CN.md)
+[中文文档](https://github.com/air-controller/air-controller-mobile/blob/master/README_zh_CN.md)
 
 AirController is a powerful, handy, and cross-platform desktop application, it can manage your android phone easily without connecting to a computer.
 
