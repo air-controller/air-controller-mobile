@@ -17,7 +17,7 @@ jobs:
       - android/restore-gradle-cache
       - run:
           name: Run Android tests
-          command: ./gradlew androidApp:testDebugUnitTest
+          command: ./gradlew air_controller_mobile:testDebugUnitTest
       - android/save-gradle-cache
       - android/save-build-cache
 
