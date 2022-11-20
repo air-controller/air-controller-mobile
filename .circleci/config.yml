@@ -1,0 +1,19 @@
+version: 2.1
+
+orbs:
+  android: circleci/android@2.1.2
+  flutter-orb: circleci/flutter@1.1.0
+  ruby: circleci/ruby@1.8.0
+  macos: circleci/macos@2.3.1
+
+jobs:
+  build:
+    executor:
+      name: android/android-machine
+      tag: 2022.03.1
+    steps:
+      - checkout
+      - flutter-orb/install_sdk_and_pub:
+          flutter_version: 2.10.3
+      - run:
+          command: flutter build android
