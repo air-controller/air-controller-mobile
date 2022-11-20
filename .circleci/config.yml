@@ -3,7 +3,9 @@ orbs:
 
 jobs:
   build:
-    executor: android/android
+    executor:
+      name: android/android-machine
+      tag: 2022.03.1
     steps:
       - checkout
       - android/restore-build-cache
