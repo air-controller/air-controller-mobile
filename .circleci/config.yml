@@ -22,5 +22,5 @@ jobs:
       - android/save-build-cache
 
       - store_artifacts:
-          path: app/build/outputs/apk/debug
+          path: app/build/outputs/apk/release
           
