@@ -2,6 +2,7 @@ package com.youngfeng.android.assistant.server.controller
 
 import android.media.MediaScannerConnection
 import android.text.TextUtils
+import com.yanzhenjie.andserver.annotation.CrossOrigin
 import com.yanzhenjie.andserver.annotation.PostMapping
 import com.yanzhenjie.andserver.annotation.RequestBody
 import com.yanzhenjie.andserver.annotation.RequestMapping
@@ -27,6 +28,7 @@ import java.io.File
 import java.lang.Exception
 import java.util.Locale
 
+@CrossOrigin
 @RestController
 @RequestMapping("/image")
 class ImageController {

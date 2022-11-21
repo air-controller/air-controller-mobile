@@ -2,6 +2,7 @@ package com.youngfeng.android.assistant.server.controller
 
 import android.Manifest
 import android.accounts.Account
+import com.yanzhenjie.andserver.annotation.CrossOrigin
 import com.yanzhenjie.andserver.annotation.PostMapping
 import com.yanzhenjie.andserver.annotation.RequestBody
 import com.yanzhenjie.andserver.annotation.RequestMapping
@@ -60,6 +61,7 @@ import org.greenrobot.eventbus.EventBus
 import pub.devrel.easypermissions.EasyPermissions
 import timber.log.Timber
 
+@CrossOrigin
 @RestController
 @RequestMapping("/contact")
 class ContactController {

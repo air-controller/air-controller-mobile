@@ -12,6 +12,7 @@ import android.util.Log
 import android.util.Size
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.yanzhenjie.andserver.annotation.CrossOrigin
 import com.yanzhenjie.andserver.annotation.GetMapping
 import com.yanzhenjie.andserver.annotation.PathVariable
 import com.yanzhenjie.andserver.annotation.QueryParam
@@ -44,6 +45,7 @@ import timber.log.Timber
 import java.io.File
 import java.net.URLEncoder
 
+@CrossOrigin
 @RestController
 @RequestMapping("/stream")
 class StreamController {

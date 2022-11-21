@@ -38,6 +38,7 @@ import java.io.File
 import java.lang.Exception
 import java.util.Locale
 
+@CrossOrigin
 @RestController
 @RequestMapping("/video")
 class VideoController {

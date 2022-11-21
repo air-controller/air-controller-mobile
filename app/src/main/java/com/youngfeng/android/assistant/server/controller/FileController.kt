@@ -28,6 +28,7 @@ import java.io.*
 import java.lang.Exception
 import java.util.Locale
 
+@CrossOrigin
 @RestController
 @RequestMapping("/file")
 open class FileController {

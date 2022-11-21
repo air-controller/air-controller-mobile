@@ -4,6 +4,7 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.text.TextUtils
+import com.yanzhenjie.andserver.annotation.CrossOrigin
 import com.yanzhenjie.andserver.annotation.PostMapping
 import com.yanzhenjie.andserver.annotation.RequestBody
 import com.yanzhenjie.andserver.annotation.RequestMapping
@@ -30,6 +31,7 @@ import timber.log.Timber
 import java.io.File
 import java.util.Locale
 
+@CrossOrigin
 @RestController
 @RequestMapping("/common")
 class CommonController {

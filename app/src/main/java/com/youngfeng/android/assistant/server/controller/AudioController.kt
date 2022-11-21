@@ -3,6 +3,7 @@ package com.youngfeng.android.assistant.server.controller
 import android.Manifest
 import android.media.MediaScannerConnection
 import android.text.TextUtils
+import com.yanzhenjie.andserver.annotation.CrossOrigin
 import com.yanzhenjie.andserver.annotation.GetMapping
 import com.yanzhenjie.andserver.annotation.PathVariable
 import com.yanzhenjie.andserver.annotation.PostMapping
@@ -34,6 +35,7 @@ import pub.devrel.easypermissions.EasyPermissions
 import java.io.File
 import java.util.Locale
 
+@CrossOrigin
 @RestController
 @RequestMapping("/audio")
 class AudioController {
