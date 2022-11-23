@@ -13,6 +13,10 @@
                         android:title="@string/scan"
                         android:icon="@mipmap/ic_scan" />
                 <item
+                        android:id="@+id/menu_connect"
+                        android:title="@string/set_web_connection"
+                        android:icon="@mipmap/ic_connect" />
+                <item
                         android:id="@+id/menu_about"
                         android:title="@string/about"
                         android:icon="@mipmap/ic_about" />

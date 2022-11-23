@@ -170,4 +170,8 @@ class CommonController {
         EventBus.getDefault().post(BatchUninstallEvent(packages))
         return HttpResponseEntity.success()
     }
+
+    fun connect(): HttpResponseEntity<Any> {
+        return HttpResponseEntity.success()
+    }
 }

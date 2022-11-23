@@ -39,6 +39,7 @@
     <string name="cancel">Cancel</string>
     <string name="expand">Expand</string>
     <string name="scan">Scan</string>
+    <string name="connect">Connect</string>
     <string name="about">About</string>
     <string name="rationale_camera_perm">Scanning QR code needs enable camera permission, please go to setting to enable it.</string>
     <string name="rationale_ask_ok">Enable immediately</string>
@@ -76,4 +77,13 @@
     <string name="upload_audio_file_fail">Upload audios failure</string>
     <string name="upload_video_file_failure">Upload videos failure</string>
     <string name="working">Working -_-</string>
+    <string name="ip_addr">IP</string>
+    <string name="access_control">Access Control</string>
+    <string name="security_access">Security</string>
+    <string name="allow">allow</string>
+    <string name="disallow">disallow</string>
+    <string name="no_pwd">none</string>
+    <string name="password">password</string>
+    <string name="web_pwd_requirement">Password must contain at least 6 digits</string>
+    <string name="set_web_connection">Set web connection</string>
 </resources>

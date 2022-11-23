@@ -1,11 +1,14 @@
 package com.youngfeng.android.assistant.util
 
 import android.content.Context
+import android.content.Context.WIFI_SERVICE
 import android.content.Intent
 import android.net.Uri
+import android.net.wifi.WifiManager
 import android.os.BatteryManager
 import android.os.Build
 import android.os.Environment
+import android.text.format.Formatter
 import androidx.core.content.FileProvider
 import com.youngfeng.android.assistant.model.StorageSize
 import com.youngfeng.android.assistant.server.entity.ApkInfo
@@ -74,5 +77,11 @@ object CommonUtil {
         intent.action = "android.settings.APPLICATION_DETAILS_SETTINGS"
         intent.data = Uri.fromParts("package", context.packageName, null)
         context.startActivity(intent)
+    }
+
+    fun getLocalIpAddress(context: Context): String? {
+        val wifiManager = context.applicationContext.getSystemService(WIFI_SERVICE) as WifiManager
+        val wifiInfo = wifiManager.connectionInfo
+        return Formatter.formatIpAddress(wifiInfo.ipAddress)
     }
 }

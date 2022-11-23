@@ -24,6 +24,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.youngfeng.android.assistant.about.AboutActivity
+import com.youngfeng.android.assistant.connection.view.ConnectionActivity
 import com.youngfeng.android.assistant.databinding.ActivityMainBinding
 import com.youngfeng.android.assistant.event.BatchUninstallEvent
 import com.youngfeng.android.assistant.event.DeviceConnectEvent
@@ -345,6 +346,12 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
 
         if (item.itemId == R.id.menu_about) {
             val intent = Intent(this, AboutActivity::class.java)
+            startActivity(intent)
+            return true
+        }
+
+        if (item.itemId == R.id.menu_connect) {
+            val intent = Intent(this, ConnectionActivity::class.java)
             startActivity(intent)
             return true
         }

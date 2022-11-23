@@ -39,6 +39,7 @@
     <string name="cancel">取消</string>
     <string name="expand">展开</string>
     <string name="scan">扫一扫</string>
+    <string name="connect">连接</string>
     <string name="about">关于</string>
     <string name="rationale_camera_perm">扫描二维码需要开启摄像头权限，请前往设置页面开启</string>
     <string name="rationale_ask_ok">立即开启</string>
@@ -76,4 +77,13 @@
     <string name="upload_audio_file_fail">上传音频失败</string>
     <string name="upload_video_file_failure">上传视频失败</string>
     <string name="working">工作中 -_- </string>
+    <string name="ip_addr">地址</string>
+    <string name="access_control">访问控制</string>
+    <string name="security_access">安全性</string>
+    <string name="allow">允许</string>
+    <string name="disallow">禁止</string>
+    <string name="no_pwd">无</string>
+    <string name="password">密码</string>
+    <string name="web_pwd_requirement">密码应至少包含6位数字</string>
+    <string name="set_web_connection">设置网页连接</string>
 </resources>

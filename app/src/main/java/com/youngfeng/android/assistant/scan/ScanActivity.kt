@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import cn.bingoogolapple.qrcode.core.QRCodeView
@@ -40,8 +41,7 @@ class ScanActivity : AppCompatActivity(), QRCodeView.Delegate, EasyPermissions.P
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scan)
 
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setHomeButtonEnabled(true)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         initZXingView()
         checkCameraPermission {
@@ -92,8 +92,6 @@ class ScanActivity : AppCompatActivity(), QRCodeView.Delegate, EasyPermissions.P
     }
 
     override fun onScanQRCodeSuccess(result: String) {
-        Log.d(TAG, "onScanQRCodeSuccess: $result")
-
         if (result.startsWith("http://") || result.startsWith("https://")) {
             openExternalBrowser(result)
         }
@@ -136,8 +134,12 @@ class ScanActivity : AppCompatActivity(), QRCodeView.Delegate, EasyPermissions.P
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        return super.onSupportNavigateUp()
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            finish()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onResume() {
