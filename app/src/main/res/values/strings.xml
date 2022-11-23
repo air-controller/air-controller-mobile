@@ -86,4 +86,6 @@
     <string name="password">密码</string>
     <string name="web_pwd_requirement">密码应至少包含6位数字</string>
     <string name="set_web_connection">设置网页连接</string>
+    <string name="web_access_is_not_allowed">网页访问是禁止的，请在手机端"设置网页连接-访问控制"设置"允许"</string>
+    <string name="web_passwd_is_not_correct">密码不正确，请重新输入</string>
 </resources>

@@ -64,6 +64,8 @@ enum class HttpError(var code: String, var value: Int) {
     // Common module
     UploadInstallFileFailure("01", R.string.install_bundle_upload_failure),
     InstallationFileNotFound("02", R.string.installation_package_not_found),
+    WebAccessIsNotAllowed("03", R.string.web_access_is_not_allowed),
+    PasswdIsInCorrect("04", R.string.web_passwd_is_not_correct),
 
     // System module, process common error
     LackOfNecessaryPermissions("01", R.string.lack_of_necessary_permissions);

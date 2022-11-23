@@ -86,4 +86,6 @@
     <string name="password">password</string>
     <string name="web_pwd_requirement">Password must contain at least 6 digits</string>
     <string name="set_web_connection">Set web connection</string>
+    <string name="web_access_is_not_allowed">Webpage access is prohibited, please set "Allow" in "Setting Webpage Connection-Access Control" on the mobile phone</string>
+    <string name="web_passwd_is_not_correct">Password is incorrect, please re-enter</string>
 </resources>

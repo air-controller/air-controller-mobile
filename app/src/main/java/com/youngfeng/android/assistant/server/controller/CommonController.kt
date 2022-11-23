@@ -17,11 +17,13 @@ import com.youngfeng.android.assistant.app.AirControllerApp
 import com.youngfeng.android.assistant.db.RoomDatabaseHolder
 import com.youngfeng.android.assistant.db.entity.UploadFileRecord
 import com.youngfeng.android.assistant.event.BatchUninstallEvent
+import com.youngfeng.android.assistant.manager.AccessControlManager
 import com.youngfeng.android.assistant.model.MobileInfo
 import com.youngfeng.android.assistant.server.HttpError
 import com.youngfeng.android.assistant.server.HttpModule
 import com.youngfeng.android.assistant.server.entity.HttpResponseEntity
 import com.youngfeng.android.assistant.server.entity.InstalledAppEntity
+import com.youngfeng.android.assistant.server.request.ConnectionRequest
 import com.youngfeng.android.assistant.server.util.ErrorBuilder
 import com.youngfeng.android.assistant.util.CommonUtil
 import com.youngfeng.android.assistant.util.MD5Helper
@@ -60,8 +62,7 @@ class CommonController {
             index++
             val appName = packageManager.getApplicationLabel(
                 packageManager.getApplicationInfo(
-                    it.packageName,
-                    0
+                    it.packageName, 0
                 )
             ).toString()
             val packageInfo = packageManager.getPackageInfo(it.packageName, 0)
@@ -127,10 +128,13 @@ class CommonController {
         } catch (e: Exception) {
             Timber.e("Upload install bundle failure, reason: ${e.message}")
             val languageCode = httpRequest.getHeader("languageCode")
-            val locale = if (!TextUtils.isEmpty(languageCode)) Locale(languageCode!!) else Locale("en")
+            val locale =
+                if (!TextUtils.isEmpty(languageCode)) Locale(languageCode!!) else Locale("en")
 
-            val response = ErrorBuilder().locale(locale).module(HttpModule.CommonModule).error(HttpError.UploadInstallFileFailure).build<Any>()
-            response.msg = mContext.getString(HttpError.UploadInstallFileFailure.value).replace("%s", "${e.message}")
+            val response = ErrorBuilder().locale(locale).module(HttpModule.CommonModule)
+                .error(HttpError.UploadInstallFileFailure).build<Any>()
+            response.msg = mContext.getString(HttpError.UploadInstallFileFailure.value)
+                .replace("%s", "${e.message}")
             return response
         }
     }
@@ -171,7 +175,22 @@ class CommonController {
         return HttpResponseEntity.success()
     }
 
-    fun connect(): HttpResponseEntity<Any> {
-        return HttpResponseEntity.success()
+    @ResponseBody
+    @PostMapping("/connect")
+    fun connect(@RequestBody reqEntity: ConnectionRequest): HttpResponseEntity<Any> {
+        if (AccessControlManager.getInstance().allowAccess) {
+            val enablePwd = AccessControlManager.getInstance().enablePwd
+            if (enablePwd) {
+                val passwd = AccessControlManager.getInstance().password
+                if (reqEntity.passwd != passwd) {
+                    return ErrorBuilder().module(HttpModule.CommonModule)
+                        .error(HttpError.PasswdIsInCorrect).build()
+                }
+            }
+            return HttpResponseEntity.success()
+        } else {
+            return ErrorBuilder().module(HttpModule.CommonModule)
+                .error(HttpError.WebAccessIsNotAllowed).build()
+        }
     }
 }
