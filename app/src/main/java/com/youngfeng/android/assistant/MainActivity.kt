@@ -31,6 +31,7 @@ import com.youngfeng.android.assistant.event.DeviceConnectEvent
 import com.youngfeng.android.assistant.event.DeviceDisconnectEvent
 import com.youngfeng.android.assistant.event.DeviceReportEvent
 import com.youngfeng.android.assistant.event.Permission
+import com.youngfeng.android.assistant.event.RequestDrawOverlayEvent
 import com.youngfeng.android.assistant.event.RequestPermissionsEvent
 import com.youngfeng.android.assistant.home.HomeViewModel
 import com.youngfeng.android.assistant.model.DesktopInfo
@@ -62,15 +63,28 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         AlertDialog.Builder(this)
             .setPositiveButton(
                 R.string.support
-            ) { _, _ ->
+            ) { dialog, _ ->
                 CommonUtil.openExternalBrowser(
                     this,
                     getString(R.string.url_project_desktop)
                 )
+                dialog.dismiss()
             }
             .setNegativeButton(R.string.refuse) { dialog, _ ->
                 dialog.dismiss()
             }.setMessage(R.string.tip_support_developer)
+            .create()
+    }
+    private val mRequestDrawOverlayDialog by lazy {
+        AlertDialog.Builder(this)
+            .setPositiveButton(
+                R.string.authorize_now
+            ) { _, _ ->
+                startDrawOverlayRequestActivity()
+            }
+            .setNegativeButton(R.string.cancel) { dialog, _ ->
+                dialog.dismiss()
+            }.setMessage(R.string.rationale_draw_overlay_window)
             .create()
     }
     private val mUninstalledPackages = mutableListOf<String>()
@@ -86,6 +100,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         private const val RC_PERM_GET_ACCOUNTS = 3
         private const val RC_PERM_READ_CONTACTS = 4
         private const val RC_PERM_WRITE_CONTACTS = 5
+        private const val RC_DIALOG_PERMISSION = 6
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -100,6 +115,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
 
         updatePermissionsStatus()
         requestPermissions(true)
+        requestFloatPermission()
 
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this)
@@ -274,6 +290,24 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         )
     }
 
+    private fun requestFloatPermission() {
+        if (!CommonUtil.checkFloatPermission(this)) {
+            mRequestDrawOverlayDialog.show()
+        }
+    }
+
+    private fun startDrawOverlayRequestActivity() {
+        val sdkInt = Build.VERSION.SDK_INT
+        if (sdkInt >= Build.VERSION_CODES.O) {
+            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
+            startActivity(intent)
+        } else if (sdkInt >= Build.VERSION_CODES.M) {
+            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
+            intent.data = Uri.parse("package:$packageName")
+            startActivity(intent)
+        }
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onDeviceConnected(event: DeviceConnectEvent) {
         mViewModel.setDeviceConnected(true)
@@ -323,6 +357,11 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         }.toTypedArray()
 
         mPermissionManager.requestMultiplePermissions(RC_PERMISSIONS, *permissions)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onRequestDrawOverlay(event: RequestDrawOverlayEvent) {
+        requestFloatPermission()
     }
 
     private fun batchUninstall(packageName: String) {

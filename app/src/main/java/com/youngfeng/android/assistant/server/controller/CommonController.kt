@@ -17,6 +17,7 @@ import com.youngfeng.android.assistant.app.AirControllerApp
 import com.youngfeng.android.assistant.db.RoomDatabaseHolder
 import com.youngfeng.android.assistant.db.entity.UploadFileRecord
 import com.youngfeng.android.assistant.event.BatchUninstallEvent
+import com.youngfeng.android.assistant.event.RequestDrawOverlayEvent
 import com.youngfeng.android.assistant.manager.AccessControlManager
 import com.youngfeng.android.assistant.model.MobileInfo
 import com.youngfeng.android.assistant.server.HttpError
@@ -171,6 +172,9 @@ class CommonController {
     @ResponseBody
     @PostMapping("/uninstall")
     fun unInstall(@RequestBody packages: List<String>): HttpResponseEntity<Any> {
+        if (!CommonUtil.checkFloatPermission(mContext)) {
+            EventBus.getDefault().post(RequestDrawOverlayEvent())
+        }
         EventBus.getDefault().post(BatchUninstallEvent(packages))
         return HttpResponseEntity.success()
     }

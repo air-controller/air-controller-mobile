@@ -88,4 +88,5 @@
     <string name="set_web_connection">Set web connection</string>
     <string name="web_access_is_not_allowed">Webpage access is prohibited, please set "Allow" in "Setting Webpage Connection-Access Control" on the mobile phone</string>
     <string name="web_passwd_is_not_correct">Password is incorrect, please re-enter</string>
+    <string name="rationale_draw_overlay_window">In order to serve you better, please allow AirController to be displayed on top of other applications</string>
 </resources>
