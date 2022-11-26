@@ -114,4 +114,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     implementation 'com.github.vestrel00:contacts-android:0.2.2'
     implementation "org.jetbrains.kotlin:kotlin-reflect:1.6.21"
+    implementation 'com.github.bumptech.glide:glide:4.14.2'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
 }

@@ -166,4 +166,7 @@ object Constants {
 
     const val ROOT_DIR_TYPE_SDCARD = 1
     const val ROOT_DIR_TYPE_DOWNLOAD = 2
+
+    const val URL_GITHUB_STAR = "https://img.shields.io/github/stars/air-controller/air-controller-desktop?style=social"
+    const val URL_GITHUB = "https://github.com/air-controller/air-controller-desktop"
 }

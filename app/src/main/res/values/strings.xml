@@ -89,4 +89,10 @@
     <string name="web_access_is_not_allowed">网页访问是禁止的，请在手机端"设置网页连接-访问控制"设置"允许"</string>
     <string name="web_passwd_is_not_correct">密码不正确，请重新输入</string>
     <string name="rationale_draw_overlay_window">为了更好地给你提供服务，请允许AirController显示在其它应用的上层</string>
+    <string name="star">Star</string>
+    <string name="choose_a_way_to_support">选择一种方式支持作者</string>
+    <string name="give_a_reward">打赏</string>
+    <string name="qr_code_saved">二维码已保存到相册</string>
+    <string name="reward_any_amount">打赏任意金额，支持作者继续开发，谢谢您的支持！</string>
+    <string name="watch_ad">看广告</string>
 </resources>

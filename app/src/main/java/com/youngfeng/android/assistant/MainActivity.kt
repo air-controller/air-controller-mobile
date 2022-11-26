@@ -38,6 +38,7 @@ import com.youngfeng.android.assistant.model.DesktopInfo
 import com.youngfeng.android.assistant.model.Device
 import com.youngfeng.android.assistant.scan.ScanActivity
 import com.youngfeng.android.assistant.service.NetworkService
+import com.youngfeng.android.assistant.support.DeveloperSupportActivity
 import com.youngfeng.android.assistant.util.CommonUtil
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -57,22 +58,6 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
             .setNegativeButton(R.string.cancel) { dialog, _ ->
                 dialog.dismiss()
             }.setMessage(R.string.tip_disconnect)
-            .create()
-    }
-    private val mSupportDeveloperDialog by lazy {
-        AlertDialog.Builder(this)
-            .setPositiveButton(
-                R.string.support
-            ) { dialog, _ ->
-                CommonUtil.openExternalBrowser(
-                    this,
-                    getString(R.string.url_project_desktop)
-                )
-                dialog.dismiss()
-            }
-            .setNegativeButton(R.string.refuse) { dialog, _ ->
-                dialog.dismiss()
-            }.setMessage(R.string.tip_support_developer)
             .create()
     }
     private val mRequestDrawOverlayDialog by lazy {
@@ -157,7 +142,8 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
             }
 
             this.textSupportDeveloper.setOnClickListener {
-                if (!mSupportDeveloperDialog.isShowing) mSupportDeveloperDialog.show()
+                val intent = Intent(this@MainActivity, DeveloperSupportActivity::class.java)
+                startActivity(intent)
             }
 
             this.textAuthorizeNow.apply {
@@ -252,6 +238,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
             Manifest.permission.GET_ACCOUNTS,
             Manifest.permission.READ_CONTACTS,
             Manifest.permission.WRITE_CONTACTS,
+            Manifest.permission.REQUEST_INSTALL_PACKAGES
         )
 
         EasyPermissions.hasPermissions(this, *permissions.toTypedArray()).apply {
