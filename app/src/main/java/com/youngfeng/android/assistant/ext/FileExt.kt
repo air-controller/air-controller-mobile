@@ -27,3 +27,20 @@ val File.isDoc: Boolean
     get() {
         return Constants.DOCUMENT_SUFFIX.contains(this.extension.lowercase())
     }
+
+fun File.deleteRecursivelyWhere(where: (File) -> Boolean) {
+    if (this.isDirectory) {
+        this.listFiles()?.forEach {
+            it.deleteRecursivelyWhere(where)
+        }
+    }
+
+    if (where(this)) {
+        this.delete()
+    }
+}
+
+val File.isHiddenFile: Boolean
+    get() {
+        return this.name.startsWith(".")
+    }

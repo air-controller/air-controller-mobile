@@ -1,8 +1,11 @@
 package com.youngfeng.android.assistant.util
 
 import android.content.Context
+import android.media.MediaScannerConnection
 import android.provider.MediaStore
 import com.youngfeng.android.assistant.server.entity.AudioEntity
+import com.youngfeng.android.assistant.server.entity.DeleteResultEntity
+import java.io.File
 
 object AudioUtil {
 
@@ -121,5 +124,44 @@ object AudioUtil {
             }
 
         return null
+    }
+
+    fun deleteByIds(context: Context, ids: List<String>): DeleteResultEntity {
+        var successCount = 0
+        ids.forEach {
+            findById(context, it)?.apply {
+                if (delete(context, this)) {
+                    successCount ++
+                }
+            }
+        }
+
+        return if (successCount == ids.size) {
+            DeleteResultEntity.success()
+        } else if (successCount > 0 && successCount < ids.size) {
+            DeleteResultEntity.partial(failedCount = ids.size - successCount)
+        } else {
+            DeleteResultEntity.failed()
+        }
+    }
+
+    fun delete(context: Context, audio: AudioEntity): Boolean {
+        try {
+            val file = File(audio.path)
+            if (file.exists()) {
+                if (file.delete()) {
+                    MediaScannerConnection.scanFile(
+                        context,
+                        arrayOf(audio.path),
+                        arrayOf("audio/*")
+                    ) { _, _ -> }
+                    return true
+                }
+            }
+            return false
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        }
     }
 }

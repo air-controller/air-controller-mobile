@@ -1,38 +1,41 @@
 package com.youngfeng.android.assistant.server.controller
 
 import android.media.MediaScannerConnection
-import android.text.TextUtils
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.yanzhenjie.andserver.annotation.CrossOrigin
+import com.yanzhenjie.andserver.annotation.GetMapping
 import com.yanzhenjie.andserver.annotation.PostMapping
+import com.yanzhenjie.andserver.annotation.QueryParam
 import com.yanzhenjie.andserver.annotation.RequestBody
 import com.yanzhenjie.andserver.annotation.RequestMapping
 import com.yanzhenjie.andserver.annotation.RequestParam
 import com.yanzhenjie.andserver.annotation.ResponseBody
 import com.yanzhenjie.andserver.annotation.RestController
-import com.yanzhenjie.andserver.http.HttpRequest
 import com.yanzhenjie.andserver.http.multipart.MultipartFile
-import com.youngfeng.android.assistant.R
 import com.youngfeng.android.assistant.app.AirControllerApp
-import com.youngfeng.android.assistant.ext.getString
+import com.youngfeng.android.assistant.db.RoomDatabaseHolder
+import com.youngfeng.android.assistant.db.entity.ZipFileRecord
 import com.youngfeng.android.assistant.server.HttpError
 import com.youngfeng.android.assistant.server.HttpModule
 import com.youngfeng.android.assistant.server.entity.*
-import com.youngfeng.android.assistant.server.request.DeleteAlbumsRequest
-import com.youngfeng.android.assistant.server.request.DeleteImageRequest
 import com.youngfeng.android.assistant.server.request.GetAlbumImagesRequest
+import com.youngfeng.android.assistant.server.request.IdsRequest
 import com.youngfeng.android.assistant.server.util.ErrorBuilder
+import com.youngfeng.android.assistant.util.CommonUtil
+import com.youngfeng.android.assistant.util.MD5Helper
 import com.youngfeng.android.assistant.util.PathHelper
 import com.youngfeng.android.assistant.util.PhotoUtil
-import timber.log.Timber
+import net.lingala.zip4j.ZipFile
+import net.lingala.zip4j.model.ZipParameters
 import java.io.File
-import java.lang.Exception
-import java.util.Locale
 
 @CrossOrigin
 @RestController
 @RequestMapping("/image")
 class ImageController {
     private val mContext by lazy { AirControllerApp.getInstance() }
+    private val mGson by lazy { Gson() }
 
     companion object {
         private const val POS_ALL = 1
@@ -71,116 +74,46 @@ class ImageController {
         return HttpResponseEntity.success(images)
     }
 
-    @PostMapping("/delete")
+    @PostMapping("/deleteImages")
     @ResponseBody
-    fun deleteImage(
-        httpRequest: HttpRequest,
-        @RequestBody request: DeleteImageRequest
+    fun deleteImages(
+        @RequestBody request: IdsRequest
     ): HttpResponseEntity<Any> {
-        val languageCode = httpRequest.getHeader("languageCode")
-        val locale = if (!TextUtils.isEmpty(languageCode)) Locale(languageCode!!) else Locale("en")
-
-        try {
-            val resultMap = HashMap<String, String>()
-            val imageFiles = ArrayList<String>()
-            var isAllSuccess = true
-            request.paths.forEach { imgPath ->
-                val imageFile = File(imgPath)
-                imageFiles.add(imageFile.absolutePath)
-                if (!imageFile.exists()) {
-                    isAllSuccess = false
-                    resultMap[imgPath] =
-                        mContext.getString(locale, HttpError.ImageFileNotExist.value)
-                } else {
-                    val isSuccess = imageFile.delete()
-                    if (!isSuccess) {
-                        isAllSuccess = false
-                        resultMap[imgPath] =
-                            mContext.getString(locale, HttpError.DeleteImageFail.value)
-                    }
-                }
+        val deleteResult = PhotoUtil.deleteImageByIds(mContext, request.ids)
+        return when (deleteResult.result) {
+            DeleteResult.SUCCESS -> {
+                HttpResponseEntity.success()
             }
-            if (imageFiles.size > 0) {
-                MediaScannerConnection.scanFile(
-                    mContext,
-                    imageFiles.toTypedArray(),
-                    null
-                ) { path, uri ->
-                    Timber.d("Path: $path, uri: ${uri?.path}")
-                }
+            DeleteResult.PARTIAL -> {
+                val response = ErrorBuilder().module(HttpModule.ImageModule).error(HttpError.DeleteImagePartialFailure).build<Any>()
+                response.msg = response.msg?.format("%s", deleteResult.failedCount.toString())
+                response
             }
-            if (!isAllSuccess) {
-                val response = ErrorBuilder().locale(locale).module(HttpModule.ImageModule)
-                    .error(HttpError.DeleteImageFail).build<Any>()
-                response.msg = resultMap.map { "${it.key}[${it.value}];" }.toString()
-                return response
+            else -> {
+                ErrorBuilder().module(HttpModule.ImageModule).error(HttpError.DeleteImageFail).build()
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            val response = ErrorBuilder().locale(locale).module(HttpModule.ImageModule)
-                .error(HttpError.DeleteImageFail).build<Any>()
-            response.msg = e.message
-            return response
         }
-
-        return HttpResponseEntity.success()
     }
 
     @PostMapping("/deleteAlbums")
     @ResponseBody
     fun deleteAlbums(
-        httpRequest: HttpRequest,
-        @RequestBody request: DeleteAlbumsRequest
+        @RequestBody request: IdsRequest
     ): HttpResponseEntity<Any> {
-        val languageCode = httpRequest.getHeader("languageCode")
-        val locale = if (!TextUtils.isEmpty(languageCode)) Locale(languageCode!!) else Locale("en")
-        try {
-            val paths = request.paths
-
-            var deleteItemNum = 0
-            paths.forEach { path ->
-                val file = File(path)
-                if (!file.exists()) {
-                    val response = ErrorBuilder().locale(locale).module(HttpModule.ImageModule)
-                        .error(HttpError.DeleteAlbumFail).build<Any>()
-                    response.msg = convertToDeleteAlbumError(locale, paths.size, deleteItemNum)
-                    return response
-                } else {
-                    val isSuccess = file.deleteRecursively()
-                    if (!isSuccess) {
-                        val response = ErrorBuilder().locale(locale).module(HttpModule.ImageModule)
-                            .error(HttpError.DeleteAlbumFail).build<Any>()
-                        response.msg = convertToDeleteAlbumError(locale, paths.size, deleteItemNum)
-                        return response
-                    } else {
-                        MediaScannerConnection.scanFile(mContext, arrayOf(path), null, null)
-                    }
-                }
-
-                deleteItemNum++
+        val deleteResult = PhotoUtil.deleteAlbumByIds(mContext, request.ids)
+        return when (deleteResult.result) {
+            DeleteResult.SUCCESS -> {
+                HttpResponseEntity.success()
             }
-
-            return HttpResponseEntity.success()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            val response = ErrorBuilder().locale(locale).module(HttpModule.ImageModule)
-                .error(HttpError.DeleteAlbumFail).build<Any>()
-            response.msg = e.message
-            return response
+            DeleteResult.PARTIAL -> {
+                val response = ErrorBuilder().module(HttpModule.ImageModule).error(HttpError.DeleteAlbumPartialFailure).build<Any>()
+                response.msg = response.msg?.format("%s", deleteResult.failedCount.toString())
+                response
+            }
+            else -> {
+                ErrorBuilder().module(HttpModule.ImageModule).error(HttpError.DeleteAlbumFail).build()
+            }
         }
-    }
-
-    private fun convertToDeleteAlbumError(
-        locale: Locale,
-        albumNum: Int,
-        deletedItemNum: Int
-    ): String {
-        if (deletedItemNum > 0) {
-            return mContext.getString(locale, R.string.place_holder_delete_part_of_success)
-                .format(albumNum, deletedItemNum)
-        }
-
-        return mContext.getString(locale, R.string.delete_album_fail)
     }
 
     @PostMapping("/imagesOfAlbum")
@@ -234,5 +167,139 @@ class ImageController {
         }
 
         return HttpResponseEntity.success(images)
+    }
+
+    @GetMapping("/downloadImages")
+    fun downloadImages(@QueryParam("ids") ids: String): File? {
+        val idList = mGson.fromJson<List<String>>(ids, object : TypeToken<List<String>>() {}.type)
+
+        if (idList.isEmpty()) return null
+
+        if (idList.size == 1) {
+            val id = idList[0]
+            val image = PhotoUtil.findImageById(mContext, id) ?: return null
+
+            val file = File(image.path)
+
+            if (file.isFile) {
+                if (file.exists()) {
+                    return file
+                }
+            }
+
+            return null
+        }
+
+        val images = mutableListOf<ImageEntity>()
+        idList.forEach { id ->
+            PhotoUtil.findImageById(mContext, id)?.apply {
+                images.add(this)
+            }
+        }
+
+        CommonUtil.findZipCacheWithPaths(mContext, images.map { it.path })?.apply { return this }
+
+        return compressImages(images).file
+    }
+
+    @GetMapping("/downloadAlbums")
+    fun downloadAlbums(@QueryParam("ids") ids: String): File? {
+        val idList = mGson.fromJson<List<String>>(ids, object : TypeToken<List<String>>() {}.type)
+
+        if (idList.isEmpty()) return null
+
+        if (idList.size == 1) {
+            val id = idList[0]
+            val images = PhotoUtil.getImagesOfAlbum(mContext, id)
+            if (images.isEmpty()) return null
+
+            CommonUtil.findZipCacheWithPaths(mContext, images.map { it.path })?.apply { return this }
+        }
+
+        val albums = mutableListOf<AlbumEntity>()
+        val videos = mutableListOf<ImageEntity>()
+        idList.forEach {
+            PhotoUtil.findAlbumById(mContext, it)?.apply {
+                albums.add(this)
+                PhotoUtil.getImagesOfAlbum(mContext, this.id).apply {
+                    videos.addAll(this)
+                }
+            }
+        }
+        CommonUtil.findZipCacheWithPaths(mContext, videos.map { it.path }.toMutableList())?.apply { return this }
+
+        return compressAlbums(albums).file
+    }
+
+    private fun compressAlbums(albums: List<AlbumEntity>): ZipFile {
+        val db = RoomDatabaseHolder.getRoomDatabase(mContext)
+        val zipFileRecordDao = db.zipFileRecordDao()
+
+        val originalFilesMD5Json = mutableMapOf<String, String>()
+
+        val zipFile = ZipFile("${PathHelper.zipFileDir().absolutePath}/albums_${System.currentTimeMillis()}.zip")
+
+        val videos = mutableListOf<ImageEntity>()
+        albums.forEach { album ->
+            PhotoUtil.findAlbumById(mContext, album.id)?.apply {
+                PhotoUtil.getImagesOfAlbum(mContext, this.id).onEach {
+                    val file = File(it.path)
+
+                    zipFile.addFile(file, ZipParameters().apply { fileNameInZip = "${album.name}/${file.name}" })
+
+                    originalFilesMD5Json[file.absolutePath] = MD5Helper.md5(file)
+
+                    videos.add(it)
+                }
+            }
+        }
+
+        val sortedOriginalPathsMD5 = MD5Helper.md5(videos.map { it.path }.sorted().joinToString(","))
+
+        val record = ZipFileRecord(
+            name = zipFile.file.name,
+            path = zipFile.file.path,
+            md5 = MD5Helper.md5(zipFile.file),
+            originalFilesMD5 = mGson.toJson(originalFilesMD5Json),
+            originalPathsMD5 = sortedOriginalPathsMD5,
+            createTime = System.currentTimeMillis(),
+            isMultiOriginalFile = true
+        )
+
+        zipFileRecordDao.insert(record)
+
+        return zipFile
+    }
+
+    private fun compressImages(images: List<ImageEntity>): ZipFile {
+        val db = RoomDatabaseHolder.getRoomDatabase(mContext)
+        val zipFileRecordDao = db.zipFileRecordDao()
+
+        val originalFilesMD5Json = mutableMapOf<String, String>()
+        val sortedOriginalPathsMD5 = MD5Helper.md5(images.map { it.path }.sorted().joinToString(","))
+
+        val zipFile = ZipFile("${PathHelper.zipFileDir().absolutePath}/images_${System.currentTimeMillis()}.zip")
+
+        images.forEach {
+            val file = File(it.path)
+
+            zipFile.addFile(file)
+
+            originalFilesMD5Json[file.absolutePath] = MD5Helper.md5(file)
+        }
+
+        val record = ZipFileRecord(
+            name = zipFile.file.name,
+            path = zipFile.file.path,
+            md5 = MD5Helper.md5(zipFile.file),
+            originalFilesMD5 = mGson.toJson(originalFilesMD5Json),
+            originalPathsMD5 = sortedOriginalPathsMD5,
+            createTime = System.currentTimeMillis(),
+            isMultiOriginalFile = true
+        )
+
+        zipFileRecordDao.insert(record)
+
+        return zipFile
     }
 }

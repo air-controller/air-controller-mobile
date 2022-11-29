@@ -33,6 +33,7 @@ enum class HttpError(var code: String, var value: Int) {
     DeleteFileFail("08", R.string.delete_file_fail),
     RenameFileFail("09", R.string.rename_file_fail),
     MoveFileFail("10", R.string.move_file_fail),
+    DeleteFilePartialFailure("11", R.string.delete_file_partial_failure),
 
     // 图片模块
     DeleteImageFail("01", R.string.delete_image_fail),
@@ -40,14 +41,20 @@ enum class HttpError(var code: String, var value: Int) {
     ImageFileNotExist("03", R.string.image_not_exist),
     DeleteAlbumFail("04", R.string.delete_album_fail),
     GetPhotoDirFailure("05", R.string.get_photo_dir_failure),
+    DeleteImagePartialFailure("06", R.string.delete_image_partial_failure),
+    DeleteAlbumPartialFailure("07", R.string.delete_album_partial_failure),
 
     // 音频模块
     DeleteAudioFail("01", R.string.delete_audio_file_fail),
     UploadAudioFail("02", R.string.upload_audio_file_fail),
+    DeleteAudioPartialFailure("03", R.string.delete_audio_partial_failure),
 
     // 视频模块
     DeleteVideoFail("01", R.string.delete_video_file_fail),
     UploadVideoFailure("02", R.string.upload_video_file_failure),
+    DeleteVideoPartialFailure("03", R.string.delete_video_partial_failure),
+    DeleteVideoFolderPartialFailure("04", R.string.delete_video_folder_partial_failure),
+    DeleteVideoFolderFail("05", R.string.delete_video_folder_fail),
 
     // 下载模块
     GetDownloadDirFail("01", R.string.get_download_dir_fail),

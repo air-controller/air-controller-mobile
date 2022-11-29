@@ -95,4 +95,11 @@
     <string name="qr_code_saved">The QR code has been saved to the photo album</string>
     <string name="reward_any_amount">Reward any amount, support the author to continue to develop, thank you for your support!</string>
     <string name="watch_ad">Watch Ads</string>
+    <string name="delete_image_partial_failure">Some pictures failed to delete, the number of failures: %s</string>
+    <string name="delete_album_partial_failure">Some albums failed to delete, the number of failures: %s</string>
+    <string name="delete_audio_partial_failure">Some audios failed to delete, the number of failures: %s</string>
+    <string name="delete_video_partial_failure">Some videos failed to delete, the number of failures: %s</string>
+    <string name="delete_video_folder_partial_failure">Some video folders failed to delete, the number of failures: %s</string>
+    <string name="delete_video_folder_fail">Delete video folders failed</string>
+    <string name="delete_file_partial_failure">Some files failed to delete, the number of failures: %s</string>
 </resources>

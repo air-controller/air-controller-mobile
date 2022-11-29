@@ -95,4 +95,11 @@
     <string name="qr_code_saved">二维码已保存到相册</string>
     <string name="reward_any_amount">打赏任意金额，支持作者继续开发，谢谢您的支持！</string>
     <string name="watch_ad">看广告</string>
+    <string name="delete_image_partial_failure">部分图片删除失败，失败数量：%s</string>
+    <string name="delete_album_partial_failure">部分相册删除失败，失败数量：%s</string>
+    <string name="delete_audio_partial_failure">部分音频删除失败，失败数量：%s</string>
+    <string name="delete_video_partial_failure">部分视频删除失败，失败数量：%s</string>
+    <string name="delete_video_folder_partial_failure">部分视频文件夹删除失败，失败数量：%s</string>
+    <string name="delete_video_folder_fail">删除视频文件夹失败</string>
+    <string name="delete_file_partial_failure">部分文件删除失败，失败数量：%s</string>
 </resources>

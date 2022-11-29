@@ -17,10 +17,12 @@ import com.youngfeng.android.assistant.event.RequestPermissionsEvent
 import com.youngfeng.android.assistant.ext.isValidFileName
 import com.youngfeng.android.assistant.server.HttpError
 import com.youngfeng.android.assistant.server.HttpModule
+import com.youngfeng.android.assistant.server.entity.DeleteResult
 import com.youngfeng.android.assistant.server.entity.FileEntity
 import com.youngfeng.android.assistant.server.entity.HttpResponseEntity
 import com.youngfeng.android.assistant.server.request.*
 import com.youngfeng.android.assistant.server.util.ErrorBuilder
+import com.youngfeng.android.assistant.util.CommonUtil
 import net.lingala.zip4j.ZipFile
 import org.greenrobot.eventbus.EventBus
 import pub.devrel.easypermissions.EasyPermissions
@@ -235,59 +237,23 @@ open class FileController {
     @PostMapping("/deleteMulti")
     @ResponseBody
     fun deleteMulti(
-        httpRequest: HttpRequest,
         @RequestBody request: DeleteMultiFileRequest
     ): HttpResponseEntity<Any> {
-        val languageCode = httpRequest.getHeader("languageCode")
-        val locale = if (!TextUtils.isEmpty(languageCode)) Locale(languageCode!!) else Locale("en")
-
-        // 先判断是否存在写入外部存储权限
-        if (ContextCompat.checkSelfPermission(
-                AirControllerApp.getInstance(),
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return ErrorBuilder().locale(locale).module(HttpModule.FileModule)
-                .error(HttpError.NoWriteExternalStoragePerm).build()
-        }
-
-        try {
-            val paths = request.paths
-
-            var deleteCount = 0
-
-            paths.forEachIndexed { index, path ->
-                val file = File(path)
-
-                if (file.exists()) {
-                    if (file.isDirectory) {
-                        if (file.deleteRecursively()) {
-                            deleteCount++
-                            MediaScannerConnection.scanFile(mContext, arrayOf(path), null, null)
-                        }
-                    } else {
-                        if (file.delete()) {
-                            deleteCount++
-                            MediaScannerConnection.scanFile(mContext, arrayOf(path), null, null)
-                        }
-                    }
-                }
+        val files = request.paths.map { File(it) }
+        val deleteResult = CommonUtil.deleteFiles(files)
+        return when (deleteResult.result) {
+            DeleteResult.SUCCESS -> {
+                HttpResponseEntity.success()
             }
-
-            if (deleteCount == paths.size) {
-                return HttpResponseEntity.success()
-            } else {
-                val response = ErrorBuilder().locale(locale).module(HttpModule.FileModule)
-                    .error(HttpError.DeleteFileFail).build<Any>()
-                response.msg = "Delete ${deleteCount} success，${paths.size - deleteCount} failure."
-                return response
+            DeleteResult.PARTIAL -> {
+                val response = ErrorBuilder().module(HttpModule.FileModule)
+                    .error(HttpError.DeleteFilePartialFailure).build<Any>()
+                response.msg = response.msg?.format("%s", deleteResult.failedCount.toString())
+                response
             }
-        } catch (e: IOException) {
-            e.printStackTrace()
-            val response = ErrorBuilder().locale(locale).module(HttpModule.FileModule)
-                .error(HttpError.DeleteFileFail).build<Any>()
-            response.msg = e.message
-            return response
+            else -> {
+                ErrorBuilder().module(HttpModule.FileModule).error(HttpError.DeleteFileFail).build()
+            }
         }
     }
 

@@ -9,8 +9,12 @@ import android.os.Build
 import android.os.Environment
 import android.provider.Settings
 import androidx.core.content.FileProvider
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.youngfeng.android.assistant.db.RoomDatabaseHolder
 import com.youngfeng.android.assistant.model.StorageSize
 import com.youngfeng.android.assistant.server.entity.ApkInfo
+import com.youngfeng.android.assistant.server.entity.DeleteResultEntity
 import java.io.File
 import java.lang.reflect.Field
 import java.lang.reflect.Method
@@ -103,6 +107,82 @@ object CommonUtil {
                 e.printStackTrace()
                 false
             }
+        }
+    }
+
+    fun findZipCacheWithPaths(context: Context, paths: List<String>): File? {
+        val db = RoomDatabaseHolder.getRoomDatabase(context)
+        val zipFileRecordDao = db.zipFileRecordDao()
+        val sortedOriginalPathsMD5 = MD5Helper.md5(paths.sorted().joinToString(","))
+
+        val zipFileRecord =
+            zipFileRecordDao.findByOriginalPathsMd5(sortedOriginalPathsMD5).singleOrNull()
+
+        if (null != zipFileRecord) {
+            if (zipFileRecord.isMultiOriginalFile) {
+                var isMatch = true
+
+                val gson = Gson()
+                val originalFileMD5Map = gson.fromJson<Map<String, String>>(
+                    zipFileRecord.originalFilesMD5,
+                    object : TypeToken<Map<String, String>>() {}.type
+                )
+
+                kotlin.run {
+                    paths.forEach {
+                        val current = File(it)
+
+                        if (MD5Helper.md5(current) != originalFileMD5Map[current.absolutePath]) {
+                            isMatch = false
+                            return@run
+                        }
+                    }
+                }
+
+                if (isMatch) {
+                    val zipOldFile = File(zipFileRecord.path)
+
+                    if (zipOldFile.exists()) return zipOldFile
+                }
+            }
+        }
+
+        return null
+    }
+
+    fun deleteFiles(files: List<File>): DeleteResultEntity {
+        try {
+            var successCount = 0
+
+            files.forEach {
+                if (deleteFile(it)) {
+                    successCount++
+                }
+            }
+
+            return if (successCount == files.size) {
+                DeleteResultEntity.success()
+            } else if (successCount > 0 && successCount < files.size) {
+                DeleteResultEntity.partial(failedCount = files.size - successCount)
+            } else {
+                DeleteResultEntity.failed()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return DeleteResultEntity.failed()
+        }
+    }
+
+    fun deleteFile(file: File): Boolean {
+        return try {
+            if (file.exists()) {
+                file.delete()
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
         }
     }
 }
