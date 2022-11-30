@@ -12,7 +12,6 @@ import com.youngfeng.android.assistant.view.RewardDialog
 
 class DeveloperSupportActivity : AppCompatActivity() {
     private val mStarBtn by lazy { findViewById<LinearLayoutCompat>(R.id.btn_star) }
-    private val mWatchAd by lazy { findViewById<LinearLayoutCompat>(R.id.btn_watch_ad) }
     private val mRewardBtn by lazy { findViewById<AppCompatButton>(R.id.btn_reward) }
 
     private val mRewardDialog by lazy { RewardDialog(this) }
@@ -36,7 +35,6 @@ class DeveloperSupportActivity : AppCompatActivity() {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
         }
-        mWatchAd.setOnClickListener { }
         mRewardBtn.setOnClickListener {
             mRewardDialog.show()
         }
