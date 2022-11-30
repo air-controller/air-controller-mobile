@@ -5,6 +5,9 @@ dependencyResolutionManagement {
         mavenCentral()
         jcenter()
         maven { url "https://jitpack.io" }
+        maven {
+            url 'https://artifact.bytedance.com/repository/pangle'
+        }
     }
 }
 rootProject.name = "air_controller_mobile"

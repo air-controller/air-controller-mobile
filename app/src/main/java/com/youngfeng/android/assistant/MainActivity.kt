@@ -14,6 +14,7 @@ import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.ActivityResultLauncher
@@ -23,6 +24,12 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import com.bytedance.sdk.openadsdk.AdSlot
+import com.bytedance.sdk.openadsdk.TTAdLoadType
+import com.bytedance.sdk.openadsdk.TTAdNative
+import com.bytedance.sdk.openadsdk.TTAdNative.NativeExpressAdListener
+import com.bytedance.sdk.openadsdk.TTAdSdk
+import com.bytedance.sdk.openadsdk.TTNativeExpressAd
 import com.youngfeng.android.assistant.about.AboutActivity
 import com.youngfeng.android.assistant.connection.view.ConnectionActivity
 import com.youngfeng.android.assistant.databinding.ActivityMainBinding
@@ -77,6 +84,8 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
     private val mPermissionManager by lazy {
         com.youngfeng.android.assistant.manager.PermissionManager.with(this)
     }
+    private var mTTAdNative: TTAdNative? = null
+    private var mTTExpressAd: TTNativeExpressAd? = null
 
     companion object {
         private const val TAG = "MainActivity"
@@ -108,6 +117,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
 
         registerUninstallLauncher()
         startNetworkService()
+        initTTBannerAd()
     }
 
     private fun startNetworkService() {
@@ -358,6 +368,34 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         mUninstallLauncher.launch(intent)
     }
 
+    private fun initTTBannerAd() {
+        mTTAdNative = TTAdSdk.getAdManager().createAdNative(this)
+    }
+
+    private fun showBannerAd() {
+        val adSlot = AdSlot.Builder()
+            .setCodeId(Constants.TTAdConst.TT_AD_HOME_BANNER_CODE_ID)
+            .setSupportDeepLink(true)
+            .setAdCount(1)
+            .setExpressViewAcceptedSize(650f, 150f)
+            .setAdLoadType(TTAdLoadType.PRELOAD)
+            .build()
+
+        mTTAdNative?.loadBannerExpressAd(
+            adSlot,
+            object : NativeExpressAdListener {
+                override fun onError(code: Int, message: String) {
+                }
+
+                override fun onNativeExpressAdLoad(ads: List<TTNativeExpressAd>) {
+                    if (ads.isNotEmpty()) {
+                        ads.first().showInteractionExpressAd(this@MainActivity)
+                    }
+                }
+            }
+        )
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
         return super.onCreateOptionsMenu(menu)
@@ -404,6 +442,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
     override fun onResume() {
         super.onResume()
         updatePermissionsStatus()
+        showBannerAd()
     }
 
     override fun onDestroy() {

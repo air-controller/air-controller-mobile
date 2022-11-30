@@ -169,4 +169,10 @@ object Constants {
 
     const val URL_GITHUB_STAR = "https://img.shields.io/github/stars/air-controller/air-controller-desktop?style=social"
     const val URL_GITHUB = "https://github.com/air-controller/air-controller-desktop"
+
+    object TTAdConst {
+        const val TT_AD_ID = "5352793"
+        const val TT_AD_FULL_CODE_ID = "950521211"
+        const val TT_AD_HOME_BANNER_CODE_ID = "950522345"
+    }
 }
